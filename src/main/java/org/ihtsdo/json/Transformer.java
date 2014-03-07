@@ -8,7 +8,6 @@ package org.ihtsdo.json;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,9 +17,12 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import org.ihtsdo.json.model.Concept;
 import org.ihtsdo.json.model.ConceptDescriptor;
 import org.ihtsdo.json.model.Description;
@@ -31,6 +33,7 @@ import org.ihtsdo.json.model.LightRefsetMembership;
 import org.ihtsdo.json.model.LightRelationship;
 import org.ihtsdo.json.model.RefsetMembership;
 import org.ihtsdo.json.model.Relationship;
+import org.ihtsdo.json.model.TextIndexDescription;
 
 /**
  *
@@ -40,13 +43,15 @@ public class Transformer {
 
     private String MODIFIER = "Existential restriction";
     private String sep = System.getProperty("line.separator");
-    
+
     private Map<Long, ConceptDescriptor> concepts;
     private Map<Long, List<LightDescription>> descriptions;
     private Map<Long, List<LightRelationship>> relationships;
     private Map<Long, List<LightRefsetMembership>> simpleMembers;
     private Map<Long, List<LightRefsetMembership>> simpleMapMembers;
     private Map<Long, List<LightLangMembership>> languageMembers;
+
+    private String defaultLangCode = "en";
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -56,24 +61,38 @@ public class Transformer {
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
     }
-    
+
     public static void main(String[] args) throws Exception {
         Transformer tr = new Transformer();
+        tr.setDefaultLangCode("es");
+
         tr.loadConceptsFile(new File("/Users/alo/Downloads/Archive 2/sct2_Concept_Snapshot_INT_20140131.txt"));
+        tr.loadConceptsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_Concept_SpanishExtensionSnapshot_INT_20131031.txt"));
+
         tr.loadDescriptionsFile(new File("/Users/alo/Downloads/Archive 2/sct2_Description_Snapshot-en_INT_20140131.txt"));
+        tr.loadDescriptionsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_Description_SpanishExtensionSnapshot-es_INT_20131031.txt"));
+
         tr.loadRelationshipsFile(new File("/Users/alo/Downloads/Archive 2/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+        tr.loadRelationshipsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_StatedRelationship_SpanishExtensionSnapshot_INT_20131031.txt"));
+
         tr.loadRelationshipsFile(new File("/Users/alo/Downloads/Archive 2/sct2_Relationship_Snapshot_INT_20140131.txt"));
+        tr.loadRelationshipsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_Relationship_SpanishExtensionSnapshot_INT_20131031.txt"));
+
         tr.loadSimpleRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+
         tr.loadSimpleMapRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
+
         tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
-        
-        tr.createConceptsJsonFile("concepts.json");
+        tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Refset/Language/der2_cRefset_LanguageSpanishExtensionSnapshot-es_INT_20131031.txt"));
+
+        tr.createConceptsJsonFile("target/concepts.json");
+        tr.createTextIndexFile("target/text-index.json");
 
     }
 
     public void loadConceptsFile(File conceptsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Concepts: " + conceptsFile.getName());
-        BufferedReader br = new BufferedReader(new FileReader(conceptsFile));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(conceptsFile), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -107,7 +126,7 @@ public class Transformer {
 
     public void loadDescriptionsFile(File descriptionsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Descriptions: " + descriptionsFile.getName());
-        BufferedReader br = new BufferedReader(new FileReader(descriptionsFile));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(descriptionsFile), "UTF8"));
         int descriptionsCount = 0;
         try {
             String line = br.readLine();
@@ -130,6 +149,7 @@ public class Transformer {
                 loopDescription.setTerm(columns[7]);
                 loopDescription.setIcs(Long.parseLong(columns[8]));
                 loopDescription.setModule(Long.parseLong(columns[3]));
+                loopDescription.setLang(columns[5]);
                 List<LightDescription> list = descriptions.get(sourceId);
                 if (list == null) {
                     list = new ArrayList<LightDescription>();
@@ -137,7 +157,12 @@ public class Transformer {
                 list.add(loopDescription);
                 descriptions.put(sourceId, list);
 
-                if (act && columns[6].equals("900000000000003001")) {
+                if (act && columns[6].equals("900000000000003001") && columns[5].equals("en")) {
+                    cdesc = concepts.get(sourceId);
+                    if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
+                        cdesc.setDefaultTerm(columns[7]);
+                    }
+                } else if (act && columns[6].equals("900000000000003001") && columns[5].equals(defaultLangCode)) {
                     cdesc = concepts.get(sourceId);
                     if (cdesc != null) {
                         cdesc.setDefaultTerm(columns[7]);
@@ -158,7 +183,7 @@ public class Transformer {
 
     public void loadRelationshipsFile(File relationshipsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Relationships: " + relationshipsFile.getName());
-        BufferedReader br = new BufferedReader(new FileReader(relationshipsFile));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(relationshipsFile), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -200,10 +225,10 @@ public class Transformer {
             br.close();
         }
     }
-    
+
     public void loadSimpleRefsetFile(File simpleRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Simple Refset Members: " + simpleRefsetFile.getName());
-        BufferedReader br = new BufferedReader(new FileReader(simpleRefsetFile));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleRefsetFile), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -245,10 +270,10 @@ public class Transformer {
             br.close();
         }
     }
-    
+
     public void loadSimpleMapRefsetFile(File simpleMapRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting SimpleMap Refset Members: " + simpleMapRefsetFile.getName());
-        BufferedReader br = new BufferedReader(new FileReader(simpleMapRefsetFile));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleMapRefsetFile), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -291,10 +316,10 @@ public class Transformer {
             br.close();
         }
     }
-    
+
     public void loadLanguageRefsetFile(File languageRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Language Refset Members: " + languageRefsetFile.getName());
-        BufferedReader br = new BufferedReader(new FileReader(languageRefsetFile));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(languageRefsetFile), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -334,7 +359,7 @@ public class Transformer {
             br.close();
         }
     }
-    
+
     public void createConceptsJsonFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         System.out.println("Starting creation of " + fileName);
         FileOutputStream fos = new FileOutputStream(fileName);
@@ -342,8 +367,6 @@ public class Transformer {
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
 
-        Concept cpt = new Concept();
-        ConceptDescriptor cptdesc;
         List<LightDescription> listLD = new ArrayList<LightDescription>();
         List<Description> listD = new ArrayList<Description>();
 
@@ -356,8 +379,12 @@ public class Transformer {
         List<LightRefsetMembership> listLRM = new ArrayList<LightRefsetMembership>();
         List<RefsetMembership> listRM = new ArrayList<RefsetMembership>();
 
+        int count = 0;
         for (Long cptId : concepts.keySet()) {
-            cptdesc = concepts.get(cptId);
+            count++;
+            //if (count > 10) break;
+            Concept cpt = new Concept();
+            ConceptDescriptor cptdesc = concepts.get(cptId);
 
             cpt.setConceptId(cptId);
             cpt.setActive(cptdesc.getActive());
@@ -383,6 +410,7 @@ public class Transformer {
                     d.setLength(ldesc.getTerm().length());
                     d.setModule(ldesc.getModule());
                     d.setType(concepts.get(ldesc.getType()));
+                    d.setLang(ldesc.getLang());
 
                     listLLM = languageMembers.get(descId);
                     listLM = new ArrayList<LangMembership>();
@@ -512,6 +540,50 @@ public class Transformer {
             bw.append(gson.toJson(cpt).toString());
             bw.append(sep);
         }
+        bw.close();
+        System.out.println(fileName + " Done");
+    }
+
+    public String getDefaultLangCode() {
+        return defaultLangCode;
+    }
+
+    public void setDefaultLangCode(String defaultLangCode) {
+        this.defaultLangCode = defaultLangCode;
+    }
+
+    public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+        System.out.println("Starting creation of " + fileName);
+        FileOutputStream fos = new FileOutputStream(fileName);
+        OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+        BufferedWriter bw = new BufferedWriter(osw);
+        Gson gson = new Gson();
+        int count = 0;
+        for (long conceptId : descriptions.keySet()) {
+            count++;
+            //if (count > 10) break;
+            for (LightDescription ldesc : descriptions.get(conceptId)) {
+                TextIndexDescription d = new TextIndexDescription();
+                d.setActive(ldesc.getActive());
+                d.setTerm(ldesc.getTerm());
+                d.setLength(ldesc.getTerm().length());
+                d.setTypeId(ldesc.getType());
+                d.setLang(ldesc.getLang());
+                ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
+                d.setConceptActive(concept.getActive());
+                d.setFsn(concept.getDefaultTerm());
+                d.setSemanticTag("");
+                if (d.getFsn().contains("(")) {
+                    d.setSemanticTag(d.getFsn().substring(d.getFsn().indexOf("(") + 1, d.getFsn().length() - 1));
+                }
+                String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
+                String[] tokens = cleanTerm.split("\\s+");
+                d.setWords(Arrays.asList(tokens));
+                bw.append(gson.toJson(d).toString());
+                bw.append(sep);
+            }
+        }
+
         bw.close();
         System.out.println(fileName + " Done");
     }
