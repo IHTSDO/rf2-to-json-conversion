@@ -50,6 +50,7 @@ public class Transformer {
     private Map<Long, List<LightRefsetMembership>> simpleMembers;
     private Map<Long, List<LightRefsetMembership>> simpleMapMembers;
     private Map<Long, List<LightLangMembership>> languageMembers;
+    private Map<String,String> langCodes;
 
     private String defaultLangCode = "en";
 
@@ -60,6 +61,14 @@ public class Transformer {
         simpleMembers = new HashMap<Long, List<LightRefsetMembership>>();
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
+        
+        langCodes = new HashMap<String, String>();
+        langCodes.put("en", "english");
+        langCodes.put("es", "spanish");
+        langCodes.put("da", "danish");
+        langCodes.put("sv", "swedish");
+        langCodes.put("fr", "french");
+        langCodes.put("nl", "dutch");
     }
 
     public static void main(String[] args) throws Exception {
@@ -85,7 +94,7 @@ public class Transformer {
         tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
         tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Refset/Language/der2_cRefset_LanguageSpanishExtensionSnapshot-es_INT_20131031.txt"));
 
-        tr.createConceptsJsonFile("target/concepts.json");
+        //tr.createConceptsJsonFile("target/concepts.json");
         tr.createTextIndexFile("target/text-index.json");
 
     }
@@ -568,7 +577,10 @@ public class Transformer {
                 d.setTerm(ldesc.getTerm());
                 d.setLength(ldesc.getTerm().length());
                 d.setTypeId(ldesc.getType());
-                d.setLang(ldesc.getLang());
+                d.setConceptId(ldesc.getConceptId());
+                d.setDescriptionId(ldesc.getDescriptionId());
+                // using long lang names for Mongo 2.4.x text indexes
+                d.setLang(langCodes.get(ldesc.getLang()));
                 ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
                 d.setConceptActive(concept.getActive());
                 d.setFsn(concept.getDefaultTerm());
