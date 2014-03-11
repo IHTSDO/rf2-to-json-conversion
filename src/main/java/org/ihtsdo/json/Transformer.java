@@ -50,7 +50,7 @@ public class Transformer {
     private Map<Long, List<LightRefsetMembership>> simpleMembers;
     private Map<Long, List<LightRefsetMembership>> simpleMapMembers;
     private Map<Long, List<LightLangMembership>> languageMembers;
-    private Map<String,String> langCodes;
+    private Map<String, String> langCodes;
 
     private String defaultLangCode = "en";
 
@@ -61,7 +61,7 @@ public class Transformer {
         simpleMembers = new HashMap<Long, List<LightRefsetMembership>>();
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
-        
+
         langCodes = new HashMap<String, String>();
         langCodes.put("en", "english");
         langCodes.put("es", "spanish");
@@ -94,7 +94,7 @@ public class Transformer {
         tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
         tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Refset/Language/der2_cRefset_LanguageSpanishExtensionSnapshot-es_INT_20131031.txt"));
 
-        //tr.createConceptsJsonFile("target/concepts.json");
+        tr.createConceptsJsonFile("target/concepts.json");
         tr.createTextIndexFile("target/text-index.json");
 
     }
@@ -455,18 +455,19 @@ public class Transformer {
             listR = new ArrayList<Relationship>();
             if (listLR != null) {
                 for (LightRelationship lrel : listLR) {
-                    Relationship d = new Relationship();
-                    d.setEffectiveTime(lrel.getEffectiveTime());
-                    d.setActive(lrel.getActive());
-                    d.setModule(lrel.getModule());
-                    d.setGroupId(lrel.getGroupId());
-                    d.setModifier(MODIFIER);
-                    d.setSourceId(cptId);
-                    d.setTarget(concepts.get(lrel.getTarget()));
-                    d.setType(concepts.get(lrel.getType()));
-                    d.setCharType(concepts.get(lrel.getCharType()));
-
-                    listR.add(d);
+                    if (lrel.getCharType().equals(900000000000010007L)) {
+                        Relationship d = new Relationship();
+                        d.setEffectiveTime(lrel.getEffectiveTime());
+                        d.setActive(lrel.getActive());
+                        d.setModule(lrel.getModule());
+                        d.setGroupId(lrel.getGroupId());
+                        d.setModifier(MODIFIER);
+                        d.setSourceId(cptId);
+                        d.setTarget(concepts.get(lrel.getTarget()));
+                        d.setType(concepts.get(lrel.getType()));
+                        d.setCharType(concepts.get(lrel.getCharType()));
+                        listR.add(d);
+                    }
                 }
 
                 if (listR.isEmpty()) {
@@ -482,18 +483,19 @@ public class Transformer {
             listR = new ArrayList<Relationship>();
             if (listLR != null) {
                 for (LightRelationship lrel : listLR) {
-                    Relationship d = new Relationship();
-                    d.setEffectiveTime(lrel.getEffectiveTime());
-                    d.setActive(lrel.getActive());
-                    d.setModule(lrel.getModule());
-                    d.setGroupId(lrel.getGroupId());
-                    d.setModifier(MODIFIER);
-                    d.setSourceId(cptId);
-                    d.setTarget(concepts.get(lrel.getTarget()));
-                    d.setType(concepts.get(lrel.getType()));
-                    d.setCharType(concepts.get(lrel.getCharType()));
-
-                    listR.add(d);
+                    if (lrel.getCharType().equals(900000000000011006L)) {
+                        Relationship d = new Relationship();
+                        d.setEffectiveTime(lrel.getEffectiveTime());
+                        d.setActive(lrel.getActive());
+                        d.setModule(lrel.getModule());
+                        d.setGroupId(lrel.getGroupId());
+                        d.setModifier(MODIFIER);
+                        d.setSourceId(cptId);
+                        d.setTarget(concepts.get(lrel.getTarget()));
+                        d.setType(concepts.get(lrel.getType()));
+                        d.setCharType(concepts.get(lrel.getCharType()));
+                        listR.add(d);
+                    }
                 }
 
                 if (listR.isEmpty()) {
