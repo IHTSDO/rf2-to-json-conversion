@@ -53,6 +53,9 @@ public class Transformer {
     private Map<String, String> langCodes;
 
     private String defaultLangCode = "en";
+    public String fsnType = "900000000000003001";
+    public String synType = "900000000000013009";
+    private String defaultTermType = fsnType;
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -73,26 +76,28 @@ public class Transformer {
 
     public static void main(String[] args) throws Exception {
         Transformer tr = new Transformer();
-        tr.setDefaultLangCode("es");
+        tr.setDefaultLangCode("da");
+        tr.setDefaultTermType(tr.synType);
 
-        tr.loadConceptsFile(new File("/Users/alo/Downloads/Archive 2/sct2_Concept_Snapshot_INT_20140131.txt"));
-        tr.loadConceptsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_Concept_SpanishExtensionSnapshot_INT_20131031.txt"));
+        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Concept_Snapshot_INT_20140131.txt"));
+        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadDescriptionsFile(new File("/Users/alo/Downloads/Archive 2/sct2_Description_Snapshot-en_INT_20140131.txt"));
-        tr.loadDescriptionsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_Description_SpanishExtensionSnapshot-es_INT_20131031.txt"));
+        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Description_Snapshot-en_INT_20140131.txt"));
+        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadRelationshipsFile(new File("/Users/alo/Downloads/Archive 2/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
-        tr.loadRelationshipsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_StatedRelationship_SpanishExtensionSnapshot_INT_20131031.txt"));
+        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadRelationshipsFile(new File("/Users/alo/Downloads/Archive 2/sct2_Relationship_Snapshot_INT_20140131.txt"));
-        tr.loadRelationshipsFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Terminology/sct2_Relationship_SpanishExtensionSnapshot_INT_20131031.txt"));
+        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Relationship_Snapshot_INT_20140131.txt"));
+        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadSimpleRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+        tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
 
-        tr.loadSimpleMapRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
+        tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
 
-        tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/Archive 2/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
-        tr.loadLanguageRefsetFile(new File("/Users/alo/Downloads/SnomedCT_es_SpanishExtension_20131031/Snapshot/Refset/Language/der2_cRefset_LanguageSpanishExtensionSnapshot-es_INT_20131031.txt"));
+        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
+        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
+        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
 
         tr.createConceptsJsonFile("target/concepts.json");
         tr.createTextIndexFile("target/text-index.json");
@@ -171,7 +176,7 @@ public class Transformer {
                     if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
                         cdesc.setDefaultTerm(columns[7]);
                     }
-                } else if (act && columns[6].equals("900000000000003001") && columns[5].equals(defaultLangCode)) {
+                } else if (act && columns[6].equals(defaultTermType) && columns[5].equals(defaultLangCode)) {
                     cdesc = concepts.get(sourceId);
                     if (cdesc != null) {
                         cdesc.setDefaultTerm(columns[7]);
@@ -586,6 +591,10 @@ public class Transformer {
                 ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
                 d.setConceptActive(concept.getActive());
                 d.setFsn(concept.getDefaultTerm());
+                if (d.getFsn() == null) {
+                    System.out.println("FSN Issue..." + d.getConceptId());
+                    d.setFsn(d.getTerm());
+                }
                 d.setSemanticTag("");
                 if (d.getFsn().contains("(")) {
                     d.setSemanticTag(d.getFsn().substring(d.getFsn().indexOf("(") + 1, d.getFsn().length() - 1));
@@ -601,5 +610,15 @@ public class Transformer {
         bw.close();
         System.out.println(fileName + " Done");
     }
+
+    public String getDefaultTermType() {
+        return defaultTermType;
+    }
+
+    public void setDefaultTermType(String defaultTermType) {
+        this.defaultTermType = defaultTermType;
+    }
+    
+    
 
 }
