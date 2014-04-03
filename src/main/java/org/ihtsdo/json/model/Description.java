@@ -21,6 +21,7 @@ public class Description extends Component {
     Integer length;
     ConceptDescriptor ics;
     List<LangMembership> langMemberships;
+    List<RefsetMembership> refsetMemberships;
 
     public Description() {
     }
@@ -88,5 +89,13 @@ public class Description extends Component {
     public void setLang(String lang) {
         this.lang = lang;
     }
+
+	public List<RefsetMembership> getRefsetMemberships() {
+		return refsetMemberships;
+	}
+
+	public void setRefsetMemberships(List<RefsetMembership> refsetMemberships) {
+		this.refsetMemberships = refsetMemberships;
+	}
 
 }

@@ -56,12 +56,18 @@ public class Transformer {
     public String fsnType = "900000000000003001";
     public String synType = "900000000000013009";
     private String defaultTermType = fsnType;
+	private HashMap<Long, List<LightDescription>> tdefMembers;
+	private HashMap<Long, List<LightRefsetMembership>> attrMembers;
+	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
         descriptions = new HashMap<Long, List<LightDescription>>();
         relationships = new HashMap<Long, List<LightRelationship>>();
         simpleMembers = new HashMap<Long, List<LightRefsetMembership>>();
+        assocMembers = new HashMap<Long, List<LightRefsetMembership>>();
+        attrMembers = new HashMap<Long, List<LightRefsetMembership>>();
+        tdefMembers = new HashMap<Long, List<LightDescription>>();
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
 
@@ -76,31 +82,52 @@ public class Transformer {
 
     public static void main(String[] args) throws Exception {
         Transformer tr = new Transformer();
-        tr.setDefaultLangCode("da");
-        tr.setDefaultTermType(tr.synType);
+//        tr.setDefaultLangCode("da");
+//        tr.setDefaultTermType(tr.synType);
 
-        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Concept_Snapshot_INT_20140131.txt"));
-        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
+//        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Concept_Snapshot_INT_20140131.txt"));
+//        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Description_Snapshot-en_INT_20140131.txt"));
-        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
+//        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Description_Snapshot-en_INT_20140131.txt"));
+//        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
-        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
+//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Relationship_Snapshot_INT_20140131.txt"));
-        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
+//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Relationship_Snapshot_INT_20140131.txt"));
+//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
 
-        tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+//        tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+//        tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
 
-        tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
+//        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
+//        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
+//        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
 
-        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
-        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
-        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
+//        tr.createConceptsJsonFile("target/concepts.json");
+//        tr.createTextIndexFile("target/text-index.json");
+        
 
-        tr.createConceptsJsonFile("target/concepts.json");
-        tr.createTextIndexFile("target/text-index.json");
+      tr.setDefaultLangCode("en");
+      tr.setDefaultTermType(tr.synType);
+
+      tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
+
+      tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20140131.txt"));
+      tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20140131.txt"));
+
+      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+
+      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
+
+      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
+      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
+      tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
+
+      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
+
+      tr.createConceptsJsonFile("target/concepts.json");
 
     }
 
@@ -195,6 +222,50 @@ public class Transformer {
         }
     }
 
+    public void loadTextDefinitionFile(File textDefinitionFile) throws FileNotFoundException, IOException {
+        System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(textDefinitionFile), "UTF8"));
+        int descriptionsCount = 0;
+        try {
+            String line = br.readLine();
+            line = br.readLine(); // Skip header
+            boolean act;
+            while (line != null) {
+                if (line.isEmpty()) {
+                    continue;
+                }
+                String[] columns = line.split("\\t");
+                LightDescription loopDescription = new LightDescription();
+                loopDescription.setDescriptionId(Long.parseLong(columns[0]));
+                act = columns[2].equals("1");
+                loopDescription.setActive(act);
+                loopDescription.setEffectiveTime(columns[1]);
+                Long sourceId = Long.parseLong(columns[4]);
+                loopDescription.setConceptId(sourceId);
+                loopDescription.setType(Long.parseLong(columns[6]));
+                loopDescription.setTerm(columns[7]);
+                loopDescription.setIcs(Long.parseLong(columns[8]));
+                loopDescription.setModule(Long.parseLong(columns[3]));
+                loopDescription.setLang(columns[5]);
+                List<LightDescription> list = tdefMembers.get(sourceId);
+                if (list == null) {
+                    list = new ArrayList<LightDescription>();
+                }
+                list.add(loopDescription);
+                tdefMembers.put(sourceId, list);
+
+                line = br.readLine();
+                descriptionsCount++;
+                if (descriptionsCount % 100000 == 0) {
+                    System.out.print(".");
+                }
+            }
+            System.out.println(".");
+            System.out.println("Text Definitions loaded = " + tdefMembers.size());
+        } finally {
+            br.close();
+        }
+    }
     public void loadRelationshipsFile(File relationshipsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Relationships: " + relationshipsFile.getName());
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(relationshipsFile), "UTF8"));
@@ -285,6 +356,97 @@ public class Transformer {
         }
     }
 
+    public void loadAssociationsFile(File associationsFile) throws FileNotFoundException, IOException {
+        System.out.println("Starting Association Refset Members: " + associationsFile.getName());
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(associationsFile), "UTF8"));
+        try {
+            String line = br.readLine();
+            line = br.readLine(); // Skip header
+            int count = 0;
+            while (line != null) {
+                if (line.isEmpty()) {
+                    continue;
+                }
+                String[] columns = line.split("\\t");
+                if (columns[2].equals("1")) {
+                    LightRefsetMembership loopMember = new LightRefsetMembership();
+                    loopMember.setType(LightRefsetMembership.RefsetMembershipType.ASSOCIATION.name());
+                    loopMember.setUuid(UUID.fromString(columns[0]));
+
+                    loopMember.setActive(columns[2].equals("1"));
+                    loopMember.setEffectiveTime(columns[1]);
+                    loopMember.setModule(Long.parseLong(columns[3]));
+
+                    Long sourceId = Long.parseLong(columns[5]);
+                    loopMember.setReferencedComponentId(sourceId);
+                    loopMember.setRefset(Long.parseLong(columns[4]));
+                    loopMember.setCidValue(Long.parseLong(columns[6]));
+
+                    List<LightRefsetMembership> list = assocMembers.get(sourceId);
+                    if (list == null) {
+                        list = new ArrayList<LightRefsetMembership>();
+                    }
+                    list.add(loopMember);
+                    assocMembers.put(Long.parseLong(columns[5]), list);
+                    count++;
+                    if (count % 100000 == 0) {
+                        System.out.print(".");
+                    }
+                }
+                line = br.readLine();
+            }
+            System.out.println(".");
+            System.out.println("AssociationMember loaded = " + assocMembers.size());
+        } finally {
+            br.close();
+        }
+    }
+
+    public void loadAttributeFile(File attributeFile) throws FileNotFoundException, IOException {
+        System.out.println("Starting Attribute Refset Members: " + attributeFile.getName());
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(attributeFile), "UTF8"));
+        try {
+            String line = br.readLine();
+            line = br.readLine(); // Skip header
+            int count = 0;
+            while (line != null) {
+                if (line.isEmpty()) {
+                    continue;
+                }
+                String[] columns = line.split("\\t");
+                if (columns[2].equals("1")) {
+                    LightRefsetMembership loopMember = new LightRefsetMembership();
+                    loopMember.setType(LightRefsetMembership.RefsetMembershipType.ATTRIBUTE_VALUE.name());
+                    loopMember.setUuid(UUID.fromString(columns[0]));
+
+                    loopMember.setActive(columns[2].equals("1"));
+                    loopMember.setEffectiveTime(columns[1]);
+                    loopMember.setModule(Long.parseLong(columns[3]));
+
+                    Long sourceId = Long.parseLong(columns[5]);
+                    loopMember.setReferencedComponentId(sourceId);
+                    loopMember.setRefset(Long.parseLong(columns[4]));
+                    loopMember.setCidValue(Long.parseLong(columns[6]));
+
+                    List<LightRefsetMembership> list = attrMembers.get(sourceId);
+                    if (list == null) {
+                        list = new ArrayList<LightRefsetMembership>();
+                    }
+                    list.add(loopMember);
+                    attrMembers.put(Long.parseLong(columns[5]), list);
+                    count++;
+                    if (count % 100000 == 0) {
+                        System.out.print(".");
+                    }
+                }
+                line = br.readLine();
+            }
+            System.out.println(".");
+            System.out.println("AttributeMember loaded = " + attrMembers.size());
+        } finally {
+            br.close();
+        }
+    }
     public void loadSimpleMapRefsetFile(File simpleMapRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting SimpleMap Refset Members: " + simpleMapRefsetFile.getName());
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleMapRefsetFile), "UTF8"));
@@ -393,9 +555,9 @@ public class Transformer {
         List<LightRefsetMembership> listLRM = new ArrayList<LightRefsetMembership>();
         List<RefsetMembership> listRM = new ArrayList<RefsetMembership>();
 
-        int count = 0;
+//        int count = 0;
         for (Long cptId : concepts.keySet()) {
-            count++;
+//            count++;
             //if (count > 10) break;
             Concept cpt = new Concept();
             ConceptDescriptor cptdesc = concepts.get(cptId);
@@ -450,8 +612,82 @@ public class Transformer {
                             d.setLangMemberships(listLM);
                         }
                     }
+
+                    listLRM = attrMembers.get(descId);
+                    listRM = new ArrayList<RefsetMembership>();
+                    if (listLRM != null) {
+                        for (LightRefsetMembership lrm : listLRM) {
+                            RefsetMembership rm = new RefsetMembership();
+                            rm.setEffectiveTime(lrm.getEffectiveTime());
+                            rm.setActive(lrm.getActive());
+                            rm.setModule(lrm.getModule());
+                            rm.setUuid(lrm.getUuid());
+
+                            rm.setReferencedComponentId(descId);
+                            rm.setRefset(concepts.get(lrm.getRefset()));
+                            rm.setType(lrm.getType());
+                            rm.setCidValue(concepts.get(lrm.getCidValue()));
+
+                            listRM.add(rm);
+                        }
+                        if (listRM.isEmpty()){
+                        	d.setRefsetMemberships(null);
+                        }else{
+                        	d.setRefsetMemberships(listRM);
+                        }
+                    }else{
+                    	d.setRefsetMemberships(null);
+                    }
+
                     listD.add(d);
                 }
+            }
+            
+            listLD = tdefMembers.get(cptId);
+            if (listLD != null) {
+                Long descId;
+                for (LightDescription ldesc : listLD) {
+                    Description d = new Description();
+                    d.setActive(ldesc.getActive());
+                    d.setConceptId(ldesc.getConceptId());
+                    descId = ldesc.getDescriptionId();
+                    d.setDescriptionId(descId);
+                    d.setEffectiveTime(ldesc.getEffectiveTime());
+                    d.setIcs(concepts.get(ldesc.getIcs()));
+                    d.setTerm(ldesc.getTerm());
+                    d.setLength(ldesc.getTerm().length());
+                    d.setModule(ldesc.getModule());
+                    d.setType(concepts.get(ldesc.getType()));
+                    d.setLang(ldesc.getLang());
+
+                    listLLM = languageMembers.get(descId);
+                    listLM = new ArrayList<LangMembership>();
+
+                    if (listLLM != null) {
+                        for (LightLangMembership llm : listLLM) {
+                            LangMembership lm = new LangMembership();
+
+                            lm.setActive(llm.getActive());
+                            lm.setDescriptionId(descId);
+                            lm.setEffectiveTime(llm.getEffectiveTime());
+                            lm.setModule(llm.getModule());
+                            lm.setAcceptability(concepts.get(llm.getAcceptability()));
+                            lm.setRefset(concepts.get(llm.getRefset()));
+                            lm.setUuid(llm.getUuid());
+
+                            listLM.add(lm);
+
+                        }
+                        if (listLM.isEmpty()) {
+                            d.setLangMemberships(null);
+                        } else {
+                            d.setLangMemberships(listLM);
+                        }
+                    }
+                    listD.add(d);
+                }
+            }
+            if (listD!=null && !listD.isEmpty()){
                 cpt.setDescriptions(listD);
             } else {
                 cpt.setDescriptions(null);
@@ -547,6 +783,40 @@ public class Transformer {
                     listRM.add(d);
                 }
             }
+            listLRM = assocMembers.get(cptId);
+            if (listLRM != null) {
+                for (LightRefsetMembership lrm : listLRM) {
+                    RefsetMembership d = new RefsetMembership();
+                    d.setEffectiveTime(lrm.getEffectiveTime());
+                    d.setActive(lrm.getActive());
+                    d.setModule(lrm.getModule());
+                    d.setUuid(lrm.getUuid());
+
+                    d.setReferencedComponentId(cptId);
+                    d.setRefset(concepts.get(lrm.getRefset()));
+                    d.setType(lrm.getType());
+                    d.setCidValue(concepts.get(lrm.getCidValue()));
+
+                    listRM.add(d);
+                }
+            }
+            listLRM = attrMembers.get(cptId);
+            if (listLRM != null) {
+                for (LightRefsetMembership lrm : listLRM) {
+                    RefsetMembership d = new RefsetMembership();
+                    d.setEffectiveTime(lrm.getEffectiveTime());
+                    d.setActive(lrm.getActive());
+                    d.setModule(lrm.getModule());
+                    d.setUuid(lrm.getUuid());
+
+                    d.setReferencedComponentId(cptId);
+                    d.setRefset(concepts.get(lrm.getRefset()));
+                    d.setType(lrm.getType());
+                    d.setCidValue(concepts.get(lrm.getCidValue()));
+
+                    listRM.add(d);
+                }
+            }
             if (listRM.isEmpty()) {
                 cpt.setMemberships(null);
             } else {
@@ -574,9 +844,9 @@ public class Transformer {
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
-        int count = 0;
+//        int count = 0;
         for (long conceptId : descriptions.keySet()) {
-            count++;
+//            count++;
             //if (count > 10) break;
             for (LightDescription ldesc : descriptions.get(conceptId)) {
                 TextIndexDescription d = new TextIndexDescription();
