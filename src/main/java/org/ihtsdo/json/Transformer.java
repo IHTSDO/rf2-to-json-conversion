@@ -121,8 +121,8 @@ public class Transformer {
       tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
 
       tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
-      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
-      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
+      tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
+      tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
       tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
 
       tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
@@ -356,7 +356,7 @@ public class Transformer {
         }
     }
 
-    public void loadAssociationsFile(File associationsFile) throws FileNotFoundException, IOException {
+    public void loadAssociationFile(File associationsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Association Refset Members: " + associationsFile.getName());
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(associationsFile), "UTF8"));
         try {
