@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import org.ihtsdo.json.model.Concept;
+import org.ihtsdo.json.model.ConceptAncestor;
 import org.ihtsdo.json.model.ConceptDescriptor;
 import org.ihtsdo.json.model.Description;
 import org.ihtsdo.json.model.LangMembership;
@@ -55,10 +56,14 @@ public class Transformer {
     private String defaultLangCode = "en";
     public String fsnType = "900000000000003001";
     public String synType = "900000000000013009";
+    private Long inferred = 900000000000011006l;
+    private Long stated = 900000000000010007l;
+    private Long isaSCTId=116680003l;
     private String defaultTermType = fsnType;
 	private HashMap<Long, List<LightDescription>> tdefMembers;
 	private HashMap<Long, List<LightRefsetMembership>> attrMembers;
 	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
+	private ArrayList<Long> listA;
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -108,30 +113,41 @@ public class Transformer {
 //        tr.createTextIndexFile("target/text-index.json");
         
 
-      tr.setDefaultLangCode("en");
-      tr.setDefaultTermType(tr.synType);
+//      tr.setDefaultLangCode("en");
+//      tr.setDefaultTermType(tr.synType);
 
-      tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
+//      tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
 
-      tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20140131.txt"));
-      tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20140131.txt"));
+//      tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20140131.txt"));
+//      tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20140131.txt"));
 
-      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+//      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+//
+//      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
 
-      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
-
-      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
-      tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
-      tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
-      tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
-
-      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
-
-      tr.createConceptsJsonFile("target/concepts.json");
-
+//      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+//      tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
+//      tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
+//      tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
+//
+//      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
+//
+//      tr.createConceptsJsonFile("target/concepts.json");
+      tr.createTClosures();
     }
 
-    public void loadConceptsFile(File conceptsFile) throws FileNotFoundException, IOException {
+	public void createTClosures() throws IOException {
+		loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
+		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
+		createTClosure("target/inferred_tc.txt",inferred);
+        relationships = new HashMap<Long, List<LightRelationship>>();
+		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+		createTClosure("target/stated_tc.txt",stated);
+
+
+	}
+
+	public void loadConceptsFile(File conceptsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Concepts: " + conceptsFile.getName());
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(conceptsFile), "UTF8"));
         try {
@@ -838,7 +854,55 @@ public class Transformer {
         this.defaultLangCode = defaultLangCode;
     }
 
-    public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+    private void createTClosure(String fileName,Long charType) throws IOException {
+    	
+    	 System.out.println("Starting creation of " + fileName);
+         FileOutputStream fos = new FileOutputStream(fileName);
+         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+         BufferedWriter bw = new BufferedWriter(osw);
+         Gson gson = new Gson();
+
+
+//         int count = 0;
+         for (Long cptId : concepts.keySet()) {		
+        	 
+        	 listA = new ArrayList<Long>();
+        	 getAncestors(cptId,charType);
+        	 if (!listA.isEmpty()){
+        		 ConceptAncestor ca=new ConceptAncestor();
+        		 
+        		 ca.setConceptId(cptId);
+        		 ca.setAncestor(listA);
+        		 bw.append(gson.toJson(ca).toString());
+        		 bw.append(sep);
+        	 }
+         }
+         bw.close();
+         System.out.println(fileName + " Done");
+	}
+
+    private void getAncestors(Long cptId,Long charType) {
+
+        List<LightRelationship> listLR = new ArrayList<LightRelationship>();
+        
+        listLR = relationships.get(cptId);
+        if (listLR != null) {
+            for (LightRelationship lrel : listLR) {
+                if (lrel.getCharType().equals(charType) &&
+                		lrel.getType()==isaSCTId &&
+                		lrel.getActive()) {
+                    Long tgt=lrel.getTarget();
+                    if (!listA.contains(tgt)){
+	                    listA.add(tgt);
+	                    getAncestors(tgt,charType);
+                    }
+                }
+            }
+        }
+        return ;
+	}
+
+	public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         System.out.println("Starting creation of " + fileName);
         FileOutputStream fos = new FileOutputStream(fileName);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
