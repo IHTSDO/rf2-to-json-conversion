@@ -138,7 +138,7 @@ public class Transformer {
 
 	public void createTClosures() throws IOException {
 		loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
-		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
+		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology//sct2_Relationship_Snapshot_INT_20140131.txt"));
 		createTClosure("target/inferred_tc.txt",inferred);
         relationships = new HashMap<Long, List<LightRelationship>>();
 		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
@@ -889,7 +889,7 @@ public class Transformer {
         if (listLR != null) {
             for (LightRelationship lrel : listLR) {
                 if (lrel.getCharType().equals(charType) &&
-                		lrel.getType()==isaSCTId &&
+                		lrel.getType().equals(isaSCTId) &&
                 		lrel.getActive()) {
                     Long tgt=lrel.getTarget();
                     if (!listA.contains(tgt)){
