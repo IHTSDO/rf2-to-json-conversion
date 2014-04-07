@@ -135,7 +135,27 @@ public class Transformer4F {
 //      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
 //
 //      tr.createConceptsJsonFile("target/concepts.json");
-      tr.createTClosures();
+
+      tr.setDefaultLangCode("en");
+      tr.setDefaultTermType(tr.fsnType);
+
+      tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Terminology/sct2_Concept_Full_INT_20140131.txt"));
+
+      tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Terminology/sct2_Description_Full-en_INT_20140131.txt"));
+      tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Terminology/sct2_TextDefinition_Full-en_INT_20140131.txt"));
+
+      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Terminology/sct2_StatedRelationship_Full_INT_20140131.txt"));
+
+      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Terminology/sct2_Relationship_Full_INT_20140131.txt"));
+
+      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Refset/Content/der2_Refset_SimpleFull_INT_20140131.txt"));
+      tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Refset/Content/der2_cRefset_AssociationReferenceFull_INT_20140131.txt"));
+      tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Refset/Content/der2_cRefset_AttributeValueFull_INT_20140131.txt"));
+      tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Refset/Map/der2_sRefset_SimpleMapFull_INT_20140131.txt"));
+
+      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Full/Refset/Language/der2_cRefset_LanguageFull-en_INT_20140131.txt"));
+
+      tr.createConceptsJsonFile("target/concepts.json");
     }
 
 	public void createTClosures() throws IOException {
