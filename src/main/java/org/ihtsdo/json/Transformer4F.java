@@ -699,6 +699,7 @@ public class Transformer4F {
                     descId = ldesc.getDescriptionId();
                     d.setDescriptionId(descId);
                     d.setEffectiveTime(ldesc.getEffectiveTime());
+                    d.setScTime(ldesc.getScTime());
                     d.setIcs(getCptVersion(concepts.get(ldesc.getIcs()),ldesc.getEffectiveTime()));
                     d.setTerm(ldesc.getTerm());
                     d.setLength(ldesc.getTerm().length());
@@ -716,6 +717,7 @@ public class Transformer4F {
                             lm.setActive(llm.getActive());
                             lm.setDescriptionId(descId);
                             lm.setEffectiveTime(llm.getEffectiveTime());
+                            lm.setScTime(llm.getScTime());
                             lm.setModule(llm.getModule());
                             lm.setAcceptability(getCptVersion(concepts.get(llm.getAcceptability()),llm.getEffectiveTime()));
                             lm.setRefset(getCptVersion(concepts.get(llm.getRefset()),llm.getEffectiveTime()));
@@ -737,6 +739,7 @@ public class Transformer4F {
                         for (LightRefsetMembership lrm : listLRM) {
                             RefsetMembership rm = new RefsetMembership();
                             rm.setEffectiveTime(lrm.getEffectiveTime());
+                            rm.setScTime(lrm.getScTime());
                             rm.setActive(lrm.getActive());
                             rm.setModule(lrm.getModule());
                             rm.setUuid(lrm.getUuid());
@@ -771,6 +774,7 @@ public class Transformer4F {
                     descId = ldesc.getDescriptionId();
                     d.setDescriptionId(descId);
                     d.setEffectiveTime(ldesc.getEffectiveTime());
+                    d.setScTime(ldesc.getScTime());
                     d.setIcs(getCptVersion(concepts.get(ldesc.getIcs()),ldesc.getEffectiveTime()));
                     d.setTerm(ldesc.getTerm());
                     d.setLength(ldesc.getTerm().length());
@@ -788,6 +792,7 @@ public class Transformer4F {
                             lm.setActive(llm.getActive());
                             lm.setDescriptionId(descId);
                             lm.setEffectiveTime(llm.getEffectiveTime());
+                            lm.setScTime(llm.getScTime());
                             lm.setModule(llm.getModule());
                             lm.setAcceptability(getCptVersion(concepts.get(llm.getAcceptability()),llm.getEffectiveTime()));
                             lm.setRefset(getCptVersion(concepts.get(llm.getRefset()),llm.getEffectiveTime()));
@@ -817,6 +822,7 @@ public class Transformer4F {
                     if (lrel.getCharType().equals(900000000000010007L)) {
                         Relationship d = new Relationship();
                         d.setEffectiveTime(lrel.getEffectiveTime());
+                        d.setScTime(lrel.getScTime());
                         d.setActive(lrel.getActive());
                         d.setModule(lrel.getModule());
                         d.setGroupId(lrel.getGroupId());
@@ -845,6 +851,7 @@ public class Transformer4F {
                     if (lrel.getCharType().equals(900000000000011006L)) {
                         Relationship d = new Relationship();
                         d.setEffectiveTime(lrel.getEffectiveTime());
+                        d.setScTime(lrel.getScTime());
                         d.setActive(lrel.getActive());
                         d.setModule(lrel.getModule());
                         d.setGroupId(lrel.getGroupId());
@@ -872,6 +879,7 @@ public class Transformer4F {
                 for (LightRefsetMembership lrm : listLRM) {
                     RefsetMembership d = new RefsetMembership();
                     d.setEffectiveTime(lrm.getEffectiveTime());
+                    d.setScTime(lrm.getScTime());
                     d.setActive(lrm.getActive());
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
@@ -889,6 +897,7 @@ public class Transformer4F {
                 for (LightRefsetMembership lrm : listLRM) {
                     RefsetMembership d = new RefsetMembership();
                     d.setEffectiveTime(lrm.getEffectiveTime());
+                    d.setScTime(lrm.getScTime());
                     d.setActive(lrm.getActive());
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
@@ -906,6 +915,7 @@ public class Transformer4F {
                 for (LightRefsetMembership lrm : listLRM) {
                     RefsetMembership d = new RefsetMembership();
                     d.setEffectiveTime(lrm.getEffectiveTime());
+                    d.setScTime(lrm.getScTime());
                     d.setActive(lrm.getActive());
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
@@ -923,6 +933,7 @@ public class Transformer4F {
                 for (LightRefsetMembership lrm : listLRM) {
                     RefsetMembership d = new RefsetMembership();
                     d.setEffectiveTime(lrm.getEffectiveTime());
+                    d.setScTime(lrm.getScTime());
                     d.setActive(lrm.getActive());
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
