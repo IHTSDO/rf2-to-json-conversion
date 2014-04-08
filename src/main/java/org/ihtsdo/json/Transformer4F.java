@@ -251,7 +251,7 @@ public class Transformer4F {
                 }else{
                 	
                 	for (LightDescription item:list){
-                		if (item.getScTime().equals(MAXEFFTIME)){
+                		if (item.getDescriptionId().equals(loopDescription.getDescriptionId()) && item.getScTime().equals(MAXEFFTIME)){
                 			item.setScTime(columns[1]);
                 		}
                 	}
@@ -320,7 +320,7 @@ public class Transformer4F {
                 }else{
                 	
                 	for (LightDescription item:list){
-                		if (item.getScTime().equals(MAXEFFTIME)){
+                		if (item.getDescriptionId().equals(loopDescription.getDescriptionId()) && item.getScTime().equals(MAXEFFTIME)){
                 			item.setScTime(columns[1]);
                 		}
                 	}
@@ -342,7 +342,7 @@ public class Transformer4F {
     }
     public void loadRelationshipsFile(File relationshipsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Relationships: " + relationshipsFile.getName());
-        File output=sortFile(relationshipsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{0,1});
+        File output=sortFile(relationshipsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,7,6,1});
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
@@ -373,7 +373,10 @@ public class Transformer4F {
                 }else{
                 	
                 	for (LightRelationship item:relList){
-                		if (item.getScTime().equals(MAXEFFTIME)){
+                		if (item.getType().equals(loopRelationship.getType()) &&
+                				item.getTarget().equals(loopRelationship.getTarget()) &&
+                				item.getGroupId().equals(loopRelationship.getGroupId()) &&
+                				item.getScTime().equals(MAXEFFTIME)){
                 			item.setScTime(columns[1]);
                 		}
                 	}
@@ -587,7 +590,8 @@ public class Transformer4F {
                         list = new ArrayList<LightRefsetMembership>();
                     }else{
                     	for (LightRefsetMembership item:list){
-	                		if (item.getScTime().equals(MAXEFFTIME) && item.getRefset().equals(Long.parseLong(columns[4]))){
+	                		if (item.getScTime().equals(MAXEFFTIME) && item.getRefset().equals(Long.parseLong(columns[4]))
+	                				&& item.getOtherValue().equals(Long.parseLong(columns[6]))){
 	                			item.setScTime(columns[1]);
 	                		}
                     	}
