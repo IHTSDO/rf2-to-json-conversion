@@ -36,6 +36,7 @@ import org.ihtsdo.json.model.versioned.LightRelationship;
 import org.ihtsdo.json.model.versioned.RefsetMembership;
 import org.ihtsdo.json.model.versioned.Relationship;
 import org.ihtsdo.json.model.versioned.TextIndexDescription;
+import org.ihtsdo.json.utils.FileSorter;
 
 /**
  *
@@ -66,6 +67,8 @@ public class Transformer4F {
 	private HashMap<Long, List<LightRefsetMembership>> attrMembers;
 	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
 	private ArrayList<Long> listA;
+	File tmpFolder;
+	File tmpOutputFileSortedFolder;
 
     public Transformer4F() {
         concepts = new HashMap<Long, List<ConceptDescriptor>>();
@@ -78,6 +81,8 @@ public class Transformer4F {
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
 
+        tmpFolder=new File("target/tmp");
+        tmpOutputFileSortedFolder=new File("target/SortedFiles");
         langCodes = new HashMap<String, String>();
         langCodes.put("en", "english");
         langCodes.put("es", "spanish");
@@ -147,10 +152,26 @@ public class Transformer4F {
 
 
 	}
+	public File sortFile(File inputFile, File tempSortFolder,File outputFolder, int[] sortColumns){
 
+		if (!outputFolder.exists()){
+			outputFolder.mkdirs();
+		}
+		if (!tempSortFolder.exists()){
+			tempSortFolder.mkdirs();
+		}
+		File outputFile=new File(outputFolder,"tmp_" + inputFile.getName());
+        FileSorter fs=new FileSorter(inputFile, outputFile, tempSortFolder, sortColumns);
+        fs.execute();
+        fs=null;
+        System.gc();
+        return outputFile;
+	}
 	public void loadConceptsFile(File conceptsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Concepts: " + conceptsFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(conceptsFile), "UTF8"));
+        
+        File output=sortFile(conceptsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{0,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
         	List<ConceptDescriptor>conceptVer=new ArrayList<ConceptDescriptor>();
             String line = br.readLine();
@@ -198,7 +219,8 @@ public class Transformer4F {
 
     public void loadDescriptionsFile(File descriptionsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Descriptions: " + descriptionsFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(descriptionsFile), "UTF8"));
+        File output=sortFile(descriptionsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{0,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         int descriptionsCount = 0;
         try {
             String line = br.readLine();
@@ -267,7 +289,8 @@ public class Transformer4F {
 
     public void loadTextDefinitionFile(File textDefinitionFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(textDefinitionFile), "UTF8"));
+        File output=sortFile(textDefinitionFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{0,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         int descriptionsCount = 0;
         try {
             String line = br.readLine();
@@ -319,7 +342,8 @@ public class Transformer4F {
     }
     public void loadRelationshipsFile(File relationshipsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Relationships: " + relationshipsFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(relationshipsFile), "UTF8"));
+        File output=sortFile(relationshipsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{0,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -371,7 +395,8 @@ public class Transformer4F {
 
     public void loadSimpleRefsetFile(File simpleRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Simple Refset Members: " + simpleRefsetFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleRefsetFile), "UTF8"));
+        File output=sortFile(simpleRefsetFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -424,7 +449,8 @@ public class Transformer4F {
 
     public void loadAssociationFile(File associationsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Association Refset Members: " + associationsFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(associationsFile), "UTF8"));
+        File output=sortFile(associationsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -477,7 +503,8 @@ public class Transformer4F {
 
     public void loadAttributeFile(File attributeFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Attribute Refset Members: " + attributeFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(attributeFile), "UTF8"));
+        File output=sortFile(attributeFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -529,7 +556,8 @@ public class Transformer4F {
     }
     public void loadSimpleMapRefsetFile(File simpleMapRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting SimpleMap Refset Members: " + simpleMapRefsetFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleMapRefsetFile), "UTF8"));
+        File output=sortFile(simpleMapRefsetFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{5,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
@@ -582,7 +610,8 @@ public class Transformer4F {
 
     public void loadLanguageRefsetFile(File languageRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Language Refset Members: " + languageRefsetFile.getName());
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(languageRefsetFile), "UTF8"));
+        File output=sortFile(languageRefsetFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{5,1});
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
             line = br.readLine(); // Skip header
