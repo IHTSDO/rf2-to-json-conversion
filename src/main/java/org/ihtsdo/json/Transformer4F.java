@@ -591,7 +591,7 @@ public class Transformer4F {
                     }else{
                     	for (LightRefsetMembership item:list){
 	                		if (item.getScTime().equals(MAXEFFTIME) && item.getRefset().equals(Long.parseLong(columns[4]))
-	                				&& item.getOtherValue().equals(Long.parseLong(columns[6]))){
+	                				&& item.getOtherValue().equals(columns[6])){
 	                			item.setScTime(columns[1]);
 	                		}
                     	}
