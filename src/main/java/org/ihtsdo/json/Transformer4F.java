@@ -395,7 +395,7 @@ public class Transformer4F {
 
     public void loadSimpleRefsetFile(File simpleRefsetFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Simple Refset Members: " + simpleRefsetFile.getName());
-        File output=sortFile(simpleRefsetFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,1});
+        File output=sortFile(simpleRefsetFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{5,1});
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
@@ -449,7 +449,7 @@ public class Transformer4F {
 
     public void loadAssociationFile(File associationsFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Association Refset Members: " + associationsFile.getName());
-        File output=sortFile(associationsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,1});
+        File output=sortFile(associationsFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{5,1});
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
@@ -503,7 +503,7 @@ public class Transformer4F {
 
     public void loadAttributeFile(File attributeFile) throws FileNotFoundException, IOException {
         System.out.println("Starting Attribute Refset Members: " + attributeFile.getName());
-        File output=sortFile(attributeFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{4,5,1});
+        File output=sortFile(attributeFile, tmpFolder, tmpOutputFileSortedFolder, new int[]{5,1});
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(output), "UTF8"));
         try {
             String line = br.readLine();
