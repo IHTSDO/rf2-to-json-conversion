@@ -64,6 +64,7 @@ public class Transformer {
 	private HashMap<Long, List<LightRefsetMembership>> attrMembers;
 	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
 	private ArrayList<Long> listA;
+	private Map<String, String> charConv;
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -87,30 +88,35 @@ public class Transformer {
 
     public static void main(String[] args) throws Exception {
         Transformer tr = new Transformer();
-//        tr.setDefaultLangCode("da");
-//        tr.setDefaultTermType(tr.synType);
+        tr.setDefaultLangCode("da");
+        tr.setDefaultTermType(tr.synType);
 
-//        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Concept_Snapshot_INT_20140131.txt"));
-//        tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
+        tr.loadConceptsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20130731.txt"));
+        tr.loadConceptsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
 
-//        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Description_Snapshot-en_INT_20140131.txt"));
-//        tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
+        tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20130731.txt"));
+        tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
+        
+        tr.loadTextDefinitionFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/Terminology/sct2_TextDefinition_Snapshot-en_INT_20130731.txt"));
+   
+        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20130731.txt"));
+        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
 
-//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
-//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
+        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20130731.txt"));
+        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
 
-//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/sct2_Relationship_Snapshot_INT_20140131.txt"));
-//        tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
+        tr.loadSimpleRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20130731.txt"));
+        tr.loadSimpleMapRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20130731.txt"));
 
-//        tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
-//        tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
-
-//        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/destination/Snapshot/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
-//        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
-//        tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/tmp/content-processing-1.17-release-files/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
-
-//        tr.createConceptsJsonFile("target/concepts.json");
-//        tr.createTextIndexFile("target/text-index.json");
+        tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/der2_cRefset_LanguageSnapshot-en_INT_20130731.txt"));
+        tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
+        tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
+        
+        tr.loadAssociationFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20130731.txt"));
+        tr.loadAttributeFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20130731.txt"));
+      
+        tr.createConceptsJsonFile("target/concepts.json");
+        tr.createTextIndexFile("target/text-index.json");
         
 
 //      tr.setDefaultLangCode("en");
@@ -133,7 +139,7 @@ public class Transformer {
 //      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
 //
 //      tr.createConceptsJsonFile("target/concepts.json");
-      tr.createTClosures();
+//      tr.createTClosures();
     }
 
 	public void createTClosures() throws IOException {
@@ -903,6 +909,7 @@ public class Transformer {
 	}
 
 	public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+		getCharConvTable();
         System.out.println("Starting creation of " + fileName);
         FileOutputStream fos = new FileOutputStream(fileName);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
@@ -930,11 +937,12 @@ public class Transformer {
                     d.setFsn(d.getTerm());
                 }
                 d.setSemanticTag("");
-                if (d.getFsn().contains("(")) {
-                    d.setSemanticTag(d.getFsn().substring(d.getFsn().indexOf("(") + 1, d.getFsn().length() - 1));
+                if (d.getFsn().endsWith(")")) {
+                    d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
                 }
                 String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
-                String[] tokens = cleanTerm.split("\\s+");
+                String convertedTerm=convertTerm(cleanTerm);
+                String[] tokens = convertedTerm.toLowerCase().split("\\s+");
                 d.setWords(Arrays.asList(tokens));
                 bw.append(gson.toJson(d).toString());
                 bw.append(sep);
@@ -945,7 +953,34 @@ public class Transformer {
         System.out.println(fileName + " Done");
     }
 
-    public String getDefaultTermType() {
+    private String convertTerm(String cleanTerm) {
+    	for (String code:charConv.keySet()){
+    		String test="\\u" + code;
+    		String repl=charConv.get(code);
+    		cleanTerm=cleanTerm.replaceAll(test, repl);
+    	}
+    	return cleanTerm;
+	}
+
+	private void getCharConvTable() throws IOException {
+
+        String charconvtable="src/main/resources/org/ihtsdo/util/char_conversion_table.txt";
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(charconvtable), "UTF8"));	
+		br.readLine();
+		String line=null;
+		charConv=new HashMap<String,String>();
+		while ((line=br.readLine())!=null){
+			String[] spl=line.split("\t",-1);
+			String[]codes=spl[2].split(" ");
+			for (String code:codes){
+				
+				charConv.put(code,spl[0]);
+			}
+			
+		}
+	}
+
+	public String getDefaultTermType() {
         return defaultTermType;
     }
 
