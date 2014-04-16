@@ -65,6 +65,7 @@ public class Transformer {
 	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
 	private ArrayList<Long> listA;
 	private Map<String, String> charConv;
+	private Map<Long, String> cptFSN;
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -76,7 +77,8 @@ public class Transformer {
         tdefMembers = new HashMap<Long, List<LightDescription>>();
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
-
+        cptFSN = new HashMap<Long, String>();
+        
         langCodes = new HashMap<String, String>();
         langCodes.put("en", "english");
         langCodes.put("es", "spanish");
@@ -87,60 +89,125 @@ public class Transformer {
     }
 
     public static void main(String[] args) throws Exception {
-        Transformer tr = new Transformer();
-        tr.setDefaultLangCode("da");
-        tr.setDefaultTermType(tr.synType);
-
-        tr.loadConceptsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20130731.txt"));
-        tr.loadConceptsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
-
-        tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20130731.txt"));
-        tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
+    	Transformer tr = new Transformer();
         
-        tr.loadTextDefinitionFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/Terminology/sct2_TextDefinition_Snapshot-en_INT_20130731.txt"));
-   
-        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20130731.txt"));
-        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
-
-        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20130731.txt"));
-        tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
-
-        tr.loadSimpleRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20130731.txt"));
-        tr.loadSimpleMapRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20130731.txt"));
-
-        tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/der2_cRefset_LanguageSnapshot-en_INT_20130731.txt"));
-        tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
-        tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
         
-        tr.loadAssociationFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20130731.txt"));
-        tr.loadAttributeFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20130731.txt"));
-      
-        tr.createConceptsJsonFile("target/concepts.json");
-        tr.createTextIndexFile("target/text-index.json");
-        
-
-//      tr.setDefaultLangCode("en");
-//      tr.setDefaultTermType(tr.synType);
-
+//      tr.setDefaultLangCode("es");
+//      tr.setDefaultTermType(tr.fsnType);
+//
 //      tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
-
+//      tr.loadConceptsFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Terminology/sct2_Concept_SpanishExtensionSnapshot_INT_20140430.txt"));
+//
 //      tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20140131.txt"));
-//      tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20140131.txt"));
-
+//      tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Terminology/sct2_Description_SpanishExtensionSnapshot-es_INT_20140430.txt"));
+//    
+//      tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20140131.txt"));        
+//      tr.loadTextDefinitionFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Terminology/sct2_TextDefinition_SpanishExtensionSnapshot-es_INT_20140430.txt"));
+// 
 //      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+//      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Terminology/sct2_StatedRelationship_SpanishExtensionSnapshot_INT_20140430.txt"));
 //
 //      tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
-
+//      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Terminology/sct2_Relationship_SpanishExtensionSnapshot_INT_20140430.txt"));
+//
 //      tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
-//      tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
-//      tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
 //      tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
 //
 //      tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
-//
+//      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Refset/Language/der2_cRefset_LanguageSpanishExtensionSnapshot-es_INT_20140430.txt"));
+//      
+//      tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
+//      
+//      tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
+//      tr.loadAttributeFile(new File("/Users/termmed/Downloads/SnomedCT_es_SpanishExtension_20140430/Snapshot/Refset/Content/der2_cRefset_AttributeValueSpanishExtensionSnapshot_INT_20140430.txt"));
+//    
 //      tr.createConceptsJsonFile("target/concepts.json");
-//      tr.createTClosures();
-    }
+//      tr.createTextIndexFile("target/text-index.json");
+      
+//              tr.setDefaultLangCode("sv");
+//      tr.setDefaultTermType(tr.fsnType);
+//
+//      tr.loadConceptsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20130731.txt"));
+//      tr.loadConceptsFile(new File("/Users/termmed/Downloads/3/SnomedCT_Release_SE1000052_20131130/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_SE1000052_20131130.txt"));
+//
+//      tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20130731.txt"));
+//      tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/3/SnomedCT_Release_SE1000052_20131130/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_SE1000052_20131130.txt"));
+//      
+//      tr.loadTextDefinitionFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20130731.txt"));
+// 
+//      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20130731.txt"));
+//      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/3/SnomedCT_Release_SE1000052_20131130/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_SE1000052_20131130.txt"));
+//
+//      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20130731.txt"));
+//      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/3/SnomedCT_Release_SE1000052_20131130/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_SE1000052_20131130.txt"));
+//
+//      tr.loadSimpleRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20130731.txt"));
+//      tr.loadSimpleMapRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20130731.txt"));
+//
+//      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20130731.txt"));
+//      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/3/SnomedCT_Release_SE1000052_20131130/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-sv_SE1000052_20131130.txt"));
+//      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/3/SnomedCT_Release_SE1000052_20131130/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_SE1000052_20131130.txt"));
+//      
+//      tr.loadAssociationFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20130731.txt"));
+//      tr.loadAttributeFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20130731.txt"));
+//    
+//      tr.createConceptsJsonFile("target/concepts.json");
+//      tr.createTextIndexFile("target/text-index.json");
+      
+      tr.setDefaultLangCode("da");
+      tr.setDefaultTermType(tr.fsnType);
+
+      tr.loadConceptsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20130731.txt"));
+      tr.loadConceptsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_DK1000005_20131018.txt"));
+
+      tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20130731.txt"));
+      tr.loadDescriptionsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot_DK1000005_20131018.txt"));
+      
+      tr.loadTextDefinitionFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20130731.txt"));
+ 
+      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20130731.txt"));
+      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_DK1000005_20131018.txt"));
+
+      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20130731.txt"));
+      tr.loadRelationshipsFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_DK1000005_20131018.txt"));
+
+      tr.loadSimpleRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20130731.txt"));
+      tr.loadSimpleMapRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20130731.txt"));
+
+      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20130731.txt"));
+      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-da_DK1000005_20131018.txt"));
+      tr.loadLanguageRefsetFile(new File("/Users/termmed/Downloads/1-1/SnomedCT_Release_DK1000005_20131018/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_DK1000005_20131018.txt"));
+      
+      tr.loadAssociationFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20130731.txt"));
+      tr.loadAttributeFile(new File("/Users/termmed/Downloads/SnomedCT_Release_INT_20130731/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20130731.txt"));
+    
+//      tr.createConceptsJsonFile("target/concepts.json");
+      tr.createTextIndexFile("target/text-index.json");
+      
+
+//    tr.setDefaultLangCode("en");
+//    tr.setDefaultTermType(tr.fsnType);
+//
+//    tr.loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
+//
+//    tr.loadDescriptionsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en_INT_20140131.txt"));
+//    tr.loadTextDefinitionFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_TextDefinition_Snapshot-en_INT_20140131.txt"));
+//
+//    tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
+//
+//    tr.loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_INT_20140131.txt"));
+//
+//    tr.loadSimpleRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_Refset_SimpleSnapshot_INT_20140131.txt"));
+//    tr.loadAssociationFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_INT_20140131.txt"));
+//    tr.loadAttributeFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Content/der2_cRefset_AttributeValueSnapshot_INT_20140131.txt"));
+//    tr.loadSimpleMapRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Map/der2_sRefset_SimpleMapSnapshot_INT_20140131.txt"));
+//
+//    tr.loadLanguageRefsetFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en_INT_20140131.txt"));
+//
+//    tr.createConceptsJsonFile("target/concepts.json");
+//      tr.createTextIndexFile("target/text-index.json");
+//    tr.createTClosures();
+      }
 
 	public void createTClosures() throws IOException {
 		loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
@@ -225,11 +292,19 @@ public class Transformer {
                     if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
                         cdesc.setDefaultTerm(columns[7]);
                     }
+                    if (getDefaultTermType()!=fsnType){
+                    	if (!cptFSN.containsKey(sourceId)){
+                    		cptFSN.put(sourceId,columns[7]);
+                    	}
+                    }
                 } else if (act && columns[6].equals(defaultTermType) && columns[5].equals(defaultLangCode)) {
                     cdesc = concepts.get(sourceId);
                     if (cdesc != null) {
                         cdesc.setDefaultTerm(columns[7]);
                     }
+                }
+                if (getDefaultTermType()!=fsnType && act && columns[6].equals("900000000000003001") && columns[5].equals(defaultLangCode)){
+                	cptFSN.put(sourceId,columns[7]);
                 }
                 line = br.readLine();
                 descriptionsCount++;
@@ -931,7 +1006,14 @@ public class Transformer {
                 d.setLang(langCodes.get(ldesc.getLang()));
                 ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
                 d.setConceptActive(concept.getActive());
-                d.setFsn(concept.getDefaultTerm());
+                if (getDefaultTermType()!=fsnType){
+                	String fsn= cptFSN.get(ldesc.getConceptId());
+                	if (fsn!=null){
+                		d.setFsn(fsn);
+                	}
+                }else{
+                	d.setFsn(concept.getDefaultTerm());
+                }
                 if (d.getFsn() == null) {
                     System.out.println("FSN Issue..." + d.getConceptId());
                     d.setFsn(d.getTerm());
@@ -978,6 +1060,8 @@ public class Transformer {
 			}
 			
 		}
+		br.close();
+		System.gc();
 	}
 
 	public String getDefaultTermType() {
