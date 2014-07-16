@@ -148,6 +148,7 @@ public class Transformer {
 				}else{}
 			}
 		}
+		completeDefaultTerm();
 
 	}
 
@@ -204,7 +205,6 @@ public class Transformer {
 			String line = br.readLine();
 			line = br.readLine(); // Skip header
 			boolean act;
-			ConceptDescriptor cdesc;
 			while (line != null) {
 				if (line.isEmpty()) {
 					continue;
@@ -229,25 +229,6 @@ public class Transformer {
 				list.add(loopDescription);
 				descriptions.put(sourceId, list);
 
-				if (act && columns[6].equals("900000000000003001") && columns[5].equals("en")) {
-					cdesc = concepts.get(sourceId);
-					if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
-						cdesc.setDefaultTerm(columns[7]);
-					}
-					if (getDefaultTermType()!=fsnType){
-						if (!cptFSN.containsKey(sourceId)){
-							cptFSN.put(sourceId,columns[7]);
-						}
-					}
-				} else if (act && columns[6].equals(defaultTermType) && columns[5].equals(defaultLangCode)) {
-					cdesc = concepts.get(sourceId);
-					if (cdesc != null) {
-						cdesc.setDefaultTerm(columns[7]);
-					}
-				}
-				if (getDefaultTermType()!=fsnType && act && columns[6].equals("900000000000003001") && columns[5].equals(defaultLangCode)){
-					cptFSN.put(sourceId,columns[7]);
-				}
 				line = br.readLine();
 				descriptionsCount++;
 				if (descriptionsCount % 100000 == 0) {
@@ -261,6 +242,43 @@ public class Transformer {
 		}
 	}
 
+	public void completeDefaultTerm(){
+		boolean act;
+		String type;
+		String lang;
+		ConceptDescriptor cdesc;
+		for (Long sourceId:concepts.keySet()){
+			List<LightDescription> lDescriptions = descriptions.get(sourceId);
+			if (lDescriptions!=null){
+				for (LightDescription desc:lDescriptions){
+					
+					act=desc.getActive();
+					type=String.valueOf(desc.getType());
+					lang=desc.getLang();
+					if (act && type.equals("900000000000003001") && lang.equals("en")) {
+						cdesc = concepts.get(sourceId);
+						if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
+							cdesc.setDefaultTerm(desc.getTerm());
+						}
+						
+						if (getDefaultTermType()!=fsnType){
+							if (!cptFSN.containsKey(sourceId)){
+								cptFSN.put(sourceId,desc.getTerm());
+							}
+						}
+					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
+						cdesc = concepts.get(sourceId);
+						if (cdesc != null) {
+							cdesc.setDefaultTerm(desc.getTerm());
+						}
+					}
+					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
+						cptFSN.put(sourceId,desc.getTerm());
+					}
+				}
+			}
+		}
+	}
 	public void loadTextDefinitionFile(File textDefinitionFile) throws FileNotFoundException, IOException {
 		System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(textDefinitionFile), "UTF8"));
