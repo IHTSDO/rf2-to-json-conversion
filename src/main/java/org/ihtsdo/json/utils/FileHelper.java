@@ -119,6 +119,12 @@ public class FileHelper {
 				headerRule = xmlConfig.getString("files.file(" + i + ").headerRule.regex");
 				namePattern = namePatterns.get(i);
 				if( header.matches(headerRule)){
+					if ((inputFile.getName().toLowerCase().contains("textdefinition") 
+							&& namePattern.equals("rf2-descriptions")) 
+							|| (inputFile.getName().toLowerCase().contains("description") 
+									&& namePattern.equals("rf2-textDefinition"))){
+						continue;
+					}
 					toCheck = true;
 					break;
 				}

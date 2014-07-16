@@ -122,6 +122,21 @@
 			</contentRule>
 		</file>
 		<file>
+			<fileType>rf2-association-2</fileType>
+			<namePattern>
+				<regex>.*Association.*</regex>
+			</namePattern>
+			<nameRule>
+				<regex>.*Association.*</regex>
+			</nameRule>
+			<headerRule>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\ttargetComponentId$</regex>
+			</headerRule>
+			<contentRule>
+				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
+			</contentRule>
+		</file>
+		<file>
 			<fileType>rf2-refinability</fileType>
 			<namePattern>
 				<regex>.*Refinability.*</regex>
@@ -136,7 +151,8 @@
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
 			</contentRule>
 		</file>
-		<file>
+		<!-- Commented to avoid match with relationships
+			<file>
 			<fileType>rf2-qualifier</fileType>
 			<namePattern>
 				<regex>.*Qualifier.*</regex>
@@ -150,7 +166,7 @@
 			<contentRule>
 				<regex>\d{3\,}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,3}\\t\d{3\,}\\t((\-1)|(\d{1\,}))\\t\d{3\,}$</regex>
 			</contentRule>
-		</file>
+		</file> -->
 		<file>
 			<fileType>rf2-componenthistory</fileType>
 			<namePattern>
