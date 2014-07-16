@@ -1,15 +1,24 @@
 package org.ihtsdo.json.utils;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 
 public class FileHelper {
@@ -36,6 +45,104 @@ public class FileHelper {
 		}else{
 			return cnt;
 		}
+	}
+
+	public void findSimpleRefsetFiles(File releaseFolder,String stringKey,String nocontains, HashSet< String> hashSimpleRefsetList) {
+		String name="";
+		if (hashSimpleRefsetList==null){
+			hashSimpleRefsetList=new HashSet<String>();
+			
+		}
+		for (File file:releaseFolder.listFiles()){
+			if (file.isDirectory()){
+				findSimpleRefsetFiles(file, stringKey,nocontains,hashSimpleRefsetList);
+			}else{
+				name=file.getName().toLowerCase().trim().replaceAll("-","_");
+				if (name.endsWith(".txt") 
+						&& name.contains(stringKey)){ 
+						
+						if (nocontains!=null && !name.contains(nocontains)  ){
+							hashSimpleRefsetList.add(file.getAbsolutePath());
+						}
+				}
+			}
+		}
+
+	}
+
+
+	public void findAllFiles(File releaseFolder, HashSet< String> hashSimpleRefsetList) {
+		String name="";
+		if (hashSimpleRefsetList==null){
+			hashSimpleRefsetList=new HashSet<String>();
+			
+		}
+		for (File file:releaseFolder.listFiles()){
+			if (file.isDirectory()){
+				findAllFiles(file, hashSimpleRefsetList);
+			}else{
+				name=file.getName();
+				if (name.endsWith(".txt")){ 
+					hashSimpleRefsetList.add(file.getAbsolutePath());
+				}
+			}
+		}
+
+	}
+	
+	public static String getFileTypeByHeader(File inputFile, File validationConfig) {
+		String namePattern =null;
+		try {
+			Thread currThread = Thread.currentThread();
+			if (currThread.isInterrupted()) {
+				return null;
+			}
+			XMLConfiguration xmlConfig = new XMLConfiguration(validationConfig);
+
+			List<String> namePatterns = new ArrayList<String>();
+
+			Object prop = xmlConfig.getProperty("files.file.fileType");
+			if (prop instanceof Collection) {
+				namePatterns.addAll((Collection) prop);
+			}
+			System.out.println("");
+			boolean toCheck = false;
+			String headerRule = null;
+			FileInputStream fis = new FileInputStream(inputFile);
+			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			BufferedReader br = new BufferedReader(isr);
+			String header = br.readLine();
+			for (int i = 0; i < namePatterns.size(); i++) {
+				if (currThread.isInterrupted()) {
+					return null;
+				}
+				headerRule = xmlConfig.getString("files.file(" + i + ").headerRule.regex");
+				namePattern = namePatterns.get(i);
+				if( header.matches(headerRule)){
+					toCheck = true;
+					break;
+				}
+			}
+			if (toCheck) {
+
+				
+				 System.out.println( "File: " + inputFile.getAbsolutePath() +  " ** match file pattern: " + namePattern);
+				
+			} else {
+				
+				System.out.println( "Cannot found header matcher for : " + inputFile.getName());
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			System.out.println(  "FileAnalizer: " +    e.getMessage());
+		} catch (UnsupportedEncodingException e) {
+			System.out.println(  "FileAnalizer: " +    e.getMessage());
+		} catch (IOException e) {
+			System.out.println(  "FileAnalizer: " +    e.getMessage());
+		} catch (ConfigurationException e) {
+			System.out.println(  "FileAnalizer: " +    e.getMessage());
+		}
+		return namePattern;
 	}
 
 	public static void emptyFolder(File folder){
