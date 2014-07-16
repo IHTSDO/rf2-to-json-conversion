@@ -167,7 +167,7 @@
 				<regex>\d{3\,}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,3}\\t\d{3\,}\\t((\-1)|(\d{1\,}))\\t\d{3\,}$</regex>
 			</contentRule>
 		</file> -->
-		<file>
+		<!-- <file>
 			<fileType>rf2-componenthistory</fileType>
 			<namePattern>
 				<regex>.*ComponentHistory.*</regex>
@@ -181,8 +181,8 @@
 			<contentRule>
 				<regex>\d{3\,}\\t\d{3\,}\\t\d{1}\\t\d{1}\\t.*$</regex>
 			</contentRule>
-		</file>
-		<file>
+		</file> -->
+		<!-- <file>
 			<fileType>rf2-historicalrelationshipidentifiers</fileType>
 			<namePattern>
 				<regex>.*HistoricalRelationshipIdentifiers.*</regex>
@@ -196,8 +196,8 @@
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{3\,}$</regex>
 			</contentRule>
-		</file>
-		<file>
+		</file> -->
+		<!-- <file>
 			<fileType>rf2-retiredisarelationship</fileType>
 			<namePattern>
 				<regex>.*RetiredIsaRelationship.*</regex>
@@ -211,8 +211,8 @@
 			<contentRule>
 				<regex>\d{3\,}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,3}\\t\d{3\,}\\t((\-1)|(\d{1\,}))\\t\d{3\,}$</regex>
 			</contentRule>
-		</file>
-		<file>
+		</file> -->
+		<!-- <file>
 			<fileType>rf2-retiredstatedisarelationship</fileType>
 			<namePattern>
 				<regex>.*RetiredStatedIsaRelationship.*</regex>
@@ -226,7 +226,7 @@
 			<contentRule>
 				<regex>\d{3\,}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,3}\\t\d{3\,}\\t((\-1)|(\d{1\,}))\\t\d{3\,}$</regex>
 			</contentRule>
-		</file>
+		</file> -->
 		<file>
 			<fileType>rf2-subsets</fileType>
 			<namePattern>
