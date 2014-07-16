@@ -130,6 +130,8 @@ public class Transformer {
 					loadTextDefinitionFile(new File(file));
 				}else if(pattern.equals("rf2-association")){
 					loadAssociationFile(new File(file));
+				}else if(pattern.equals("rf2-association-2")){
+					loadAssociationFile(new File(file));
 				}else if(pattern.equals("rf2-attributevalue")){
 					loadAttributeFile(new File(file));
 				}else if(pattern.equals("rf2-language")){
