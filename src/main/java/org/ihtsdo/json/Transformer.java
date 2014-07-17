@@ -111,10 +111,25 @@ public class Transformer {
 
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/text-index.json");
-
+		tr.freeStep1();
 		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
 		
 		
+	}
+
+	public void freeStep1() {
+		descriptions =  null;
+		simpleMembers =  null;
+		assocMembers =  null;
+		attrMembers = null;
+		tdefMembers =  null;
+		simpleMapMembers =  null;
+		languageMembers =  null;
+		notLeafInferred= null;
+		notLeafStated= null;
+		cptFSN =  null;
+		langCodes = null;
+		System.gc();
 	}
 
 	private void getFilesFromFolders(HashSet<String> folders, String validationConfig) throws IOException, Exception {
