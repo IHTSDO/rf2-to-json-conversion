@@ -69,6 +69,8 @@ public class Transformer {
 	private ArrayList<Long> listA;
 	private Map<String, String> charConv;
 	private Map<Long, String> cptFSN;
+	private HashSet<Long> notLeafInferred;
+	private HashSet<Long> notLeafStated;
 
 	public Transformer() {
 		concepts = new HashMap<Long, ConceptDescriptor>();
@@ -80,6 +82,8 @@ public class Transformer {
 		tdefMembers = new HashMap<Long, List<LightDescription>>();
 		simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
 		languageMembers = new HashMap<Long, List<LightLangMembership>>();
+		notLeafInferred=new HashSet<Long>();
+		notLeafStated=new HashSet<Long>();
 		cptFSN = new HashMap<Long, String>();
 
 		langCodes = new HashMap<String, String>();
@@ -108,7 +112,9 @@ public class Transformer {
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/text-index.json");
 
-		//    tr.createTClosures();
+		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
+		
+		
 	}
 
 	private void getFilesFromFolders(HashSet<String> folders, String validationConfig) throws IOException, Exception {
@@ -123,8 +129,6 @@ public class Transformer {
 				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
 
 				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file));
-				}else if(pattern.equals("rf2-statedrelationship")){
 					loadRelationshipsFile(new File(file));
 				}else if(pattern.equals("rf2-textDefinition")){
 					loadTextDefinitionFile(new File(file));
@@ -154,14 +158,36 @@ public class Transformer {
 
 	}
 
-	public void createTClosures() throws IOException {
-		loadConceptsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_INT_20140131.txt"));
-		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology//sct2_Relationship_Snapshot_INT_20140131.txt"));
-		createTClosure("target/inferred_tc.txt",inferred);
-		relationships = new HashMap<Long, List<LightRelationship>>();
-		loadRelationshipsFile(new File("/Volumes/Macintosh HD2/SnomedCT_Release_INT_20140131/RF2Release/Snapshot/Terminology/sct2_StatedRelationship_Snapshot_INT_20140131.txt"));
-		createTClosure("target/stated_tc.txt",stated);
+	public void createTClosures(HashSet<String> folders, String valConfig, String transitiveClosureInferredFile,String transitiveClosureStatedFile) throws Exception {
+		if (relationships==null || relationships.size()==0){
+			getFilesForTransClosureProcess(folders,valConfig);
+		}
+		createTClosure(transitiveClosureInferredFile,inferred);
+		createTClosure(transitiveClosureStatedFile,stated);
 
+	}
+	
+	private void getFilesForTransClosureProcess(HashSet<String> folders, String validationConfig) throws IOException, Exception {
+
+		concepts = new HashMap<Long, ConceptDescriptor>();
+		relationships = new HashMap<Long, List<LightRelationship>>();
+		File config=new File(validationConfig);
+		FileHelper fHelper=new FileHelper();
+		for (String folder:folders){
+			File dir=new File(folder);
+			HashSet<String> files=new HashSet<String>();
+			fHelper.findAllFiles(dir, files);
+
+			for (String file:files){
+				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+
+				if (pattern.equals("rf2-relationships")){
+					loadRelationshipsFile(new File(file));
+				}else if(pattern.equals("rf2-concepts")){
+					loadConceptsFile(new File(file));
+				}else{}
+			}
+		}
 
 	}
 
@@ -342,14 +368,16 @@ public class Transformer {
 				loopRelationship.setActive(columns[2].equals("1"));
 				loopRelationship.setEffectiveTime(columns[1]);
 				loopRelationship.setModule(Long.parseLong(columns[3]));
-
-				loopRelationship.setTarget(Long.parseLong(columns[5]));
-				loopRelationship.setType(Long.parseLong(columns[7]));
+				Long targetId=Long.parseLong(columns[5]);
+				loopRelationship.setTarget(targetId);
+				Long type=Long.parseLong(columns[7]);
+				loopRelationship.setType(type);
 				loopRelationship.setModifier(Long.parseLong(columns[9]));
 				loopRelationship.setGroupId(Integer.parseInt(columns[6]));
 				Long sourceId = Long.parseLong(columns[4]);
 				loopRelationship.setSourceId(sourceId);
-				loopRelationship.setCharType(Long.parseLong(columns[8]));
+				Long charType=Long.parseLong(columns[8]);
+				loopRelationship.setCharType(charType);
 
 				List<LightRelationship> relList = relationships.get(sourceId);
 				if (relList == null) {
@@ -357,6 +385,15 @@ public class Transformer {
 				}
 				relList.add(loopRelationship);
 				relationships.put(sourceId, relList);
+				
+				if (columns[2].equals("1") 
+						&& type==isaSCTId){
+					if ( charType==inferred){
+						notLeafInferred.add(targetId);
+					}else{
+						notLeafStated.add(targetId);
+					}
+				}
 				line = br.readLine();
 				count++;
 				if (count % 100000 == 0) {
@@ -627,7 +664,8 @@ public class Transformer {
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
-
+			cpt.setIsLeafInferred( (notLeafInferred.contains(cptId)? 0:1));
+			cpt.setIsLeafStated( (notLeafStated.contains(cptId)? 0:1));
 			listLD = descriptions.get(cptId);
 			listD = new ArrayList<Description>();
 
@@ -899,7 +937,7 @@ public class Transformer {
 
 	private void createTClosure(String fileName,Long charType) throws IOException {
 
-		System.out.println("Starting creation of " + fileName);
+		System.out.println("Transitive Closure creation from " + fileName);
 		FileOutputStream fos = new FileOutputStream(fileName);
 		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 		BufferedWriter bw = new BufferedWriter(osw);
@@ -964,9 +1002,11 @@ public class Transformer {
 				d.setTypeId(ldesc.getType());
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
+				d.setModule(ldesc.getModule());
 				// using long lang names for Mongo 2.4.x text indexes
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
+				d.setConceptModule(concept.getModule());
 				d.setConceptActive(concept.getActive());
 				if (getDefaultTermType()!=fsnType){
 					String fsn= cptFSN.get(ldesc.getConceptId());

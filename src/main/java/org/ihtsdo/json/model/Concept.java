@@ -17,6 +17,8 @@ public class Concept extends ConceptDescriptor{
     List<Description> descriptions;
     List<Relationship> relationships;
     List<Relationship> statedRelationships;
+    int isLeafInferred;
+    int isLeafStated;
     
     public Concept() {
     }
@@ -53,4 +55,20 @@ public class Concept extends ConceptDescriptor{
 		this.statedRelationships = statedRelationships;
 	}
 
+	public int getIsLeafInferred() {
+		return isLeafInferred;
+	}
+
+	public void setIsLeafInferred(int i) {
+		this.isLeafInferred = i;
+	}
+
+	public int getIsLeafStated() {
+		return isLeafStated;
+	}
+
+	public void setIsLeafStated(int isLeafStated) {
+		this.isLeafStated = isLeafStated;
+	}
+	
 }

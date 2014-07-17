@@ -21,7 +21,16 @@ public class TextIndexDescription extends Description {
 
     public TextIndexDescription() {
     }
+    
+    private Long conceptModule;
 
+	public Long getConceptModule() {
+		return conceptModule;
+	}
+
+	public void setConceptModule(Long conceptModule) {
+		this.conceptModule = conceptModule;
+	}
     public String getFsn() {
         return fsn;
     }
