@@ -132,11 +132,11 @@ public class FileHelper {
 			if (toCheck) {
 
 				
-				 System.out.println( "File: " + inputFile.getAbsolutePath() +  " ** match file pattern: " + namePattern);
+				 //System.out.println( "File: " + inputFile.getAbsolutePath() +  " ** match file pattern: " + namePattern);
 				
 			} else {
 				
-				System.out.println( "Cannot found header matcher for : " + inputFile.getName());
+				//System.out.println( "Cannot found header matcher for : " + inputFile.getName());
 			}
 			br.close();
 		} catch (FileNotFoundException e) {
