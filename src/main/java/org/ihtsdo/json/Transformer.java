@@ -104,10 +104,12 @@ public class Transformer {
 		folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
 		folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
 		String valConfig= "config/validation-rules.xml";
-		tr.getFilesFromFolders(folders,valConfig);
+        HashSet<String> files = tr.getFilesFromFolders(folders, valConfig);
 
-		tr.freeStep1();
-		//tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
+        tr.processFiles(files, valConfig);
+
+//		tr.freeStep1();
+//		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
 	}
 
 	public void freeStep1() {
@@ -125,65 +127,65 @@ public class Transformer {
 		System.gc();
 	}
 
-	private void getFilesFromFolders(HashSet<String> folders, String validationConfig) throws IOException, Exception {
+	private HashSet<String> getFilesFromFolders(HashSet<String> folders, String validationConfig) throws IOException, Exception {
 		File config=new File(validationConfig);
 		FileHelper fHelper=new FileHelper();
+        HashSet<String> files=new HashSet<String>();
 		for (String folder:folders){
 			File dir=new File(folder);
-			HashSet<String> files=new HashSet<String>();
 			fHelper.findAllFiles(dir, files);
+		}
+        return files;
+	}
 
+    public void processFiles(HashSet<String> files, String validationConfig) throws Exception {
+        File config=new File(validationConfig);
+        for (String file : files){
+            String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+            if(pattern.equals("rf2-concepts")){
+                loadConceptsFile(new File(file));
+            }else{}
+        }
+
+        for (Long module : modules) {
+            System.out.println("Processing module: " + module);
             for (String file:files){
                 String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
                 if(pattern.equals("rf2-concepts")){
                     loadConceptsFile(new File(file));
                 }else{}
             }
-
-            for (Long module : modules) {
-                System.out.println("Processing module: " + module);
-                for (String file:files){
-                    String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
-                    if(pattern.equals("rf2-concepts")){
-                        loadConceptsFile(new File(file));
-                    }else{}
-                }
-                for (String file:files){
-                    String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
-                    if (pattern.equals("rf2-relationships")){
-                        loadRelationshipsFile(new File(file));
-                    }else if(pattern.equals("rf2-textDefinition")){
-                        loadTextDefinitionFile(new File(file));
-                    }else if(pattern.equals("rf2-association")){
-                        loadAssociationFile(new File(file));
-                    }else if(pattern.equals("rf2-association-2")){
-                        loadAssociationFile(new File(file));
-                    }else if(pattern.equals("rf2-attributevalue")){
-                        loadAttributeFile(new File(file));
-                    }else if(pattern.equals("rf2-language")){
-                        loadLanguageRefsetFile(new File(file));
-                    }else if(pattern.equals("rf2-simple")){
-                        loadSimpleRefsetFile(new File(file));
-                    }else if(pattern.equals("rf2-orderRefset")){
-                        // TODO: add process to order refset
-                        loadSimpleRefsetFile(new File(file));
-                    }else if(pattern.equals("rf2-simplemaps")){
-                        loadSimpleMapRefsetFile(new File(file));
-                    }else if(pattern.equals("rf2-descriptions")){
-                        loadDescriptionsFile(new File(file));
-                    }else{}
-                }
-                completeDefaultTerm();
-                createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts-" + module + ".json", module);
-                createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index-" + module + ".json");
-                freeStep1();
+            for (String file:files){
+                String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+                if (pattern.equals("rf2-relationships")){
+                    loadRelationshipsFile(new File(file));
+                }else if(pattern.equals("rf2-textDefinition")){
+                    loadTextDefinitionFile(new File(file));
+                }else if(pattern.equals("rf2-association")){
+                    loadAssociationFile(new File(file));
+                }else if(pattern.equals("rf2-association-2")){
+                    loadAssociationFile(new File(file));
+                }else if(pattern.equals("rf2-attributevalue")){
+                    loadAttributeFile(new File(file));
+                }else if(pattern.equals("rf2-language")){
+                    loadLanguageRefsetFile(new File(file));
+                }else if(pattern.equals("rf2-simple")){
+                    loadSimpleRefsetFile(new File(file));
+                }else if(pattern.equals("rf2-orderRefset")){
+                    // TODO: add process to order refset
+                    loadSimpleRefsetFile(new File(file));
+                }else if(pattern.equals("rf2-simplemaps")){
+                    loadSimpleMapRefsetFile(new File(file));
+                }else if(pattern.equals("rf2-descriptions")){
+                    loadDescriptionsFile(new File(file));
+                }else{}
             }
-
-
-		}
-
-
-	}
+            completeDefaultTerm();
+            createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts-" + module + ".json", module);
+            createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index-" + module + ".json");
+            freeStep1();
+        }
+    }
 
 	public void createTClosures(HashSet<String> folders, String valConfig, String transitiveClosureInferredFile,String transitiveClosureStatedFile) throws Exception {
 		if (relationships==null || relationships.size()==0){
