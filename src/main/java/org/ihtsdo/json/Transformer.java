@@ -103,18 +103,17 @@ public class Transformer {
 		tr.setDefaultTermType(tr.fsnType);
 
 		HashSet<String> folders=new HashSet<String>();
-		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
 		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
-
+		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
+		folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
+		folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
 		String valConfig= "config/validation-rules.xml";
 		tr.getFilesFromFolders(folders,valConfig);
 
-		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/concepts.json");
-		tr.createTextIndexFile("/Volumes/Macintosh HD2/text-index.json");
+		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
+		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 		tr.freeStep1();
-		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
-		
-		
+		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
 	}
 
 	public void freeStep1() {
