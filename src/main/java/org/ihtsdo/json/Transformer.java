@@ -15,13 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.ihtsdo.json.model.Concept;
 import org.ihtsdo.json.model.ConceptAncestor;
@@ -72,6 +66,8 @@ public class Transformer {
 	private HashSet<Long> notLeafInferred;
 	private HashSet<Long> notLeafStated;
 
+    private HashSet<Long> modules;
+
 	public Transformer() {
 		concepts = new HashMap<Long, ConceptDescriptor>();
 		descriptions = new HashMap<Long, List<LightDescription>>();
@@ -85,6 +81,7 @@ public class Transformer {
 		notLeafInferred=new HashSet<Long>();
 		notLeafStated=new HashSet<Long>();
 		cptFSN = new HashMap<Long, String>();
+        modules = new HashSet<Long>();
 
 		langCodes = new HashMap<String, String>();
 		langCodes.put("en", "english");
@@ -98,7 +95,6 @@ public class Transformer {
 	public static void main(String[] args) throws Exception {
 		Transformer tr = new Transformer();
 
-
 		tr.setDefaultLangCode("en");
 		tr.setDefaultTermType(tr.fsnType);
 
@@ -110,10 +106,8 @@ public class Transformer {
 		String valConfig= "config/validation-rules.xml";
 		tr.getFilesFromFolders(folders,valConfig);
 
-		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
-		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 		tr.freeStep1();
-		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
+		//tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
 	}
 
 	public void freeStep1() {
@@ -139,36 +133,55 @@ public class Transformer {
 			HashSet<String> files=new HashSet<String>();
 			fHelper.findAllFiles(dir, files);
 
-			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+            for (String file:files){
+                String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+                if(pattern.equals("rf2-concepts")){
+                    loadConceptsFile(new File(file));
+                }else{}
+            }
 
-				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file));
-				}else if(pattern.equals("rf2-textDefinition")){
-					loadTextDefinitionFile(new File(file));
-				}else if(pattern.equals("rf2-association")){
-					loadAssociationFile(new File(file));
-				}else if(pattern.equals("rf2-association-2")){
-					loadAssociationFile(new File(file));
-				}else if(pattern.equals("rf2-attributevalue")){
-					loadAttributeFile(new File(file));
-				}else if(pattern.equals("rf2-language")){
-					loadLanguageRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-simple")){
-					loadSimpleRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-orderRefset")){
-					// TODO: add process to order refset
-					loadSimpleRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-simplemaps")){
-					loadSimpleMapRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-descriptions")){
-					loadDescriptionsFile(new File(file));
-				}else if(pattern.equals("rf2-concepts")){
-					loadConceptsFile(new File(file));
-				}else{}
-			}
+            for (Long module : modules) {
+                System.out.println("Processing module: " + module);
+                for (String file:files){
+                    String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+                    if(pattern.equals("rf2-concepts")){
+                        loadConceptsFile(new File(file));
+                    }else{}
+                }
+                for (String file:files){
+                    String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+                    if (pattern.equals("rf2-relationships")){
+                        loadRelationshipsFile(new File(file));
+                    }else if(pattern.equals("rf2-textDefinition")){
+                        loadTextDefinitionFile(new File(file));
+                    }else if(pattern.equals("rf2-association")){
+                        loadAssociationFile(new File(file));
+                    }else if(pattern.equals("rf2-association-2")){
+                        loadAssociationFile(new File(file));
+                    }else if(pattern.equals("rf2-attributevalue")){
+                        loadAttributeFile(new File(file));
+                    }else if(pattern.equals("rf2-language")){
+                        loadLanguageRefsetFile(new File(file));
+                    }else if(pattern.equals("rf2-simple")){
+                        loadSimpleRefsetFile(new File(file));
+                    }else if(pattern.equals("rf2-orderRefset")){
+                        // TODO: add process to order refset
+                        loadSimpleRefsetFile(new File(file));
+                    }else if(pattern.equals("rf2-simplemaps")){
+                        loadSimpleMapRefsetFile(new File(file));
+                    }else if(pattern.equals("rf2-descriptions")){
+                        loadDescriptionsFile(new File(file));
+                    }else{}
+                }
+                completeDefaultTerm();
+                createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts-" + module + ".json", module);
+                createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index-" + module + ".json");
+                freeStep1();
+            }
+
+
 		}
-		completeDefaultTerm();
+
 
 	}
 
@@ -223,6 +236,7 @@ public class Transformer {
 				loopConcept.setActive(columns[2].equals("1"));
 				loopConcept.setEffectiveTime(columns[1]);
 				loopConcept.setModule(Long.parseLong(columns[3]));
+                modules.add(loopConcept.getModule());
 				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
 				concepts.put(conceptId, loopConcept);
 				line = br.readLine();
@@ -646,7 +660,7 @@ public class Transformer {
 		}
 	}
 
-	public void createConceptsJsonFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	public void createConceptsJsonFile(String fileName, Long module) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		System.out.println("Starting creation of " + fileName);
 		FileOutputStream fos = new FileOutputStream(fileName);
 		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
@@ -670,6 +684,9 @@ public class Transformer {
 			//            count++;
 			//if (count > 10) break;
 			Concept cpt = new Concept();
+            if (!module.equals(cpt.getModule())) {
+                continue;
+            }
 			ConceptDescriptor cptdesc = concepts.get(cptId);
 
 			cpt.setConceptId(cptId);
