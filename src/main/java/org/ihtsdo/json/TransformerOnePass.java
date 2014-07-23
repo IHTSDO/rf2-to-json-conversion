@@ -721,6 +721,7 @@ public class TransformerOnePass {
 		List<RefsetMembership> listRM = new ArrayList<RefsetMembership>();
 
 		//        int count = 0;
+        boolean firstWritten = false;
 		for (Long cptId : concepts.keySet()) {
 			//            count++;
 			//if (count > 10) break;
@@ -991,6 +992,11 @@ public class TransformerOnePass {
 
 			bw.append(gson.toJson(cpt).toString());
 			bw.append(sep);
+
+            if (!firstWritten) {
+                firstWritten = true;
+                System.out.println(gson.toJson(cpt).toString());
+            }
 		}
 		bw.close();
 		System.out.println(fileName + " Done");
