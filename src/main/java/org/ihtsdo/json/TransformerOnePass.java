@@ -48,9 +48,6 @@ public class TransformerOnePass {
 
 
 	public TransformerOnePass() throws IOException {
-        String fileName = "/Volumes/Macintosh HD2/conversiondb/conversiondb";
-        deleteDir(new File("/Volumes/Macintosh HD2/conversiondb"));
-
 		concepts = DBMaker.newTempHashMap();
 		descriptions = DBMaker.newTempHashMap();
 		relationships = DBMaker.newTempHashMap();
@@ -92,18 +89,21 @@ public class TransformerOnePass {
         List<Long> modulesToIgnore = new ArrayList<Long>();
 
 		HashSet<String> folders=new HashSet<String>();
+        System.out.println("######## Processing Int edition ########");
 		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
         HashSet<String> files = tr.getFilesFromFolders(folders);
+        System.out.println("Files: " + files.size());
         tr.processFiles(files, valConfig, modulesToIgnore);
 
+        System.out.println("######## Processing other editions ########");
         modulesToIgnore.add(900000000000207008L);
         modulesToIgnore.add(900000000000012004L);
-
         folders=new HashSet<String>();
         folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
         folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
         folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
         files = tr.getFilesFromFolders(folders);
+        System.out.println("Files: " + files.size());
         tr.processFiles(files, valConfig, modulesToIgnore);
 
 
