@@ -5,45 +5,20 @@
  */
 package org.ihtsdo.json;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.ihtsdo.json.model.Concept;
-import org.ihtsdo.json.model.ConceptAncestor;
-import org.ihtsdo.json.model.ConceptDescriptor;
-import org.ihtsdo.json.model.Description;
-import org.ihtsdo.json.model.LangMembership;
-import org.ihtsdo.json.model.LightDescription;
-import org.ihtsdo.json.model.LightLangMembership;
-import org.ihtsdo.json.model.LightRefsetMembership;
-import org.ihtsdo.json.model.LightRelationship;
-import org.ihtsdo.json.model.RefsetMembership;
-import org.ihtsdo.json.model.Relationship;
-import org.ihtsdo.json.model.TextIndexDescription;
+import com.google.gson.Gson;
+import jdbm.RecordManager;
+import jdbm.RecordManagerFactory;
+import org.ihtsdo.json.model.*;
 import org.ihtsdo.json.utils.FileHelper;
 
-import com.google.gson.Gson;
+import java.io.*;
+import java.util.*;
 
 /**
  *
  * @author Alejandro Rodriguez
  */
-public class Transformer {
+public class TransformerOnePass {
 
 	private String MODIFIER = "Existential restriction";
 	private String sep = System.getProperty("line.separator");
@@ -63,28 +38,32 @@ public class Transformer {
 	private Long stated = 900000000000010007l;
 	private Long isaSCTId=116680003l;
 	private String defaultTermType = fsnType;
-	private HashMap<Long, List<LightDescription>> tdefMembers;
-	private HashMap<Long, List<LightRefsetMembership>> attrMembers;
-	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
+	private Map<Long, List<LightDescription>> tdefMembers;
+	private Map<Long, List<LightRefsetMembership>> attrMembers;
+	private Map<Long, List<LightRefsetMembership>> assocMembers;
 	private ArrayList<Long> listA;
 	private Map<String, String> charConv;
 	private Map<Long, String> cptFSN;
 	private HashSet<Long> notLeafInferred;
 	private HashSet<Long> notLeafStated;
 
-	public Transformer() {
-		concepts = new HashMap<Long, ConceptDescriptor>();
-		descriptions = new HashMap<Long, List<LightDescription>>();
-		relationships = new HashMap<Long, List<LightRelationship>>();
-		simpleMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		assocMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		attrMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		tdefMembers = new HashMap<Long, List<LightDescription>>();
-		simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		languageMembers = new HashMap<Long, List<LightLangMembership>>();
+    private RecordManager recMan;
+
+	public TransformerOnePass() throws IOException {
+        String fileName = "conversiondb";
+        recMan = RecordManagerFactory.createRecordManager(fileName);
+		concepts = recMan.hashMap("concepts");
+		descriptions = recMan.hashMap("descriptions");
+		relationships = recMan.hashMap("relationships");
+		simpleMembers = recMan.hashMap("simpleMembers");
+		assocMembers = recMan.hashMap("assocMembers");
+		attrMembers = recMan.hashMap("attrMembers");
+		tdefMembers = recMan.hashMap("tdefMembers");
+		simpleMapMembers = recMan.hashMap("simpleMapMembers");
+		languageMembers = recMan.hashMap("languageMembers");
 		notLeafInferred=new HashSet<Long>();
 		notLeafStated=new HashSet<Long>();
-		cptFSN = new HashMap<Long, String>();
+		cptFSN = recMan.hashMap("cptFSN");;
 
 		langCodes = new HashMap<String, String>();
 		langCodes.put("en", "english");
@@ -96,7 +75,7 @@ public class Transformer {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Transformer tr = new Transformer();
+		TransformerOnePass tr = new TransformerOnePass();
 
 
 		tr.setDefaultLangCode("en");
@@ -108,12 +87,12 @@ public class Transformer {
 		folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
 		folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
 		String valConfig= "config/validation-rules.xml";
-		tr.getFilesFromFolders(folders,valConfig);
-
+        HashSet<String> files = tr.getFilesFromFolders(folders);
+        tr.processFiles(files, valConfig);
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 		tr.freeStep1();
-		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
+		tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
 	}
 
 	public void freeStep1() {
@@ -131,44 +110,51 @@ public class Transformer {
 		System.gc();
 	}
 
-	private void getFilesFromFolders(HashSet<String> folders, String validationConfig) throws IOException, Exception {
-		File config=new File(validationConfig);
+    private void processFiles(HashSet<String> files, String validationConfig) throws IOException, Exception {
+        File config=new File(validationConfig);
+        for (String file:files){
+            String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+
+            if (pattern.equals("rf2-relationships")){
+                loadRelationshipsFile(new File(file));
+            }else if(pattern.equals("rf2-textDefinition")){
+                loadTextDefinitionFile(new File(file));
+            }else if(pattern.equals("rf2-association")){
+                loadAssociationFile(new File(file));
+            }else if(pattern.equals("rf2-association-2")){
+                loadAssociationFile(new File(file));
+            }else if(pattern.equals("rf2-attributevalue")){
+                loadAttributeFile(new File(file));
+            }else if(pattern.equals("rf2-language")){
+                loadLanguageRefsetFile(new File(file));
+            }else if(pattern.equals("rf2-simple")){
+                loadSimpleRefsetFile(new File(file));
+            }else if(pattern.equals("rf2-orderRefset")){
+                // TODO: add process to order refset
+                loadSimpleRefsetFile(new File(file));
+            }else if(pattern.equals("rf2-simplemaps")){
+                loadSimpleMapRefsetFile(new File(file));
+            }else if(pattern.equals("rf2-descriptions")){
+                loadDescriptionsFile(new File(file));
+            }else if(pattern.equals("rf2-concepts")){
+                loadConceptsFile(new File(file));
+            }else{}
+
+            recMan.commit();
+        }
+        completeDefaultTerm();
+    }
+
+	private HashSet<String> getFilesFromFolders(HashSet<String> folders) throws IOException, Exception {
+        HashSet<String> result = new HashSet<String>();
 		FileHelper fHelper=new FileHelper();
 		for (String folder:folders){
 			File dir=new File(folder);
 			HashSet<String> files=new HashSet<String>();
 			fHelper.findAllFiles(dir, files);
-
-			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
-
-				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file));
-				}else if(pattern.equals("rf2-textDefinition")){
-					loadTextDefinitionFile(new File(file));
-				}else if(pattern.equals("rf2-association")){
-					loadAssociationFile(new File(file));
-				}else if(pattern.equals("rf2-association-2")){
-					loadAssociationFile(new File(file));
-				}else if(pattern.equals("rf2-attributevalue")){
-					loadAttributeFile(new File(file));
-				}else if(pattern.equals("rf2-language")){
-					loadLanguageRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-simple")){
-					loadSimpleRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-orderRefset")){
-					// TODO: add process to order refset
-					loadSimpleRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-simplemaps")){
-					loadSimpleMapRefsetFile(new File(file));
-				}else if(pattern.equals("rf2-descriptions")){
-					loadDescriptionsFile(new File(file));
-				}else if(pattern.equals("rf2-concepts")){
-					loadConceptsFile(new File(file));
-				}else{}
-			}
+            result.addAll(files);
 		}
-		completeDefaultTerm();
+        return result;
 
 	}
 
@@ -236,7 +222,6 @@ public class Transformer {
 		} finally {
 			br.close();
 		}
-
 	}
 
 	public void loadDescriptionsFile(File descriptionsFile) throws FileNotFoundException, IOException {
