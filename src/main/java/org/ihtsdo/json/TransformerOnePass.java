@@ -50,7 +50,7 @@ public class TransformerOnePass {
     private RecordManager recMan;
 
 	public TransformerOnePass() throws IOException {
-        String fileName = "conversiondb";
+        String fileName = "/Volumes/Macintosh HD2/conversiondb";
         recMan = RecordManagerFactory.createRecordManager(fileName);
 		concepts = recMan.hashMap("concepts");
 		descriptions = recMan.hashMap("descriptions");

@@ -5,13 +5,14 @@
  */
 package org.ihtsdo.json.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
  *
  * @author Alejandro Rodriguez
  */
-public class Component {
+public class Component implements Serializable {
 
     private UUID uuid;
     private Boolean active;

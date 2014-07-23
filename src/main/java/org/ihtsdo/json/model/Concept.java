@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Alejandro Rodriguez
  */
-public class Concept extends ConceptDescriptor{
+public class Concept extends ConceptDescriptor {
     
     List<RefsetMembership> memberships;
     List<Description> descriptions;
