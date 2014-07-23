@@ -96,6 +96,7 @@ public class TransformerOnePass {
 		String valConfig= "config/validation-rules.xml";
         HashSet<String> files = tr.getFilesFromFolders(folders);
         tr.processFiles(files, valConfig);
+        tr.completeDefaultTerm();
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 		//tr.freeStep1();
@@ -147,7 +148,6 @@ public class TransformerOnePass {
                 loadConceptsFile(new File(file));
             }else{}
         }
-        completeDefaultTerm();
     }
 
 	private HashSet<String> getFilesFromFolders(HashSet<String> folders) throws IOException, Exception {
@@ -282,6 +282,8 @@ public class TransformerOnePass {
 		for (Long sourceId:concepts.keySet()){
 			List<LightDescription> lDescriptions = descriptions.get(sourceId);
 			if (lDescriptions!=null){
+                String lastTerm = "No Default Term";
+                Boolean fsnSet = false;
 				for (LightDescription desc:lDescriptions){
 					
 					act=desc.getActive();
@@ -296,6 +298,7 @@ public class TransformerOnePass {
 						if (getDefaultTermType()!=fsnType){
 							if (!cptFSN.containsKey(sourceId)){
 								cptFSN.put(sourceId, desc.getTerm());
+                                fsnSet = true;
 							}
 						}
 					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
@@ -306,8 +309,13 @@ public class TransformerOnePass {
 					}
 					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
 						cptFSN.put(sourceId, desc.getTerm());
+                        fsnSet = true;
 					}
+                    lastTerm = desc.getTerm();
 				}
+                if (!fsnSet) {
+                    cptFSN.put(sourceId, lastTerm);
+                }
 			}
 		}
 	}
@@ -664,7 +672,7 @@ public class TransformerOnePass {
 
 			cpt.setConceptId(cptId);
 			cpt.setActive(cptdesc.getActive());
-			cpt.setDefaultTerm(cptdesc.getDefaultTerm());
+			cpt.setDefaultTerm(cptFSN.get(cptId));
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
