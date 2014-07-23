@@ -102,7 +102,7 @@ public class Transformer {
 		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
 		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
 		folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
-		folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
+		//folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
 		String valConfig= "config/validation-rules.xml";
         HashSet<String> files = tr.getFilesFromFolders(folders, valConfig);
 
@@ -132,8 +132,13 @@ public class Transformer {
 		FileHelper fHelper=new FileHelper();
         HashSet<String> files=new HashSet<String>();
 		for (String folder:folders){
+			System.out.println(folder);
+			System.out.println("files size enter = " + files.size());
+			HashSet<String> tempfiles=new HashSet<String>();
 			File dir=new File(folder);
-			fHelper.findAllFiles(dir, files);
+			fHelper.findAllFiles(dir, tempfiles);
+			files.addAll(tempfiles);
+			System.out.println("files size exit = " + files.size());
 		}
         return files;
 	}
@@ -144,7 +149,11 @@ public class Transformer {
             String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
             if(pattern.equals("rf2-concepts")){
                 loadConceptsFile(new File(file));
-            }else{}
+//            	System.out.print(file + " : ");
+//            	System.out.println("TRUE");
+            }else{
+            	//System.out.println("FALSE");
+            }
         }
 
         for (Long module : modules) {

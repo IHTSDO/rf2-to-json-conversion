@@ -105,7 +105,7 @@ public class FileHelper {
 			if (prop instanceof Collection) {
 				namePatterns.addAll((Collection) prop);
 			}
-			System.out.println("");
+//			System.out.println("");
 			boolean toCheck = false;
 			String headerRule = null;
 			FileInputStream fis = new FileInputStream(inputFile);
