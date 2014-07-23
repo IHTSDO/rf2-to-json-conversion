@@ -554,9 +554,7 @@ public class Transformer {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (concepts.get(Long.parseLong(columns[5])) == null) {
-                    System.out.println("Concept not found: " + Long.parseLong(columns[5]));
-                } else if (columns[2].equals("1") && concepts.get(Long.parseLong(columns[5])).getModule().equals(module)) {
+                if (columns[2].equals("1")) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.ATTRIBUTE_VALUE.name());
 					loopMember.setUuid(UUID.fromString(columns[0]));
