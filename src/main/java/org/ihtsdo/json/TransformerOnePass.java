@@ -6,10 +6,9 @@
 package org.ihtsdo.json;
 
 import com.google.gson.Gson;
-import jdbm.RecordManager;
-import jdbm.RecordManagerFactory;
 import org.ihtsdo.json.model.*;
 import org.ihtsdo.json.utils.FileHelper;
+import org.mapdb.DBMaker;
 
 import java.io.*;
 import java.util.*;
@@ -47,25 +46,23 @@ public class TransformerOnePass {
 	private HashSet<Long> notLeafInferred;
 	private HashSet<Long> notLeafStated;
 
-    private RecordManager recMan;
 
 	public TransformerOnePass() throws IOException {
         String fileName = "/Volumes/Macintosh HD2/conversiondb/conversiondb";
         deleteDir(new File("/Volumes/Macintosh HD2/conversiondb"));
 
-        recMan = RecordManagerFactory.createRecordManager(fileName);
-		concepts = recMan.storeMap("concepts");
-		descriptions = recMan.storeMap("descriptions");
-		relationships = recMan.storeMap("relationships");
-		simpleMembers = recMan.storeMap("simpleMembers");
-		assocMembers = recMan.storeMap("assocMembers");
-		attrMembers = recMan.storeMap("attrMembers");
-		tdefMembers = recMan.storeMap("tdefMembers");
-		simpleMapMembers = recMan.storeMap("simpleMapMembers");
-		languageMembers = recMan.storeMap("languageMembers");
+		concepts = DBMaker.newTempHashMap();
+		descriptions = DBMaker.newTempHashMap();
+		relationships = DBMaker.newTempHashMap();
+		simpleMembers = DBMaker.newTempHashMap();
+		assocMembers = DBMaker.newTempHashMap();
+		attrMembers = DBMaker.newTempHashMap();
+		tdefMembers = DBMaker.newTempHashMap();
+		simpleMapMembers = DBMaker.newTempHashMap();
+		languageMembers = DBMaker.newTempHashMap();
 		notLeafInferred=new HashSet<Long>();
 		notLeafStated=new HashSet<Long>();
-		cptFSN = recMan.storeMap("cptFSN");
+		cptFSN = DBMaker.newTempHashMap();
 
 		langCodes = new HashMap<String, String>();
 		langCodes.put("en", "english");
@@ -103,7 +100,6 @@ public class TransformerOnePass {
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 		//tr.freeStep1();
 		//tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
-        tr.recMan.close();
 	}
 
 	public void freeStep1() {
@@ -150,9 +146,6 @@ public class TransformerOnePass {
             }else if(pattern.equals("rf2-concepts")){
                 loadConceptsFile(new File(file));
             }else{}
-
-            recMan.commit();
-            recMan.clearCache();
         }
         completeDefaultTerm();
     }
@@ -302,7 +295,7 @@ public class TransformerOnePass {
 						
 						if (getDefaultTermType()!=fsnType){
 							if (!cptFSN.containsKey(sourceId)){
-								cptFSN.put(sourceId,desc.getTerm());
+								cptFSN.put(sourceId, desc.getTerm());
 							}
 						}
 					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
@@ -312,7 +305,7 @@ public class TransformerOnePass {
 						}
 					}
 					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
-						cptFSN.put(sourceId,desc.getTerm());
+						cptFSN.put(sourceId, desc.getTerm());
 					}
 				}
 			}
