@@ -150,8 +150,6 @@ public class TransformerOnePass {
             }else if(pattern.equals("rf2-concepts")){
                 loadConceptsFile(new File(file));
             }else{}
-
-            recMan.commit();
             recMan.clearCache();
         }
         completeDefaultTerm();
@@ -223,6 +221,7 @@ public class TransformerOnePass {
 				loopConcept.setModule(Long.parseLong(columns[3]));
 				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
 				concepts.put(conceptId, loopConcept);
+                recMan.commit();
 				line = br.readLine();
 				count++;
 				if (count % 100000 == 0) {
@@ -267,7 +266,7 @@ public class TransformerOnePass {
 				}
 				list.add(loopDescription);
 				descriptions.put(sourceId, list);
-
+                recMan.commit();
 				line = br.readLine();
 				descriptionsCount++;
 				if (descriptionsCount % 100000 == 0) {
@@ -281,7 +280,7 @@ public class TransformerOnePass {
 		}
 	}
 
-	public void completeDefaultTerm(){
+	public void completeDefaultTerm() throws IOException {
 		boolean act;
 		String type;
 		String lang;
@@ -303,6 +302,7 @@ public class TransformerOnePass {
 						if (getDefaultTermType()!=fsnType){
 							if (!cptFSN.containsKey(sourceId)){
 								cptFSN.put(sourceId,desc.getTerm());
+                                recMan.commit();
 							}
 						}
 					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
@@ -313,6 +313,7 @@ public class TransformerOnePass {
 					}
 					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
 						cptFSN.put(sourceId,desc.getTerm());
+                        recMan.commit();
 					}
 				}
 			}
@@ -349,6 +350,7 @@ public class TransformerOnePass {
 				}
 				list.add(loopDescription);
 				tdefMembers.put(sourceId, list);
+                recMan.commit();
 
 				line = br.readLine();
 				descriptionsCount++;
@@ -396,7 +398,7 @@ public class TransformerOnePass {
 				}
 				relList.add(loopRelationship);
 				relationships.put(sourceId, relList);
-				
+                recMan.commit();
 				if (columns[2].equals("1") 
 						&& type==isaSCTId){
 					if ( charType==inferred){
@@ -449,6 +451,7 @@ public class TransformerOnePass {
 					}
 					list.add(loopMember);
 					simpleMembers.put(Long.parseLong(columns[5]), list);
+                    recMan.commit();
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -495,6 +498,7 @@ public class TransformerOnePass {
 					}
 					list.add(loopMember);
 					assocMembers.put(Long.parseLong(columns[5]), list);
+                    recMan.commit();
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -541,6 +545,7 @@ public class TransformerOnePass {
 					}
 					list.add(loopMember);
 					attrMembers.put(Long.parseLong(columns[5]), list);
+                    recMan.commit();
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -586,6 +591,7 @@ public class TransformerOnePass {
 					}
 					list.add(loopMember);
 					simpleMapMembers.put(sourceId, list);
+                    recMan.commit();
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -629,6 +635,7 @@ public class TransformerOnePass {
 					}
 					list.add(loopMember);
 					languageMembers.put(sourceId, list);
+                    recMan.commit();
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
