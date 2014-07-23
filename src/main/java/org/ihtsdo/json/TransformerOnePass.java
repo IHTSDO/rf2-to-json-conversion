@@ -240,7 +240,7 @@ public class TransformerOnePass {
                 line = br.readLine();
 			}
 			System.out.println(".");
-			System.out.println("Concepts loaded = " + concepts.size());
+			System.out.println("Concepts loaded = " + concepts.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
@@ -290,7 +290,7 @@ public class TransformerOnePass {
 				}
 			}
 			System.out.println(".");
-			System.out.println("Descriptions loaded = " + descriptions.size());
+			System.out.println("Descriptions loaded = " + descriptions.size() + " (" + descriptionsCount + ")");
 		} finally {
 			br.close();
 		}
@@ -385,7 +385,7 @@ public class TransformerOnePass {
 				}
 			}
 			System.out.println(".");
-			System.out.println("Text Definitions loaded = " + tdefMembers.size());
+			System.out.println("Text Definitions loaded = " + tdefMembers.size() + " (" + descriptionsCount + ")");
 		} finally {
 			br.close();
 		}
@@ -445,7 +445,7 @@ public class TransformerOnePass {
 				}
 			}
 			System.out.println(".");
-			System.out.println("Relationships loaded = " + relationships.size());
+			System.out.println("Relationships loaded = " + relationships.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
@@ -495,7 +495,7 @@ public class TransformerOnePass {
 				line = br.readLine();
 			}
 			System.out.println(".");
-			System.out.println("SimpleRefsetMember loaded = " + simpleMembers.size());
+			System.out.println("SimpleRefsetMember loaded = " + simpleMembers.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
@@ -546,7 +546,7 @@ public class TransformerOnePass {
 				line = br.readLine();
 			}
 			System.out.println(".");
-			System.out.println("AssociationMember loaded = " + assocMembers.size());
+			System.out.println("AssociationMember loaded = " + assocMembers.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
@@ -597,7 +597,7 @@ public class TransformerOnePass {
 				line = br.readLine();
 			}
 			System.out.println(".");
-			System.out.println("AttributeMember loaded = " + attrMembers.size());
+			System.out.println("AttributeMember loaded = " + attrMembers.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
@@ -647,7 +647,7 @@ public class TransformerOnePass {
 				line = br.readLine();
 			}
 			System.out.println(".");
-			System.out.println("SimpleMap RefsetMember loaded = " + simpleMapMembers.size());
+			System.out.println("SimpleMap RefsetMember loaded = " + simpleMapMembers.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
@@ -695,7 +695,7 @@ public class TransformerOnePass {
 				line = br.readLine();
 			}
 			System.out.println(".");
-			System.out.println("LanguageMembers loaded = " + languageMembers.size());
+			System.out.println("LanguageMembers loaded = " + languageMembers.size() + " (" + count + ")");
 		} finally {
 			br.close();
 		}
