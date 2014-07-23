@@ -217,10 +217,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				ConceptDescriptor loopConcept = new ConceptDescriptor();
@@ -231,11 +233,11 @@ public class TransformerOnePass {
 				loopConcept.setModule(Long.parseLong(columns[3]));
 				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
 				concepts.put(conceptId, loopConcept);
-				line = br.readLine();
 				count++;
 				if (count % 100000 == 0) {
 					System.out.print(".");
 				}
+                line = br.readLine();
 			}
 			System.out.println(".");
 			System.out.println("Concepts loaded = " + concepts.size());
@@ -254,10 +256,12 @@ public class TransformerOnePass {
 			boolean act;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				LightDescription loopDescription = new LightDescription();
@@ -347,10 +351,12 @@ public class TransformerOnePass {
 			boolean act;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				LightDescription loopDescription = new LightDescription();
@@ -393,10 +399,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				LightRelationship loopRelationship = new LightRelationship();
@@ -452,10 +460,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				if (columns[2].equals("1")) {
@@ -500,10 +510,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				if (columns[2].equals("1")) {
@@ -549,10 +561,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				if (columns[2].equals("1")) {
@@ -597,10 +611,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				if (columns[2].equals("1")) {
@@ -646,10 +662,12 @@ public class TransformerOnePass {
 			int count = 0;
 			while (line != null) {
 				if (line.isEmpty()) {
+                    line = br.readLine();
 					continue;
 				}
 				String[] columns = line.split("\\t");
                 if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    line = br.readLine();
                     continue;
                 }
 				if (columns[2].equals("1")) {
