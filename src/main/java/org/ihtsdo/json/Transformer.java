@@ -156,7 +156,10 @@ public class Transformer {
             }
         }
 
-        for (Long module : modules) {
+        HashSet<Long> modulesLocal = new HashSet<Long>();
+        modulesLocal.addAll(modules);
+
+        for (Long module : modulesLocal) {
             System.out.println("Processing module: " + module);
             for (String file:files){
                 String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
@@ -167,24 +170,24 @@ public class Transformer {
             for (String file:files){
                 String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
                 if (pattern.equals("rf2-relationships")){
-                    loadRelationshipsFile(new File(file));
+                    loadRelationshipsFile(new File(file), module);
                 }else if(pattern.equals("rf2-textDefinition")){
                     loadTextDefinitionFile(new File(file));
                 }else if(pattern.equals("rf2-association")){
-                    loadAssociationFile(new File(file));
+                    loadAssociationFile(new File(file), module);
                 }else if(pattern.equals("rf2-association-2")){
-                    loadAssociationFile(new File(file));
+                    loadAssociationFile(new File(file), module);
                 }else if(pattern.equals("rf2-attributevalue")){
-                    loadAttributeFile(new File(file));
+                    loadAttributeFile(new File(file), module);
                 }else if(pattern.equals("rf2-language")){
                     loadLanguageRefsetFile(new File(file));
                 }else if(pattern.equals("rf2-simple")){
-                    loadSimpleRefsetFile(new File(file));
+                    loadSimpleRefsetFile(new File(file), module);
                 }else if(pattern.equals("rf2-orderRefset")){
                     // TODO: add process to order refset
-                    loadSimpleRefsetFile(new File(file));
+                    loadSimpleRefsetFile(new File(file), module);
                 }else if(pattern.equals("rf2-simplemaps")){
-                    loadSimpleMapRefsetFile(new File(file));
+                    loadSimpleMapRefsetFile(new File(file), module);
                 }else if(pattern.equals("rf2-descriptions")){
                     loadDescriptionsFile(new File(file));
                 }else{}
@@ -220,7 +223,7 @@ public class Transformer {
 				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
 
 				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file));
+					loadRelationshipsFile(new File(file), null);
 				}else if(pattern.equals("rf2-concepts")){
 					loadConceptsFile(new File(file));
 				}else{}
@@ -390,7 +393,7 @@ public class Transformer {
 			br.close();
 		}
 	}
-	public void loadRelationshipsFile(File relationshipsFile) throws FileNotFoundException, IOException {
+	public void loadRelationshipsFile(File relationshipsFile, Long module) throws FileNotFoundException, IOException {
 		System.out.println("Starting Relationships: " + relationshipsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(relationshipsFile), "UTF8"));
 		try {
@@ -402,42 +405,44 @@ public class Transformer {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-				LightRelationship loopRelationship = new LightRelationship();
+                if (module == null || concepts.get(Long.parseLong(columns[4])).getModule().equals(module)) {
+                    LightRelationship loopRelationship = new LightRelationship();
 
-				loopRelationship.setActive(columns[2].equals("1"));
-				loopRelationship.setEffectiveTime(columns[1]);
-				loopRelationship.setModule(Long.parseLong(columns[3]));
-				Long targetId=Long.parseLong(columns[5]);
-				loopRelationship.setTarget(targetId);
-				Long type=Long.parseLong(columns[7]);
-				loopRelationship.setType(type);
-				loopRelationship.setModifier(Long.parseLong(columns[9]));
-				loopRelationship.setGroupId(Integer.parseInt(columns[6]));
-				Long sourceId = Long.parseLong(columns[4]);
-				loopRelationship.setSourceId(sourceId);
-				Long charType=Long.parseLong(columns[8]);
-				loopRelationship.setCharType(charType);
+                    loopRelationship.setActive(columns[2].equals("1"));
+                    loopRelationship.setEffectiveTime(columns[1]);
+                    loopRelationship.setModule(Long.parseLong(columns[3]));
+                    Long targetId=Long.parseLong(columns[5]);
+                    loopRelationship.setTarget(targetId);
+                    Long type=Long.parseLong(columns[7]);
+                    loopRelationship.setType(type);
+                    loopRelationship.setModifier(Long.parseLong(columns[9]));
+                    loopRelationship.setGroupId(Integer.parseInt(columns[6]));
+                    Long sourceId = Long.parseLong(columns[4]);
+                    loopRelationship.setSourceId(sourceId);
+                    Long charType=Long.parseLong(columns[8]);
+                    loopRelationship.setCharType(charType);
 
-				List<LightRelationship> relList = relationships.get(sourceId);
-				if (relList == null) {
-					relList = new ArrayList<LightRelationship>();
-				}
-				relList.add(loopRelationship);
-				relationships.put(sourceId, relList);
-				
-				if (columns[2].equals("1") 
-						&& type==isaSCTId){
-					if ( charType==inferred){
-						notLeafInferred.add(targetId);
-					}else{
-						notLeafStated.add(targetId);
-					}
-				}
-				line = br.readLine();
-				count++;
-				if (count % 100000 == 0) {
-					System.out.print(".");
-				}
+                    List<LightRelationship> relList = relationships.get(sourceId);
+                    if (relList == null) {
+                        relList = new ArrayList<LightRelationship>();
+                    }
+                    relList.add(loopRelationship);
+                    relationships.put(sourceId, relList);
+
+                    if (columns[2].equals("1")
+                            && type==isaSCTId){
+                        if ( charType==inferred){
+                            notLeafInferred.add(targetId);
+                        }else{
+                            notLeafStated.add(targetId);
+                        }
+                    }
+                    line = br.readLine();
+                    count++;
+                    if (count % 100000 == 0) {
+                        System.out.print(".");
+                    }
+                }
 			}
 			System.out.println(".");
 			System.out.println("Relationships loaded = " + relationships.size());
@@ -446,7 +451,7 @@ public class Transformer {
 		}
 	}
 
-	public void loadSimpleRefsetFile(File simpleRefsetFile) throws FileNotFoundException, IOException {
+	public void loadSimpleRefsetFile(File simpleRefsetFile, Long module) throws FileNotFoundException, IOException {
 		System.out.println("Starting Simple Refset Members: " + simpleRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleRefsetFile), "UTF8"));
 		try {
@@ -458,7 +463,7 @@ public class Transformer {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-				if (columns[2].equals("1")) {
+				if (columns[2].equals("1") && concepts.get(Long.parseLong(columns[5])).getModule().equals(module)) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.SIMPLE_REFSET.name());
 					loopMember.setUuid(UUID.fromString(columns[0]));
@@ -491,7 +496,7 @@ public class Transformer {
 		}
 	}
 
-	public void loadAssociationFile(File associationsFile) throws FileNotFoundException, IOException {
+	public void loadAssociationFile(File associationsFile, Long module) throws FileNotFoundException, IOException {
 		System.out.println("Starting Association Refset Members: " + associationsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(associationsFile), "UTF8"));
 		try {
@@ -503,7 +508,7 @@ public class Transformer {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-				if (columns[2].equals("1")) {
+				if (columns[2].equals("1") && concepts.get(Long.parseLong(columns[5])).getModule().equals(module)) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.ASSOCIATION.name());
 					loopMember.setUuid(UUID.fromString(columns[0]));
@@ -537,7 +542,7 @@ public class Transformer {
 		}
 	}
 
-	public void loadAttributeFile(File attributeFile) throws FileNotFoundException, IOException {
+	public void loadAttributeFile(File attributeFile, Long module) throws FileNotFoundException, IOException {
 		System.out.println("Starting Attribute Refset Members: " + attributeFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(attributeFile), "UTF8"));
 		try {
@@ -549,7 +554,7 @@ public class Transformer {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-				if (columns[2].equals("1")) {
+				if (columns[2].equals("1") && concepts.get(Long.parseLong(columns[5])).getModule().equals(module)) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.ATTRIBUTE_VALUE.name());
 					loopMember.setUuid(UUID.fromString(columns[0]));
@@ -582,7 +587,7 @@ public class Transformer {
 			br.close();
 		}
 	}
-	public void loadSimpleMapRefsetFile(File simpleMapRefsetFile) throws FileNotFoundException, IOException {
+	public void loadSimpleMapRefsetFile(File simpleMapRefsetFile, Long module) throws FileNotFoundException, IOException {
 		System.out.println("Starting SimpleMap Refset Members: " + simpleMapRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleMapRefsetFile), "UTF8"));
 		try {
@@ -594,7 +599,7 @@ public class Transformer {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-				if (columns[2].equals("1")) {
+				if (columns[2].equals("1") && concepts.get(Long.parseLong(columns[5])).getModule().equals(module)) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.SIMPLEMAP.name());
 					loopMember.setUuid(UUID.fromString(columns[0]));
