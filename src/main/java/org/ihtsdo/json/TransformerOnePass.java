@@ -87,15 +87,27 @@ public class TransformerOnePass {
 		TransformerOnePass tr = new TransformerOnePass();
 		tr.setDefaultLangCode("en");
 		tr.setDefaultTermType(tr.fsnType);
+        String valConfig= "config/validation-rules.xml";
+
+        List<Long> modulesToIgnore = new ArrayList<Long>();
 
 		HashSet<String> folders=new HashSet<String>();
 		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
-		folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
-		folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
-		//folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
-		String valConfig= "config/validation-rules.xml";
         HashSet<String> files = tr.getFilesFromFolders(folders);
-        tr.processFiles(files, valConfig);
+        tr.processFiles(files, valConfig, modulesToIgnore);
+
+        modulesToIgnore.add(900000000000207008L);
+        modulesToIgnore.add(900000000000012004L);
+
+        folders=new HashSet<String>();
+        folders.add("/Volumes/Macintosh HD2/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
+        folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
+        folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
+        files = tr.getFilesFromFolders(folders);
+        tr.processFiles(files, valConfig, modulesToIgnore);
+
+
+
         tr.completeDefaultTerm();
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
@@ -118,34 +130,34 @@ public class TransformerOnePass {
 		System.gc();
 	}
 
-    private void processFiles(HashSet<String> files, String validationConfig) throws IOException, Exception {
+    private void processFiles(HashSet<String> files, String validationConfig, List<Long> modulesToIgnore) throws IOException, Exception {
         File config=new File(validationConfig);
         for (String file:files){
             String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
 
             if (pattern.equals("rf2-relationships")){
-                loadRelationshipsFile(new File(file));
+                loadRelationshipsFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-textDefinition")){
-                loadTextDefinitionFile(new File(file));
+                loadTextDefinitionFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-association")){
-                loadAssociationFile(new File(file));
+                loadAssociationFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-association-2")){
-                loadAssociationFile(new File(file));
+                loadAssociationFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-attributevalue")){
-                loadAttributeFile(new File(file));
+                loadAttributeFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-language")){
-                loadLanguageRefsetFile(new File(file));
+                loadLanguageRefsetFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-simple")){
-                loadSimpleRefsetFile(new File(file));
+                loadSimpleRefsetFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-orderRefset")){
                 // TODO: add process to order refset
-                loadSimpleRefsetFile(new File(file));
+                loadSimpleRefsetFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-simplemaps")){
-                loadSimpleMapRefsetFile(new File(file));
+                loadSimpleMapRefsetFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-descriptions")){
-                loadDescriptionsFile(new File(file));
+                loadDescriptionsFile(new File(file), modulesToIgnore);
             }else if(pattern.equals("rf2-concepts")){
-                loadConceptsFile(new File(file));
+                loadConceptsFile(new File(file), modulesToIgnore);
             }else{}
         }
     }
@@ -187,16 +199,16 @@ public class TransformerOnePass {
 				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
 
 				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file));
+					loadRelationshipsFile(new File(file), null);
 				}else if(pattern.equals("rf2-concepts")){
-					loadConceptsFile(new File(file));
+					loadConceptsFile(new File(file), null);
 				}else{}
 			}
 		}
 
 	}
 
-	public void loadConceptsFile(File conceptsFile) throws FileNotFoundException, IOException {
+	public void loadConceptsFile(File conceptsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Concepts: " + conceptsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(conceptsFile), "UTF8"));
 		try {
@@ -208,6 +220,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				ConceptDescriptor loopConcept = new ConceptDescriptor();
 				Long conceptId = Long.parseLong(columns[0]);
 				loopConcept.setConceptId(conceptId);
@@ -229,7 +244,7 @@ public class TransformerOnePass {
 		}
 	}
 
-	public void loadDescriptionsFile(File descriptionsFile) throws FileNotFoundException, IOException {
+	public void loadDescriptionsFile(File descriptionsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Descriptions: " + descriptionsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(descriptionsFile), "UTF8"));
 		int descriptionsCount = 0;
@@ -242,6 +257,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				LightDescription loopDescription = new LightDescription();
 				loopDescription.setDescriptionId(Long.parseLong(columns[0]));
 				act = columns[2].equals("1");
@@ -319,7 +337,7 @@ public class TransformerOnePass {
 			}
 		}
 	}
-	public void loadTextDefinitionFile(File textDefinitionFile) throws FileNotFoundException, IOException {
+	public void loadTextDefinitionFile(File textDefinitionFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(textDefinitionFile), "UTF8"));
 		int descriptionsCount = 0;
@@ -332,6 +350,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				LightDescription loopDescription = new LightDescription();
 				loopDescription.setDescriptionId(Long.parseLong(columns[0]));
 				act = columns[2].equals("1");
@@ -363,7 +384,7 @@ public class TransformerOnePass {
 			br.close();
 		}
 	}
-	public void loadRelationshipsFile(File relationshipsFile) throws FileNotFoundException, IOException {
+	public void loadRelationshipsFile(File relationshipsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Relationships: " + relationshipsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(relationshipsFile), "UTF8"));
 		try {
@@ -375,6 +396,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				LightRelationship loopRelationship = new LightRelationship();
 
 				loopRelationship.setActive(columns[2].equals("1"));
@@ -419,7 +443,7 @@ public class TransformerOnePass {
 		}
 	}
 
-	public void loadSimpleRefsetFile(File simpleRefsetFile) throws FileNotFoundException, IOException {
+	public void loadSimpleRefsetFile(File simpleRefsetFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Simple Refset Members: " + simpleRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleRefsetFile), "UTF8"));
 		try {
@@ -431,6 +455,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				if (columns[2].equals("1")) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.SIMPLE_REFSET.name());
@@ -464,7 +491,7 @@ public class TransformerOnePass {
 		}
 	}
 
-	public void loadAssociationFile(File associationsFile) throws FileNotFoundException, IOException {
+	public void loadAssociationFile(File associationsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Association Refset Members: " + associationsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(associationsFile), "UTF8"));
 		try {
@@ -476,6 +503,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				if (columns[2].equals("1")) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.ASSOCIATION.name());
@@ -510,7 +540,7 @@ public class TransformerOnePass {
 		}
 	}
 
-	public void loadAttributeFile(File attributeFile) throws FileNotFoundException, IOException {
+	public void loadAttributeFile(File attributeFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Attribute Refset Members: " + attributeFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(attributeFile), "UTF8"));
 		try {
@@ -522,6 +552,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				if (columns[2].equals("1")) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.ATTRIBUTE_VALUE.name());
@@ -555,7 +588,7 @@ public class TransformerOnePass {
 			br.close();
 		}
 	}
-	public void loadSimpleMapRefsetFile(File simpleMapRefsetFile) throws FileNotFoundException, IOException {
+	public void loadSimpleMapRefsetFile(File simpleMapRefsetFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting SimpleMap Refset Members: " + simpleMapRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleMapRefsetFile), "UTF8"));
 		try {
@@ -567,6 +600,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				if (columns[2].equals("1")) {
 					LightRefsetMembership loopMember = new LightRefsetMembership();
 					loopMember.setType(LightRefsetMembership.RefsetMembershipType.SIMPLEMAP.name());
@@ -601,7 +637,7 @@ public class TransformerOnePass {
 		}
 	}
 
-	public void loadLanguageRefsetFile(File languageRefsetFile) throws FileNotFoundException, IOException {
+	public void loadLanguageRefsetFile(File languageRefsetFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Language Refset Members: " + languageRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(languageRefsetFile), "UTF8"));
 		try {
@@ -613,6 +649,9 @@ public class TransformerOnePass {
 					continue;
 				}
 				String[] columns = line.split("\\t");
+                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                    continue;
+                }
 				if (columns[2].equals("1")) {
 					LightLangMembership loopMember = new LightLangMembership();
 					loopMember.setUuid(UUID.fromString(columns[0]));
