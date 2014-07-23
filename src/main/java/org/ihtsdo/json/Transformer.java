@@ -437,12 +437,12 @@ public class Transformer {
                             notLeafStated.add(targetId);
                         }
                     }
-                    line = br.readLine();
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
                     }
                 }
+                line = br.readLine();
 			}
 			System.out.println(".");
 			System.out.println("Relationships loaded = " + relationships.size());
