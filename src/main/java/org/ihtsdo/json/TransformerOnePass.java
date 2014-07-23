@@ -50,7 +50,9 @@ public class TransformerOnePass {
     private RecordManager recMan;
 
 	public TransformerOnePass() throws IOException {
-        String fileName = "/Volumes/Macintosh HD2/conversiondb";
+        String fileName = "/Volumes/Macintosh HD2/conversiondb/conversiondb";
+        deleteDir(new File("/Volumes/Macintosh HD2/conversiondb"));
+
         recMan = RecordManagerFactory.createRecordManager(fileName);
 		concepts = recMan.hashMap("concepts");
 		descriptions = recMan.hashMap("descriptions");
@@ -74,10 +76,18 @@ public class TransformerOnePass {
 		langCodes.put("nl", "dutch");
 	}
 
+    public static void deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                File child = new File(dir, children[i]);
+                child.delete();
+            }
+        }
+    }
+
 	public static void main(String[] args) throws Exception {
 		TransformerOnePass tr = new TransformerOnePass();
-
-
 		tr.setDefaultLangCode("en");
 		tr.setDefaultTermType(tr.fsnType);
 
@@ -91,8 +101,9 @@ public class TransformerOnePass {
         tr.processFiles(files, valConfig);
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
-		tr.freeStep1();
-		tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
+		//tr.freeStep1();
+		//tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
+        tr.recMan.close();
 	}
 
 	public void freeStep1() {
@@ -141,6 +152,7 @@ public class TransformerOnePass {
             }else{}
 
             recMan.commit();
+            recMan.clearCache();
         }
         completeDefaultTerm();
     }
