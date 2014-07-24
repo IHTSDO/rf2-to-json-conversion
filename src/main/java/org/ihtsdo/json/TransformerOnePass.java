@@ -31,12 +31,12 @@ public class TransformerOnePass {
 	private Map<String, String> langCodes;
 
 	private String defaultLangCode = "en";
-	public String fsnType = "900000000000003001";
-	public String synType = "900000000000013009";
+	public Long fsnType = 900000000000003001L;
+	public Long synType = 900000000000013009L;
 	private Long inferred = 900000000000011006l;
 	private Long stated = 900000000000010007l;
 	private Long isaSCTId=116680003l;
-	private String defaultTermType = fsnType;
+	private Long defaultTermType = fsnType;
 	private Map<Long, List<LightDescription>> tdefMembers;
 	private Map<Long, List<LightRefsetMembership>> attrMembers;
 	private Map<Long, List<LightRefsetMembership>> assocMembers;
@@ -300,44 +300,72 @@ public class TransformerOnePass {
 		boolean act;
 		String type;
 		String lang;
-		ConceptDescriptor cdesc;
 		for (Long sourceId:concepts.keySet()){
 			List<LightDescription> lDescriptions = descriptions.get(sourceId);
 			if (lDescriptions!=null){
-                String lastTerm = "No Default Term";
-                Boolean fsnSet = false;
+                String lastTerm = "No descriptions";
+                String enFsn = null;
+                String userSelectedDefaultTerm = null;
 				for (LightDescription desc:lDescriptions){
 					
 					act=desc.getActive();
 					type=String.valueOf(desc.getType());
 					lang=desc.getLang();
-					if (act && type.equals("900000000000003001") && lang.equals("en")) {
-						cdesc = concepts.get(sourceId);
-						if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
-							cdesc.setDefaultTerm(desc.getTerm());
-						}
-						
-						if (getDefaultTermType()!=fsnType){
-							if (!cptFSN.containsKey(sourceId)){
-								cptFSN.put(sourceId, desc.getTerm());
-                                fsnSet = true;
-							}
-						}
-					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
-						cdesc = concepts.get(sourceId);
-						if (cdesc != null) {
-							cdesc.setDefaultTerm(desc.getTerm());
-						}
-					}
-					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
-						cptFSN.put(sourceId, desc.getTerm());
-                        fsnSet = true;
-					}
+
+
+                    if (act && type.equals("900000000000003001") && lang.equals("en")) {
+                        enFsn = desc.getTerm();
+                    }
+
+                    if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
+                        userSelectedDefaultTerm = desc.getTerm();
+                    }
+
                     lastTerm = desc.getTerm();
+
+//					if (act && type.equals("900000000000003001") && lang.equals("en")) {
+//						cdesc = concepts.get(sourceId);
+//						if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
+//							cdesc.setDefaultTerm(desc.getTerm());
+//						}
+//
+//						if (getDefaultTermType()!=fsnType){
+//							if (!cptFSN.containsKey(sourceId)){
+//								cptFSN.put(sourceId, desc.getTerm());
+//                                fsnSet = true;
+//							}
+//						}
+//					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
+//						cdesc = concepts.get(sourceId);
+//						if (cdesc != null) {
+//							cdesc.setDefaultTerm(desc.getTerm());
+//						}
+//					}
+//					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
+//						cptFSN.put(sourceId, desc.getTerm());
+//                        fsnSet = true;
+//					}
+//                    lastTerm = desc.getTerm();
 				}
-                if (!fsnSet) {
+                ConceptDescriptor loopConcept = concepts.get(sourceId);
+
+                if (userSelectedDefaultTerm != null) {
+                    loopConcept.setDefaultTerm(userSelectedDefaultTerm);
+                } else if (enFsn != null) {
+                    loopConcept.setDefaultTerm(enFsn);
+                } else {
+                    loopConcept.setDefaultTerm(lastTerm);
+                }
+                concepts.put(sourceId, loopConcept);
+
+                if (enFsn != null) {
+                    cptFSN.put(sourceId, enFsn);
+                } else if (userSelectedDefaultTerm != null) {
+                    cptFSN.put(sourceId, userSelectedDefaultTerm);
+                } else {
                     cptFSN.put(sourceId, lastTerm);
                 }
+
 			}
 		}
 	}
@@ -730,7 +758,7 @@ public class TransformerOnePass {
 
 			cpt.setConceptId(cptId);
 			cpt.setActive(cptdesc.getActive());
-			cpt.setDefaultTerm(cptFSN.get(cptId));
+			cpt.setDefaultTerm(cptdesc.getDefaultTerm());
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
@@ -1083,18 +1111,19 @@ public class TransformerOnePass {
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());
 				d.setConceptActive(concept.getActive());
-				if (getDefaultTermType()!=fsnType){
-					String fsn= cptFSN.get(ldesc.getConceptId());
-					if (fsn!=null){
-						d.setFsn(fsn);
-					}
-				}else{
-					d.setFsn(concept.getDefaultTerm());
-				}
-				if (d.getFsn() == null) {
-					System.out.println("FSN Issue..." + d.getConceptId());
-					d.setFsn(d.getTerm());
-				}
+                d.setFsn(cptFSN.get(conceptId));
+//				if (getDefaultTermType()!=fsnType){
+//					String fsn= cptFSN.get(ldesc.getConceptId());
+//					if (fsn!=null){
+//						d.setFsn(fsn);
+//					}
+//				}else{
+//					d.setFsn(concept.getDefaultTerm());
+//				}
+//				if (d.getFsn() == null) {
+//					System.out.println("FSN Issue..." + d.getConceptId());
+//					d.setFsn(d.getTerm());
+//				}
 				d.setSemanticTag("");
 				if (d.getFsn().endsWith(")")) {
 					d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
@@ -1141,11 +1170,11 @@ public class TransformerOnePass {
 		System.gc();
 	}
 
-	public String getDefaultTermType() {
+	public Long getDefaultTermType() {
 		return defaultTermType;
 	}
 
-	public void setDefaultTermType(String defaultTermType) {
+	public void setDefaultTermType(Long defaultTermType) {
 		this.defaultTermType = defaultTermType;
 	}
 
