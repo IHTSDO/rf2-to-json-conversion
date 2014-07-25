@@ -30,7 +30,7 @@ public class Component implements Serializable {
         this.effectiveTime = effectiveTime;
     }
 
-    public Boolean getActive() {
+    public Boolean isActive() {
 		return active;
 	}
 

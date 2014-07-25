@@ -17,7 +17,7 @@ import java.util.*;
  *
  * @author Alejandro Rodriguez
  */
-public class TransformerOnePass {
+public class TransformerDiskBased {
 
 	private String MODIFIER = "Existential restriction";
 	private String sep = System.getProperty("line.separator");
@@ -47,7 +47,7 @@ public class TransformerOnePass {
 	private HashSet<Long> notLeafStated;
 
 
-	public TransformerOnePass() throws IOException {
+	public TransformerDiskBased() throws IOException {
 		concepts = DBMaker.newTempHashMap();
 		descriptions = DBMaker.newTempHashMap();
 		relationships = DBMaker.newTempHashMap();
@@ -81,7 +81,7 @@ public class TransformerOnePass {
     }
 
 	public static void main(String[] args) throws Exception {
-		TransformerOnePass tr = new TransformerOnePass();
+		TransformerDiskBased tr = new TransformerDiskBased();
 		tr.setDefaultLangCode("en");
 		tr.setDefaultTermType(tr.fsnType);
         String valConfig= "config/validation-rules.xml";
@@ -308,7 +308,7 @@ public class TransformerOnePass {
                 String userSelectedDefaultTerm = null;
 				for (LightDescription desc:lDescriptions){
 					
-					act=desc.getActive();
+					act=desc.isActive();
 					type=String.valueOf(desc.getType());
 					lang=desc.getLang();
 
@@ -458,9 +458,8 @@ public class TransformerOnePass {
 				relList.add(loopRelationship);
 				relationships.put(sourceId, relList);
 				
-				if (columns[2].equals("1") 
-						&& type==isaSCTId){
-					if ( charType==inferred){
+				if (loopRelationship.isActive() && type.equals(isaSCTId)){
+					if ( charType.equals(inferred)){
 						notLeafInferred.add(targetId);
 					}else{
 						notLeafStated.add(targetId);
@@ -757,13 +756,13 @@ public class TransformerOnePass {
 			ConceptDescriptor cptdesc = concepts.get(cptId);
 
 			cpt.setConceptId(cptId);
-			cpt.setActive(cptdesc.getActive());
+			cpt.setActive(cptdesc.isActive());
 			cpt.setDefaultTerm(cptdesc.getDefaultTerm());
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
-			cpt.setIsLeafInferred( (notLeafInferred.contains(cptId)? 0:1));
-			cpt.setIsLeafStated( (notLeafStated.contains(cptId)? 0:1));
+			cpt.setLeafInferred(notLeafInferred.contains(cptId));
+			cpt.setLeafStated(notLeafStated.contains(cptId));
 			listLD = descriptions.get(cptId);
 			listD = new ArrayList<Description>();
 
@@ -771,7 +770,7 @@ public class TransformerOnePass {
 				Long descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
-					d.setActive(ldesc.getActive());
+					d.setActive(ldesc.isActive());
 					d.setConceptId(ldesc.getConceptId());
 					descId = ldesc.getDescriptionId();
 					d.setDescriptionId(descId);
@@ -790,7 +789,7 @@ public class TransformerOnePass {
 						for (LightLangMembership llm : listLLM) {
 							LangMembership lm = new LangMembership();
 
-							lm.setActive(llm.getActive());
+							lm.setActive(llm.isActive());
 							lm.setDescriptionId(descId);
 							lm.setEffectiveTime(llm.getEffectiveTime());
 							lm.setModule(llm.getModule());
@@ -814,7 +813,7 @@ public class TransformerOnePass {
 						for (LightRefsetMembership lrm : listLRM) {
 							RefsetMembership rm = new RefsetMembership();
 							rm.setEffectiveTime(lrm.getEffectiveTime());
-							rm.setActive(lrm.getActive());
+							rm.setActive(lrm.isActive());
 							rm.setModule(lrm.getModule());
 							rm.setUuid(lrm.getUuid());
 
@@ -843,7 +842,7 @@ public class TransformerOnePass {
 				Long descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
-					d.setActive(ldesc.getActive());
+					d.setActive(ldesc.isActive());
 					d.setConceptId(ldesc.getConceptId());
 					descId = ldesc.getDescriptionId();
 					d.setDescriptionId(descId);
@@ -862,7 +861,7 @@ public class TransformerOnePass {
 						for (LightLangMembership llm : listLLM) {
 							LangMembership lm = new LangMembership();
 
-							lm.setActive(llm.getActive());
+							lm.setActive(llm.isActive());
 							lm.setDescriptionId(descId);
 							lm.setEffectiveTime(llm.getEffectiveTime());
 							lm.setModule(llm.getModule());
@@ -894,7 +893,7 @@ public class TransformerOnePass {
 					if (lrel.getCharType().equals(900000000000010007L)) {
 						Relationship d = new Relationship();
 						d.setEffectiveTime(lrel.getEffectiveTime());
-						d.setActive(lrel.getActive());
+						d.setActive(lrel.isActive());
 						d.setModule(lrel.getModule());
 						d.setGroupId(lrel.getGroupId());
 						d.setModifier(MODIFIER);
@@ -922,7 +921,7 @@ public class TransformerOnePass {
 					if (lrel.getCharType().equals(900000000000011006L)) {
 						Relationship d = new Relationship();
 						d.setEffectiveTime(lrel.getEffectiveTime());
-						d.setActive(lrel.getActive());
+						d.setActive(lrel.isActive());
 						d.setModule(lrel.getModule());
 						d.setGroupId(lrel.getGroupId());
 						d.setModifier(MODIFIER);
@@ -949,7 +948,7 @@ public class TransformerOnePass {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -966,7 +965,7 @@ public class TransformerOnePass {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -983,7 +982,7 @@ public class TransformerOnePass {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -1000,7 +999,7 @@ public class TransformerOnePass {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -1074,7 +1073,7 @@ public class TransformerOnePass {
 			for (LightRelationship lrel : listLR) {
 				if (lrel.getCharType().equals(charType) &&
 						lrel.getType().equals(isaSCTId) &&
-						lrel.getActive()) {
+						lrel.isActive()) {
 					Long tgt=lrel.getTarget();
 					if (!listA.contains(tgt)){
 						listA.add(tgt);
@@ -1099,7 +1098,7 @@ public class TransformerOnePass {
 			//if (count > 10) break;
 			for (LightDescription ldesc : descriptions.get(conceptId)) {
 				TextIndexDescription d = new TextIndexDescription();
-				d.setActive(ldesc.getActive());
+				d.setActive(ldesc.isActive());
 				d.setTerm(ldesc.getTerm());
 				d.setLength(ldesc.getTerm().length());
 				d.setTypeId(ldesc.getType());
@@ -1110,7 +1109,7 @@ public class TransformerOnePass {
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());
-				d.setConceptActive(concept.getActive());
+				d.setConceptActive(concept.isActive());
                 d.setFsn(cptFSN.get(conceptId));
 //				if (getDefaultTermType()!=fsnType){
 //					String fsn= cptFSN.get(ldesc.getConceptId());

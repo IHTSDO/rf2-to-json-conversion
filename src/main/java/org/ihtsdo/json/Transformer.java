@@ -113,7 +113,7 @@ public class Transformer {
 		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
 		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 		tr.freeStep1();
-		tr.createTClosures( folders,  valConfig,"/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json","/Volumes/Macintosh HD2/tclosure-stated.json");
+		tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
 	}
 
 	public void freeStep1() {
@@ -294,7 +294,7 @@ public class Transformer {
 			if (lDescriptions!=null){
 				for (LightDescription desc:lDescriptions){
 					
-					act=desc.getActive();
+					act=desc.isActive();
 					type=String.valueOf(desc.getType());
 					lang=desc.getLang();
 					if (act && type.equals("900000000000003001") && lang.equals("en")) {
@@ -673,7 +673,7 @@ public class Transformer {
 			ConceptDescriptor cptdesc = concepts.get(cptId);
 
 			cpt.setConceptId(cptId);
-			cpt.setActive(cptdesc.getActive());
+			cpt.setActive(cptdesc.isActive());
 			cpt.setDefaultTerm(cptdesc.getDefaultTerm());
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
@@ -687,7 +687,7 @@ public class Transformer {
 				Long descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
-					d.setActive(ldesc.getActive());
+					d.setActive(ldesc.isActive());
 					d.setConceptId(ldesc.getConceptId());
 					descId = ldesc.getDescriptionId();
 					d.setDescriptionId(descId);
@@ -706,7 +706,7 @@ public class Transformer {
 						for (LightLangMembership llm : listLLM) {
 							LangMembership lm = new LangMembership();
 
-							lm.setActive(llm.getActive());
+							lm.setActive(llm.isActive());
 							lm.setDescriptionId(descId);
 							lm.setEffectiveTime(llm.getEffectiveTime());
 							lm.setModule(llm.getModule());
@@ -730,7 +730,7 @@ public class Transformer {
 						for (LightRefsetMembership lrm : listLRM) {
 							RefsetMembership rm = new RefsetMembership();
 							rm.setEffectiveTime(lrm.getEffectiveTime());
-							rm.setActive(lrm.getActive());
+							rm.setActive(lrm.isActive());
 							rm.setModule(lrm.getModule());
 							rm.setUuid(lrm.getUuid());
 
@@ -759,7 +759,7 @@ public class Transformer {
 				Long descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
-					d.setActive(ldesc.getActive());
+					d.setActive(ldesc.isActive());
 					d.setConceptId(ldesc.getConceptId());
 					descId = ldesc.getDescriptionId();
 					d.setDescriptionId(descId);
@@ -778,7 +778,7 @@ public class Transformer {
 						for (LightLangMembership llm : listLLM) {
 							LangMembership lm = new LangMembership();
 
-							lm.setActive(llm.getActive());
+							lm.setActive(llm.isActive());
 							lm.setDescriptionId(descId);
 							lm.setEffectiveTime(llm.getEffectiveTime());
 							lm.setModule(llm.getModule());
@@ -810,7 +810,7 @@ public class Transformer {
 					if (lrel.getCharType().equals(900000000000010007L)) {
 						Relationship d = new Relationship();
 						d.setEffectiveTime(lrel.getEffectiveTime());
-						d.setActive(lrel.getActive());
+						d.setActive(lrel.isActive());
 						d.setModule(lrel.getModule());
 						d.setGroupId(lrel.getGroupId());
 						d.setModifier(MODIFIER);
@@ -838,7 +838,7 @@ public class Transformer {
 					if (lrel.getCharType().equals(900000000000011006L)) {
 						Relationship d = new Relationship();
 						d.setEffectiveTime(lrel.getEffectiveTime());
-						d.setActive(lrel.getActive());
+						d.setActive(lrel.isActive());
 						d.setModule(lrel.getModule());
 						d.setGroupId(lrel.getGroupId());
 						d.setModifier(MODIFIER);
@@ -865,7 +865,7 @@ public class Transformer {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -882,7 +882,7 @@ public class Transformer {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -899,7 +899,7 @@ public class Transformer {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -916,7 +916,7 @@ public class Transformer {
 				for (LightRefsetMembership lrm : listLRM) {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
-					d.setActive(lrm.getActive());
+					d.setActive(lrm.isActive());
 					d.setModule(lrm.getModule());
 					d.setUuid(lrm.getUuid());
 
@@ -985,7 +985,7 @@ public class Transformer {
 			for (LightRelationship lrel : listLR) {
 				if (lrel.getCharType().equals(charType) &&
 						lrel.getType().equals(isaSCTId) &&
-						lrel.getActive()) {
+						lrel.isActive()) {
 					Long tgt=lrel.getTarget();
 					if (!listA.contains(tgt)){
 						listA.add(tgt);
@@ -1010,7 +1010,7 @@ public class Transformer {
 			//if (count > 10) break;
 			for (LightDescription ldesc : descriptions.get(conceptId)) {
 				TextIndexDescription d = new TextIndexDescription();
-				d.setActive(ldesc.getActive());
+				d.setActive(ldesc.isActive());
 				d.setTerm(ldesc.getTerm());
 				d.setLength(ldesc.getTerm().length());
 				d.setTypeId(ldesc.getType());
@@ -1021,7 +1021,7 @@ public class Transformer {
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());
-				d.setConceptActive(concept.getActive());
+				d.setConceptActive(concept.isActive());
 				if (getDefaultTermType()!=fsnType){
 					String fsn= cptFSN.get(ldesc.getConceptId());
 					if (fsn!=null){
