@@ -106,18 +106,19 @@ public class TransformerDiskBased {
 //        tr.processFiles(files, valConfig, modulesToIgnore);
 
         System.out.println("######## Processing GMDN ########");
-        files = new HashSet<String>();
-        files.add("/Users/alo/NetBeansProjects/gmdn-analyzer/output/rf2/sct2_Concept_Delta_INT_20130731.txt");
-        files.add("/Users/alo/NetBeansProjects/gmdn-analyzer/output/rf2/sct2_Description_Delta-en_INT_20130731.txt");
-        files.add("/Users/alo/NetBeansProjects/gmdn-analyzer/output/rf2/sct2_Relationship_Delta_INT_20130731.txt");
+        folders=new HashSet<String>();
+        folders.add("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
+        folders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
+        files = tr.getFilesFromFolders(folders);
+        System.out.println("Files: " + files.size());
         tr.processFiles(files, valConfig, modulesToIgnore);
 
         tr.completeDefaultTerm();
 //		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
 //		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
 
-        tr.createConceptsJsonFile("/Users/alo/NetBeansProjects/gmdn-analyzer/output/rf2/concepts.json");
-        tr.createTextIndexFile("/Users/alo/NetBeansProjects/gmdn-analyzer/output/rf2/text-index.json");
+        tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/concepts.json");
+        tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/text-index.json");
 
 		//tr.freeStep1();
 		//tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
