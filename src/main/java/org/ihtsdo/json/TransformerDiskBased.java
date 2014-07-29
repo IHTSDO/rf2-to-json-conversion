@@ -770,8 +770,8 @@ public class TransformerDiskBased {
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
-			cpt.setLeafInferred(notLeafInferred.contains(cptId));
-			cpt.setLeafStated(notLeafStated.contains(cptId));
+			cpt.setLeafInferred(!notLeafInferred.contains(cptId));
+			cpt.setLeafStated(!notLeafStated.contains(cptId));
 			listLD = descriptions.get(cptId);
 			listD = new ArrayList<Description>();
 
