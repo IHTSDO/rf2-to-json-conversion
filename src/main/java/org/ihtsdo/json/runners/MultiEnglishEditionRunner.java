@@ -29,7 +29,7 @@ public class MultiEnglishEditionRunner {
         extensionFolders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
         extensionFolders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
         extensionFolders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
-        config.setFoldersBaselineLoad(extensionFolders);
+        config.setFoldersExtensionLoad(extensionFolders);
         ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
         modulesToIgnore.add(900000000000207008L);
         modulesToIgnore.add(900000000000012004L);
