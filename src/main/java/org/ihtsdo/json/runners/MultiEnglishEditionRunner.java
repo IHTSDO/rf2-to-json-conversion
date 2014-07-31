@@ -33,7 +33,7 @@ public class MultiEnglishEditionRunner {
         ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
         modulesToIgnore.add(900000000000207008L);
         modulesToIgnore.add(900000000000012004L);
-        config.setModulesToIgnoreBaselineLoad(modulesToIgnore);
+        config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
 
         TransformerDiskBased tr = new TransformerDiskBased();
 

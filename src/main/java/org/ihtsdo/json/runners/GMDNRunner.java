@@ -30,7 +30,7 @@ public class GMDNRunner {
         extensionFolders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");config.setFoldersBaselineLoad(extensionFolders);
         config.setFoldersExtensionLoad(extensionFolders);
         ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
-        config.setModulesToIgnoreBaselineLoad(modulesToIgnore);
+        config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
 
         TransformerDiskBased tr = new TransformerDiskBased();
 
