@@ -45,9 +45,10 @@ public class TransformerDiskBased {
 	private Map<Long, String> cptFSN;
 	private HashSet<Long> notLeafInferred;
 	private HashSet<Long> notLeafStated;
+    private String valConfig;
 
 
-	public TransformerDiskBased() throws IOException {
+    public TransformerDiskBased() throws IOException {
 		concepts = DBMaker.newTempHashMap();
 		descriptions = DBMaker.newTempHashMap();
 		relationships = DBMaker.newTempHashMap();
@@ -68,7 +69,35 @@ public class TransformerDiskBased {
 		langCodes.put("sv", "swedish");
 		langCodes.put("fr", "french");
 		langCodes.put("nl", "dutch");
+
+        valConfig= "config/validation-rules.xml";
 	}
+
+    public void convert(TransformerConfig config) throws Exception {
+        setDefaultLangCode(config.getDefaultTermLangCode());
+        setDefaultTermType(config.getDefaultTermDescriptionType());
+
+        System.out.println("######## Processing Baseline ########");
+        HashSet<String> files = getFilesFromFolders(config.getFoldersBaselineLoad());
+        System.out.println("Files: " + files.size());
+        processFiles(files, valConfig, config.getModulesToIgnoreBaselineLoad());
+
+        if (config.getFoldersExtensionLoad() != null && config.getModulesToIgnoreExtensionLoad() != null) {
+            System.out.println("######## Processing Extensions ########");
+            files = getFilesFromFolders(config.getFoldersExtensionLoad());
+            System.out.println("Files: " + files.size());
+            processFiles(files, valConfig, config.getModulesToIgnoreExtensionLoad());
+        } else {
+            System.out.println("######## No Extensions options configured ########");
+        }
+
+        completeDefaultTerm();
+        File output = new File("target/output");
+        output.mkdirs();
+        createConceptsJsonFile("target/output/concepts.json");
+        createTextIndexFile("target/output/text-index.json");
+
+    }
 
     public static void deleteDir(File dir) {
         if (dir.isDirectory()) {
@@ -84,7 +113,6 @@ public class TransformerDiskBased {
 		TransformerDiskBased tr = new TransformerDiskBased();
 		tr.setDefaultLangCode("en");
 		tr.setDefaultTermType(tr.fsnType);
-        String valConfig= "config/validation-rules.xml";
 
         List<Long> modulesToIgnore = new ArrayList<Long>();
 		HashSet<String> folders=new HashSet<String>();
@@ -92,7 +120,7 @@ public class TransformerDiskBased {
 		folders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
         HashSet<String> files = tr.getFilesFromFolders(folders);
         System.out.println("Files: " + files.size());
-        tr.processFiles(files, valConfig, modulesToIgnore);
+        tr.processFiles(files, tr.valConfig, modulesToIgnore);
 
 //        System.out.println("######## Processing other editions ########");
 //        modulesToIgnore.add(900000000000207008L);
@@ -103,7 +131,7 @@ public class TransformerDiskBased {
 //        folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
 //        files = tr.getFilesFromFolders(folders);
 //        System.out.println("Files: " + files.size());
-//        tr.processFiles(files, valConfig, modulesToIgnore);
+//        tr.processFiles(files, tr.valConfig, modulesToIgnore);
 
         System.out.println("######## Processing GMDN ########");
         folders=new HashSet<String>();
@@ -111,7 +139,7 @@ public class TransformerDiskBased {
         folders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
         files = tr.getFilesFromFolders(folders);
         System.out.println("Files: " + files.size());
-        tr.processFiles(files, valConfig, modulesToIgnore);
+        tr.processFiles(files, tr.valConfig, modulesToIgnore);
 
         tr.completeDefaultTerm();
 //		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
@@ -121,7 +149,7 @@ public class TransformerDiskBased {
         tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/text-index.json");
 
 		//tr.freeStep1();
-		//tr.createTClosures(folders, valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
+		//tr.createTClosures(folders, tr.valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
 	}
 
 	public void freeStep1() {
