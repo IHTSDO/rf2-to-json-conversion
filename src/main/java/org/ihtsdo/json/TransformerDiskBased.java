@@ -7,6 +7,7 @@ package org.ihtsdo.json;
 
 import com.google.gson.Gson;
 import org.ihtsdo.json.model.*;
+import org.ihtsdo.json.model.ResourceSetManifest;
 import org.ihtsdo.json.utils.FileHelper;
 import org.mapdb.DBMaker;
 
@@ -46,22 +47,14 @@ public class TransformerDiskBased {
 	private HashSet<Long> notLeafInferred;
 	private HashSet<Long> notLeafStated;
     private String valConfig;
+    private ResourceSetManifest manifest;
+    private Set<Long> refsetsSet;
+    private Set<Long> langRefsetsSet;
+    private Set<Long> modulesSet;
+
 
 
     public TransformerDiskBased() throws IOException {
-		concepts = DBMaker.newTempHashMap();
-		descriptions = DBMaker.newTempHashMap();
-		relationships = DBMaker.newTempHashMap();
-		simpleMembers = DBMaker.newTempHashMap();
-		assocMembers = DBMaker.newTempHashMap();
-		attrMembers = DBMaker.newTempHashMap();
-		tdefMembers = DBMaker.newTempHashMap();
-		simpleMapMembers = DBMaker.newTempHashMap();
-		languageMembers = DBMaker.newTempHashMap();
-		notLeafInferred=new HashSet<Long>();
-		notLeafStated=new HashSet<Long>();
-		cptFSN = DBMaker.newTempHashMap();
-
 		langCodes = new HashMap<String, String>();
 		langCodes.put("en", "english");
 		langCodes.put("es", "spanish");
@@ -74,8 +67,36 @@ public class TransformerDiskBased {
 	}
 
     public void convert(TransformerConfig config) throws Exception {
+        concepts = DBMaker.newTempHashMap();
+        descriptions = DBMaker.newTempHashMap();
+        relationships = DBMaker.newTempHashMap();
+        simpleMembers = DBMaker.newTempHashMap();
+        assocMembers = DBMaker.newTempHashMap();
+        attrMembers = DBMaker.newTempHashMap();
+        tdefMembers = DBMaker.newTempHashMap();
+        simpleMapMembers = DBMaker.newTempHashMap();
+        languageMembers = DBMaker.newTempHashMap();
+        notLeafInferred=new HashSet<Long>();
+        notLeafStated=new HashSet<Long>();
+        cptFSN = DBMaker.newTempHashMap();
+
         setDefaultLangCode(config.getDefaultTermLangCode());
         setDefaultTermType(config.getDefaultTermDescriptionType());
+
+        manifest = new ResourceSetManifest();
+        manifest.setDatabaseName(config.getDatabaseName());
+        manifest.setTextIndexNormalized(config.isNormalizeTextIndex());
+        manifest.setEffectiveTime(config.getEffectiveTime());
+        manifest.setDefaultTermLangCode(config.getDefaultTermLangCode());
+        manifest.setCollectionName(config.getEffectiveTime());
+        manifest.setDefaultTermLangRefset(config.getDefaultTermLanguageRefset());
+        manifest.setExpirationDate(config.getExpirationTime());
+        manifest.setDefaultTermType(config.getDefaultTermDescriptionType());
+        manifest.setResourceSetName(config.getEditionName());
+
+        refsetsSet = new HashSet<Long>();
+        langRefsetsSet = new HashSet<Long>();
+        modulesSet = new HashSet<Long>();
 
         System.out.println("######## Processing Baseline ########");
         HashSet<String> files = getFilesFromFolders(config.getFoldersBaselineLoad());
@@ -96,6 +117,7 @@ public class TransformerDiskBased {
         output.mkdirs();
         createConceptsJsonFile("target/output/concepts.json");
         createTextIndexFile("target/output/text-index.json");
+        createManifestFile("target/output/text-index.json");
 
     }
 
@@ -110,17 +132,17 @@ public class TransformerDiskBased {
     }
 
 	public static void main(String[] args) throws Exception {
-		TransformerDiskBased tr = new TransformerDiskBased();
-		tr.setDefaultLangCode("en");
-		tr.setDefaultTermType(tr.fsnType);
-
-        List<Long> modulesToIgnore = new ArrayList<Long>();
-		HashSet<String> folders=new HashSet<String>();
-        System.out.println("######## Processing Int edition ########");
-		folders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
-        HashSet<String> files = tr.getFilesFromFolders(folders);
-        System.out.println("Files: " + files.size());
-        tr.processFiles(files, tr.valConfig, modulesToIgnore);
+//		TransformerDiskBased tr = new TransformerDiskBased();
+//		tr.setDefaultLangCode("en");
+//		tr.setDefaultTermType(tr.fsnType);
+//
+//        List<Long> modulesToIgnore = new ArrayList<Long>();
+//		HashSet<String> folders=new HashSet<String>();
+//        System.out.println("######## Processing Int edition ########");
+//		folders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
+//        HashSet<String> files = tr.getFilesFromFolders(folders);
+//        System.out.println("Files: " + files.size());
+//        tr.processFiles(files, tr.valConfig, modulesToIgnore);
 
 //        System.out.println("######## Processing other editions ########");
 //        modulesToIgnore.add(900000000000207008L);
@@ -133,20 +155,20 @@ public class TransformerDiskBased {
 //        System.out.println("Files: " + files.size());
 //        tr.processFiles(files, tr.valConfig, modulesToIgnore);
 
-        System.out.println("######## Processing GMDN ########");
-        folders=new HashSet<String>();
-        folders.add("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
-        folders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
-        files = tr.getFilesFromFolders(folders);
-        System.out.println("Files: " + files.size());
-        tr.processFiles(files, tr.valConfig, modulesToIgnore);
-
-        tr.completeDefaultTerm();
-//		tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
-//		tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
-
-        tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/concepts.json");
-        tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/text-index.json");
+//        System.out.println("######## Processing GMDN ########");
+//        folders=new HashSet<String>();
+//        folders.add("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
+//        folders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
+//        files = tr.getFilesFromFolders(folders);
+//        System.out.println("Files: " + files.size());
+//        tr.processFiles(files, tr.valConfig, modulesToIgnore);
+//
+//        tr.completeDefaultTerm();
+//		  tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
+//		  tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
+//
+//        tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/concepts.json");
+//        tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/text-index.json");
 
 		//tr.freeStep1();
 		//tr.createTClosures(folders, tr.valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
@@ -268,6 +290,7 @@ public class TransformerDiskBased {
 				loopConcept.setActive(columns[2].equals("1"));
 				loopConcept.setEffectiveTime(columns[1]);
 				loopConcept.setModule(Long.parseLong(columns[3]));
+                modulesSet.add(loopConcept.getModule());
 				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
 				concepts.put(conceptId, loopConcept);
 				count++;
@@ -312,6 +335,7 @@ public class TransformerDiskBased {
 				loopDescription.setTerm(columns[7]);
 				loopDescription.setIcs(Long.parseLong(columns[8]));
 				loopDescription.setModule(Long.parseLong(columns[3]));
+                modulesSet.add(Long.parseLong(columns[3]));
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = descriptions.get(sourceId);
 				if (list == null) {
@@ -435,6 +459,7 @@ public class TransformerDiskBased {
 				loopDescription.setTerm(columns[7]);
 				loopDescription.setIcs(Long.parseLong(columns[8]));
 				loopDescription.setModule(Long.parseLong(columns[3]));
+                modulesSet.add(Long.parseLong(columns[3]));
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = tdefMembers.get(sourceId);
 				if (list == null) {
@@ -477,6 +502,7 @@ public class TransformerDiskBased {
 				loopRelationship.setActive(columns[2].equals("1"));
 				loopRelationship.setEffectiveTime(columns[1]);
 				loopRelationship.setModule(Long.parseLong(columns[3]));
+                modulesSet.add(Long.parseLong(columns[3]));
 				Long targetId=Long.parseLong(columns[5]);
 				loopRelationship.setTarget(targetId);
 				Long type=Long.parseLong(columns[7]);
@@ -540,10 +566,11 @@ public class TransformerDiskBased {
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
 					loopMember.setModule(Long.parseLong(columns[3]));
-
+                    modulesSet.add(Long.parseLong(columns[3]));
 					Long sourceId = Long.parseLong(columns[5]);
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(Long.parseLong(columns[4]));
+                    refsetsSet.add(Long.parseLong(columns[4]));
 
 					List<LightRefsetMembership> list = simpleMembers.get(sourceId);
 					if (list == null) {
@@ -590,10 +617,11 @@ public class TransformerDiskBased {
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
 					loopMember.setModule(Long.parseLong(columns[3]));
-
+                    modulesSet.add(Long.parseLong(columns[3]));
 					Long sourceId = Long.parseLong(columns[5]);
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(Long.parseLong(columns[4]));
+                    refsetsSet.add(Long.parseLong(columns[4]));
 					loopMember.setCidValue(Long.parseLong(columns[6]));
 
 					List<LightRefsetMembership> list = assocMembers.get(sourceId);
@@ -641,10 +669,11 @@ public class TransformerDiskBased {
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
 					loopMember.setModule(Long.parseLong(columns[3]));
-
+                    modulesSet.add(Long.parseLong(columns[3]));
 					Long sourceId = Long.parseLong(columns[5]);
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(Long.parseLong(columns[4]));
+                    refsetsSet.add(Long.parseLong(columns[4]));
 					loopMember.setCidValue(Long.parseLong(columns[6]));
 
 					List<LightRefsetMembership> list = attrMembers.get(sourceId);
@@ -691,10 +720,11 @@ public class TransformerDiskBased {
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
 					loopMember.setModule(Long.parseLong(columns[3]));
-
+                    modulesSet.add(Long.parseLong(columns[3]));
 					Long sourceId = Long.parseLong(columns[5]);
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(Long.parseLong(columns[4]));
+                    refsetsSet.add(Long.parseLong(columns[4]));
 					loopMember.setOtherValue(columns[6]);
 
 					List<LightRefsetMembership> list = simpleMapMembers.get(sourceId);
@@ -741,9 +771,11 @@ public class TransformerDiskBased {
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
 					loopMember.setModule(Long.parseLong(columns[3]));
+                    modulesSet.add(Long.parseLong(columns[3]));
 					Long sourceId = Long.parseLong(columns[5]);
 					loopMember.setDescriptionId(sourceId);
 					loopMember.setRefset(Long.parseLong(columns[4]));
+                    langRefsetsSet.add(Long.parseLong(columns[4]));
 					loopMember.setAcceptability(Long.parseLong(columns[6]));
 					List<LightLangMembership> list = languageMembers.get(sourceId);
 					if (list == null) {
@@ -1176,6 +1208,29 @@ public class TransformerDiskBased {
 		bw.close();
 		System.out.println(fileName + " Done");
 	}
+
+    public void createManifestFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+        getCharConvTable();
+        System.out.println("Starting creation of " + fileName);
+        FileOutputStream fos = new FileOutputStream(fileName);
+        OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+        BufferedWriter bw = new BufferedWriter(osw);
+        Gson gson = new Gson();
+
+        for (Long moduleId : modulesSet) {
+            manifest.getModules().add(concepts.get(moduleId));
+        }
+        for (Long langRefsetId : langRefsetsSet) {
+            manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
+        }
+        for (Long refsetId : modulesSet) {
+            manifest.getRefsets().add(concepts.get(refsetId));
+        }
+        bw.append(gson.toJson(manifest).toString());
+
+        bw.close();
+        System.out.println(fileName + " Done");
+    }
 
 	private String convertTerm(String cleanTerm) {
 		for (String code:charConv.keySet()){
