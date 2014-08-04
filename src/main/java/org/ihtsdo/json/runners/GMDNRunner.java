@@ -27,7 +27,7 @@ public class GMDNRunner {
         config.setModulesToIgnoreBaselineLoad(new ArrayList<Long>());
         HashSet<String> extensionFolders = new HashSet<String>();
         extensionFolders.add("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
-        extensionFolders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");config.setFoldersBaselineLoad(extensionFolders);
+        extensionFolders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
         config.setFoldersExtensionLoad(extensionFolders);
         ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
         config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
