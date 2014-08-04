@@ -32,6 +32,8 @@ public class GMDNRunner {
         ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
         config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
 
+        config.setOutputFolder("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
+
         TransformerDiskBased tr = new TransformerDiskBased();
 
         tr.convert(config);

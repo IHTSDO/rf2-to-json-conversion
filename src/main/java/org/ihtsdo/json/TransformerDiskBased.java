@@ -115,9 +115,9 @@ public class TransformerDiskBased {
         completeDefaultTerm();
         File output = new File("target/output");
         output.mkdirs();
-        createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/concepts.json");
-        createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/text-index.json");
-        createManifestFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/manifest.json");
+        createConceptsJsonFile(config.getOutputFolder() + "/concepts.json");
+        createTextIndexFile(config.getOutputFolder() + "/text-index.json");
+        createManifestFile(config.getOutputFolder() + "/manifest.json");
 
     }
 

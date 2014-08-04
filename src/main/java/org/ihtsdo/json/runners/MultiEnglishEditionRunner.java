@@ -37,6 +37,8 @@ public class MultiEnglishEditionRunner {
         modulesToIgnore.add(900000000000012004L);
         config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
 
+        config.setOutputFolder("/Volumes/Macintosh HD2/Multi-english-data");
+
         TransformerDiskBased tr = new TransformerDiskBased();
 
         tr.convert(config);

@@ -16,6 +16,7 @@ public class TransformerConfig {
     private String databaseName;
     private String effectiveTime;
     private String expirationTime;
+    private String outputFolder;
 
     private HashSet<String> foldersBaselineLoad;
     private ArrayList<Long> modulesToIgnoreBaselineLoad;
@@ -24,6 +25,10 @@ public class TransformerConfig {
     private ArrayList<Long> modulesToIgnoreExtensionLoad;
 
     public TransformerConfig() {
+        foldersBaselineLoad = new HashSet<String>();
+        modulesToIgnoreBaselineLoad = new ArrayList<Long>();
+        foldersExtensionLoad = new HashSet<String>();
+        modulesToIgnoreExtensionLoad = new ArrayList<Long>();
     }
 
     public String getDefaultTermLangCode() {
@@ -120,5 +125,13 @@ public class TransformerConfig {
 
     public void setModulesToIgnoreExtensionLoad(ArrayList<Long> modulesToIgnoreExtensionLoad) {
         this.modulesToIgnoreExtensionLoad = modulesToIgnoreExtensionLoad;
+    }
+
+    public String getOutputFolder() {
+        return outputFolder;
+    }
+
+    public void setOutputFolder(String outputFolder) {
+        this.outputFolder = outputFolder;
     }
 }
