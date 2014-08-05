@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <defaultTermLangCode>en</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
+    <editionName>Multi-English Edition</editionName>
+    <databaseName>multi-edition</databaseName>
+    <effectiveTime>20140701</effectiveTime>
+    <expirationTime>20150201</expirationTime>
+    <outputFolder>/Volumes/Macintosh HD2/Multi-english-data</outputFolder>
+    <foldersBaselineLoad>
+        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
+    </foldersBaselineLoad>
+    <modulesToIgnoreBaselineLoad>
+    </modulesToIgnoreBaselineLoad>
+    <foldersExtensionLoad>
+        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot</folder>
+        <folder>/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot</folder>
+        <folder>/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot</folder>
+    </foldersExtensionLoad>
+    <modulesToIgnoreExtensionLoad>
+    </modulesToIgnoreExtensionLoad>
+</config>
