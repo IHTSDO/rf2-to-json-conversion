@@ -4,6 +4,8 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.ihtsdo.json.TransformerConfig;
 import org.ihtsdo.json.TransformerDiskBased;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +21,9 @@ public class ConfigRunner {
             config = args[0];
         }
         if (config == null) {
-            config = "config/sampleConfig.xml";
+            //config = "config/sampleConfig.xml";
+            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
+            System.exit(-1);
         }
         System.out.println("Running with config: " + config);
         XMLConfiguration xmlConfig = new XMLConfiguration(config);

@@ -140,7 +140,7 @@ public class Transformer {
 			fHelper.findAllFiles(dir, files);
 
 			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+				String pattern=FileHelper.getFileTypeByHeader(new File(file));
 
 				if (pattern.equals("rf2-relationships")){
 					loadRelationshipsFile(new File(file));
@@ -193,7 +193,7 @@ public class Transformer {
 			fHelper.findAllFiles(dir, files);
 
 			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+				String pattern=FileHelper.getFileTypeByHeader(new File(file));
 
 				if (pattern.equals("rf2-relationships")){
 					loadRelationshipsFile(new File(file));

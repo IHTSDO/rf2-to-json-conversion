@@ -6,12 +6,14 @@
 package org.ihtsdo.json;
 
 import com.google.gson.Gson;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.ihtsdo.json.model.*;
 import org.ihtsdo.json.model.ResourceSetManifest;
 import org.ihtsdo.json.utils.FileHelper;
 import org.mapdb.DBMaker;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -101,13 +103,13 @@ public class TransformerDiskBased {
         System.out.println("######## Processing Baseline ########");
         HashSet<String> files = getFilesFromFolders(config.getFoldersBaselineLoad());
         System.out.println("Files: " + files.size());
-        processFiles(files, valConfig, config.getModulesToIgnoreBaselineLoad());
+        processFiles(files, config.getModulesToIgnoreBaselineLoad());
 
         if (config.getFoldersExtensionLoad() != null && config.getModulesToIgnoreExtensionLoad() != null) {
             System.out.println("######## Processing Extensions ########");
             files = getFilesFromFolders(config.getFoldersExtensionLoad());
             System.out.println("Files: " + files.size());
-            processFiles(files, valConfig, config.getModulesToIgnoreExtensionLoad());
+            processFiles(files, config.getModulesToIgnoreExtensionLoad());
         } else {
             System.out.println("######## No Extensions options configured ########");
         }
@@ -189,10 +191,9 @@ public class TransformerDiskBased {
 		System.gc();
 	}
 
-    private void processFiles(HashSet<String> files, String validationConfig, List<Long> modulesToIgnore) throws IOException, Exception {
-        File config=new File(validationConfig);
+    private void processFiles(HashSet<String> files, List<Long> modulesToIgnore) throws IOException, Exception {
         for (String file:files){
-            String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+            String pattern=FileHelper.getFileTypeByHeader(new File(file));
 
             if (pattern.equals("rf2-relationships")){
                 loadRelationshipsFile(new File(file), modulesToIgnore);
@@ -234,20 +235,19 @@ public class TransformerDiskBased {
 
 	}
 
-	public void createTClosures(HashSet<String> folders, String valConfig, String transitiveClosureInferredFile,String transitiveClosureStatedFile) throws Exception {
+	public void createTClosures(HashSet<String> folders, String transitiveClosureInferredFile,String transitiveClosureStatedFile) throws Exception {
 		if (relationships==null || relationships.size()==0){
-			getFilesForTransClosureProcess(folders,valConfig);
+			getFilesForTransClosureProcess(folders);
 		}
 		createTClosure(transitiveClosureInferredFile,inferred);
 		createTClosure(transitiveClosureStatedFile,stated);
 
 	}
 	
-	private void getFilesForTransClosureProcess(HashSet<String> folders, String validationConfig) throws IOException, Exception {
+	private void getFilesForTransClosureProcess(HashSet<String> folders) throws IOException, Exception {
 
 		concepts = new HashMap<Long, ConceptDescriptor>();
 		relationships = new HashMap<Long, List<LightRelationship>>();
-		File config=new File(validationConfig);
 		FileHelper fHelper=new FileHelper();
 		for (String folder:folders){
 			File dir=new File(folder);
@@ -255,7 +255,7 @@ public class TransformerDiskBased {
 			fHelper.findAllFiles(dir, files);
 
 			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file), config);
+				String pattern=FileHelper.getFileTypeByHeader(new File(file));
 
 				if (pattern.equals("rf2-relationships")){
 					loadRelationshipsFile(new File(file), null);
@@ -1243,8 +1243,9 @@ public class TransformerDiskBased {
 
 	private void getCharConvTable() throws IOException {
 
-		String charconvtable="src/main/resources/org/ihtsdo/util/char_conversion_table.txt";
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(charconvtable), "UTF8"));	
+		//String charconvtable="src/main/resources/org/ihtsdo/util/char_conversion_table.txt";
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("char_conversion_table.txt"), "UTF8"));
 		br.readLine();
 		String line=null;
 		charConv=new HashMap<String,String>();
