@@ -1223,7 +1223,7 @@ public class TransformerDiskBased {
         for (Long langRefsetId : langRefsetsSet) {
             manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
         }
-        for (Long refsetId : modulesSet) {
+        for (Long refsetId : refsetsSet) {
             manifest.getRefsets().add(concepts.get(refsetId));
         }
         bw.append(gson.toJson(manifest).toString());
