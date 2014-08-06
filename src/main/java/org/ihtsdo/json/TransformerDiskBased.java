@@ -115,7 +115,7 @@ public class TransformerDiskBased {
         }
 
         completeDefaultTerm();
-        File output = new File("target/output");
+        File output = new File(config.getOutputFolder());
         output.mkdirs();
         createConceptsJsonFile(config.getOutputFolder() + "/concepts.json");
         createTextIndexFile(config.getOutputFolder() + "/text-index.json");
@@ -132,49 +132,6 @@ public class TransformerDiskBased {
             }
         }
     }
-
-	public static void main(String[] args) throws Exception {
-//		TransformerDiskBased tr = new TransformerDiskBased();
-//		tr.setDefaultLangCode("en");
-//		tr.setDefaultTermType(tr.fsnType);
-//
-//        List<Long> modulesToIgnore = new ArrayList<Long>();
-//		HashSet<String> folders=new HashSet<String>();
-//        System.out.println("######## Processing Int edition ########");
-//		folders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
-//        HashSet<String> files = tr.getFilesFromFolders(folders);
-//        System.out.println("Files: " + files.size());
-//        tr.processFiles(files, tr.valConfig, modulesToIgnore);
-
-//        System.out.println("######## Processing other editions ########");
-//        modulesToIgnore.add(900000000000207008L);
-//        modulesToIgnore.add(900000000000012004L);
-//        folders=new HashSet<String>();
-//        folders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot");
-//        folders.add("/Users/termmed/Downloads/SnomedCT_Release_US1000124_20140301/RF2Release/Snapshot");
-//        folders.add("/Users/termmed/Downloads/SnomedCT_Release_AU1000036_20140531/RF2 Release/Snapshot");
-//        files = tr.getFilesFromFolders(folders);
-//        System.out.println("Files: " + files.size());
-//        tr.processFiles(files, tr.valConfig, modulesToIgnore);
-
-//        System.out.println("######## Processing GMDN ########");
-//        folders=new HashSet<String>();
-//        folders.add("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
-//        folders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
-//        files = tr.getFilesFromFolders(folders);
-//        System.out.println("Files: " + files.size());
-//        tr.processFiles(files, tr.valConfig, modulesToIgnore);
-//
-//        tr.completeDefaultTerm();
-//		  tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/concepts.json");
-//		  tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/text-index.json");
-//
-//        tr.createConceptsJsonFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/concepts.json");
-//        tr.createTextIndexFile("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2/text-index.json");
-
-		//tr.freeStep1();
-		//tr.createTClosures(folders, tr.valConfig, "/Volumes/Macintosh HD2/Multi-english-data/tclosure-inferred.json", "/Volumes/Macintosh HD2/tclosure-stated.json");
-	}
 
 	public void freeStep1() {
 		descriptions =  null;
@@ -1174,24 +1131,12 @@ public class TransformerDiskBased {
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
 				d.setModule(ldesc.getModule());
-				// using long lang names for Mongo 2.4.x text indexes
+				//TODO: using long lang names to support compatibility with Mongo 2.4.x text indexes
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());
 				d.setConceptActive(concept.isActive());
                 d.setFsn(cptFSN.get(conceptId));
-//				if (getDefaultTermType()!=fsnType){
-//					String fsn= cptFSN.get(ldesc.getConceptId());
-//					if (fsn!=null){
-//						d.setFsn(fsn);
-//					}
-//				}else{
-//					d.setFsn(concept.getDefaultTerm());
-//				}
-//				if (d.getFsn() == null) {
-//					System.out.println("FSN Issue..." + d.getConceptId());
-//					d.setFsn(d.getTerm());
-//				}
 				d.setSemanticTag("");
 				if (d.getFsn().endsWith(")")) {
 					d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
@@ -1200,6 +1145,35 @@ public class TransformerDiskBased {
 				String convertedTerm=convertTerm(cleanTerm);
 				String[] tokens = convertedTerm.toLowerCase().split("\\s+");
 				d.setWords(Arrays.asList(tokens));
+
+                d.setRefsetIds(new ArrayList<Long>());
+
+                // Refset index assumes that only active members are included in the db.
+                List<LightRefsetMembership> listLRM = simpleMembers.get(concept.getConceptId());
+                if (listLRM != null) {
+                    for (LightRefsetMembership lrm : listLRM) {
+                        d.getRefsetIds().add(lrm.getRefset());
+                    }
+                }
+                listLRM = simpleMapMembers.get(concept.getConceptId());
+                if (listLRM != null) {
+                    for (LightRefsetMembership lrm : listLRM) {
+                        d.getRefsetIds().add(lrm.getRefset());
+                    }
+                }
+                listLRM = assocMembers.get(concept.getConceptId());
+                if (listLRM != null) {
+                    for (LightRefsetMembership lrm : listLRM) {
+                        d.getRefsetIds().add(lrm.getRefset());
+                    }
+                }
+                listLRM = attrMembers.get(concept.getConceptId());
+                if (listLRM != null) {
+                    for (LightRefsetMembership lrm : listLRM) {
+                        d.getRefsetIds().add(lrm.getRefset());
+                    }
+                }
+
 				bw.append(gson.toJson(d).toString());
 				bw.append(sep);
 			}

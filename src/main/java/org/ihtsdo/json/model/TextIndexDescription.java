@@ -18,6 +18,7 @@ public class TextIndexDescription extends Description {
     private boolean conceptActive;
     private Long typeId;
     private List<String> words;
+    private List<Long> refsetIds;
 
     public TextIndexDescription() {
     }
@@ -70,5 +71,12 @@ public class TextIndexDescription extends Description {
     public void setTypeId(Long typeId) {
         this.typeId = typeId;
     }
-    
+
+    public List<Long> getRefsetIds() {
+        return refsetIds;
+    }
+
+    public void setRefsetIds(List<Long> refsetIds) {
+        this.refsetIds = refsetIds;
+    }
 }
