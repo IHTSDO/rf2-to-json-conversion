@@ -1142,10 +1142,14 @@ public class TransformerDiskBased {
 					d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
 				}
 				String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
-				String convertedTerm=convertTerm(cleanTerm);
-				String[] tokens = convertedTerm.toLowerCase().split("\\s+");
-				d.setWords(Arrays.asList(tokens));
-
+				if (manifest.isTextIndexNormalized()) {
+                    String convertedTerm = convertTerm(cleanTerm);
+                    String[] tokens = convertedTerm.toLowerCase().split("\\s+");
+                    d.setWords(Arrays.asList(tokens));
+                } else {
+                    String[] tokens = cleanTerm.toLowerCase().split("\\s+");
+                    d.setWords(Arrays.asList(tokens));
+                }
                 d.setRefsetIds(new ArrayList<Long>());
 
                 // Refset index assumes that only active members are included in the db.
@@ -1184,7 +1188,6 @@ public class TransformerDiskBased {
 	}
 
     public void createManifestFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
-        getCharConvTable();
         System.out.println("Starting creation of " + fileName);
         FileOutputStream fos = new FileOutputStream(fileName);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
