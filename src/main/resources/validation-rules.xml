@@ -40,7 +40,7 @@
 				<regex>.*SimpleMap.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tmapTarget$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tmapTarget$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t.+$</regex>
@@ -55,7 +55,7 @@
 				<regex>.*Refset_Order.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\torder\\tlinkedTo$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\torder\\tlinkedTo$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,}\\t\d{1\,}$</regex>
@@ -70,7 +70,7 @@
 				<regex>.*Simple.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t.+$</regex>
@@ -85,7 +85,7 @@
 				<regex>.*Language.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tacceptabilityId$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tacceptabilityId$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
@@ -100,7 +100,7 @@
 				<regex>.*AttributeValue.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tvalueId$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tvalueId$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
@@ -115,7 +115,7 @@
 				<regex>.*Association.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\ttargetComponent$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\ttargetComponent$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
@@ -130,7 +130,7 @@
 				<regex>.*Association.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\ttargetComponentId$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\ttargetComponentId$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
@@ -145,7 +145,7 @@
 				<regex>.*Refinability.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tvalueId$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tvalueId$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}$</regex>
@@ -191,7 +191,7 @@
 				<regex>.*HistoricalRelationshipIdentifiers.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedRefsetMemberId\\tvalue$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedRefsetMemberId\\tvalue$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{3\,}$</regex>
@@ -296,7 +296,7 @@
 				<regex>.*ComplexMap.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tmapGroup\\tmapPriority\\tmapRule\\tmapAdvice\\tmapTarget\\tcorrelationId$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tmapGroup\\tmapPriority\\tmapRule\\tmapAdvice\\tmapTarget\\tcorrelationId$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1}\\t\d{1}\\t.*\\t.*\\t.*\\t\d{3\,}$</regex>
@@ -311,7 +311,7 @@
 				<regex>.*ComplexMap.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tmapGroup\\tmapPriority\\tmapRule\\tmapAdvice\\tmapTarget\\tcorrelationId\\tmapBlock$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tmapGroup\\tmapPriority\\tmapRule\\tmapAdvice\\tmapTarget\\tcorrelationId\\tmapBlock$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,}\\t\d{1\,}\\t.*\\t.*\\t.*\\t\d{3\,}\\t\d{1\,}$</regex>
@@ -326,7 +326,7 @@
 				<regex>.*RefsetDescriptor.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tattributeDescription\\tattributeType\\tattributeOrder$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tattributeDescription\\tattributeType\\tattributeOrder$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1}$</regex>
@@ -341,7 +341,7 @@
 				<regex>.*DescriptionType.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tdescriptionFormat\\tdescriptionLength$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tdescriptionFormat\\tdescriptionLength$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d*$</regex>
@@ -356,7 +356,7 @@
 				<regex>.*ModuleDependency.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\tsourceEffectiveTime\\ttargetEffectiveTime$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\tsourceEffectiveTime\\ttargetEffectiveTime$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{8}\\t\d{8}$</regex>
@@ -416,7 +416,7 @@
 				<regex>.*Navigation.*</regex>
 			</nameRule>
 			<headerRule>
-				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\trefsetId\\treferencedComponentId\\torder\\tlinkedTo$</regex>
+				<regex>id\\teffectiveTime\\tactive\\tmoduleId\\tref[sS]etId\\treferencedComponentId\\torder\\tlinkedTo$</regex>
 			</headerRule>
 			<contentRule>
 				<regex>[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\\t\d{8}\\t\d{1}\\t\d{3\,}\\t\d{3\,}\\t\d{3\,}\\t\d{1\,}\\t\d{3\,}$</regex>
