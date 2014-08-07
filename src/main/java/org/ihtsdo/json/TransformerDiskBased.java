@@ -335,7 +335,7 @@ public class TransformerDiskBased {
                         enFsn = desc.getTerm();
                     }
 
-                    if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
+                    if (act && type.equals(defaultTermType.toString()) && lang.equals(defaultLangCode)) {
                         userSelectedDefaultTerm = desc.getTerm();
                     }
 
@@ -773,11 +773,13 @@ public class TransformerDiskBased {
 		List<LightRefsetMembership> listLRM = new ArrayList<LightRefsetMembership>();
 		List<RefsetMembership> listRM = new ArrayList<RefsetMembership>();
 
-		//        int count = 0;
+        int count = 0;
         boolean firstWritten = false;
 		for (Long cptId : concepts.keySet()) {
-			//            count++;
-			//if (count > 10) break;
+            count++;
+            if (count % 10000 == 0) {
+                System.out.print(".");
+            }
 			Concept cpt = new Concept();
 			ConceptDescriptor cptdesc = concepts.get(cptId);
 
@@ -1048,10 +1050,11 @@ public class TransformerDiskBased {
 
             if (!firstWritten) {
                 firstWritten = true;
-                System.out.println(gson.toJson(cpt).toString());
+                //System.out.println(gson.toJson(cpt).toString());
             }
 		}
 		bw.close();
+        System.out.println(".");
 		System.out.println(fileName + " Done");
 	}
 
@@ -1072,7 +1075,7 @@ public class TransformerDiskBased {
 		Gson gson = new Gson();
 
 
-		//         int count = 0;
+//		int count = 0;
 		for (Long cptId : concepts.keySet()) {		
 
 			listA = new ArrayList<Long>();
@@ -1118,10 +1121,12 @@ public class TransformerDiskBased {
 		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 		BufferedWriter bw = new BufferedWriter(osw);
 		Gson gson = new Gson();
-		//        int count = 0;
+        int count = 0;
 		for (long conceptId : descriptions.keySet()) {
-			//            count++;
-			//if (count > 10) break;
+            count++;
+            if (count % 10000 == 0) {
+                System.out.print(".");
+            }
 			for (LightDescription ldesc : descriptions.get(conceptId)) {
 				TextIndexDescription d = new TextIndexDescription();
 				d.setActive(ldesc.isActive());
@@ -1184,6 +1189,7 @@ public class TransformerDiskBased {
 		}
 
 		bw.close();
+        System.out.println(".");
 		System.out.println(fileName + " Done");
 	}
 
