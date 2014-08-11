@@ -40,6 +40,7 @@ public class TransformerDiskBased {
 	private Long stated = 900000000000010007l;
 	private Long isaSCTId=116680003l;
 	private Long defaultTermType = fsnType;
+    private Long defaultLangRefset = 900000000000509007L;
 	private Map<Long, List<LightDescription>> tdefMembers;
 	private Map<Long, List<LightRefsetMembership>> attrMembers;
 	private Map<Long, List<LightRefsetMembership>> assocMembers;
@@ -84,6 +85,7 @@ public class TransformerDiskBased {
 
         setDefaultLangCode(config.getDefaultTermLangCode());
         setDefaultTermType(config.getDefaultTermDescriptionType());
+        setDefaultLangRefset(config.getDefaultTermLanguageRefset());
 
         manifest = new ResourceSetManifest();
         manifest.setDatabaseName(config.getDatabaseName());
@@ -323,7 +325,9 @@ public class TransformerDiskBased {
 			if (lDescriptions!=null){
                 String lastTerm = "No descriptions";
                 String enFsn = null;
-                String userSelectedDefaultTerm = null;
+                String configFsn = null;
+                String userSelectedDefaultTermByLangCode = null;
+                String userSelectedDefaultTermByRefset = null;
 				for (LightDescription desc:lDescriptions){
 					
 					act=desc.isActive();
@@ -336,39 +340,33 @@ public class TransformerDiskBased {
                     }
 
                     if (act && type.equals(defaultTermType.toString()) && lang.equals(defaultLangCode)) {
-                        userSelectedDefaultTerm = desc.getTerm();
+                        userSelectedDefaultTermByLangCode = desc.getTerm();
+                    }
+
+                    if (act && type.equals(defaultTermType.toString())) {
+                        boolean isPreferred = false;
+                        List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
+                        if (listLLM != null) {
+                            for (LightLangMembership llm : listLLM) {
+                                if (llm.getAcceptability().equals(900000000000548007L)) {
+                                    if (desc.getType().equals(900000000000003001L)) {
+                                        configFsn = desc.getTerm();
+                                    }
+                                    userSelectedDefaultTermByRefset = desc.getTerm();
+                                }
+                            }
+                        }
                     }
 
                     lastTerm = desc.getTerm();
 
-//					if (act && type.equals("900000000000003001") && lang.equals("en")) {
-//						cdesc = concepts.get(sourceId);
-//						if (cdesc != null && (cdesc.getDefaultTerm() == null || cdesc.getDefaultTerm().isEmpty())) {
-//							cdesc.setDefaultTerm(desc.getTerm());
-//						}
-//
-//						if (getDefaultTermType()!=fsnType){
-//							if (!cptFSN.containsKey(sourceId)){
-//								cptFSN.put(sourceId, desc.getTerm());
-//                                fsnSet = true;
-//							}
-//						}
-//					} else if (act && type.equals(defaultTermType) && lang.equals(defaultLangCode)) {
-//						cdesc = concepts.get(sourceId);
-//						if (cdesc != null) {
-//							cdesc.setDefaultTerm(desc.getTerm());
-//						}
-//					}
-//					if (getDefaultTermType()!=fsnType && act && type.equals("900000000000003001") && lang.equals(defaultLangCode)){
-//						cptFSN.put(sourceId, desc.getTerm());
-//                        fsnSet = true;
-//					}
-//                    lastTerm = desc.getTerm();
 				}
                 ConceptDescriptor loopConcept = concepts.get(sourceId);
 
-                if (userSelectedDefaultTerm != null) {
-                    loopConcept.setDefaultTerm(userSelectedDefaultTerm);
+                if (userSelectedDefaultTermByRefset != null) {
+                    loopConcept.setDefaultTerm(userSelectedDefaultTermByRefset);
+                } else if (userSelectedDefaultTermByLangCode != null) {
+                    loopConcept.setDefaultTerm(userSelectedDefaultTermByLangCode);
                 } else if (enFsn != null) {
                     loopConcept.setDefaultTerm(enFsn);
                 } else {
@@ -376,14 +374,13 @@ public class TransformerDiskBased {
                 }
                 concepts.put(sourceId, loopConcept);
 
-                if (enFsn != null) {
+                if (configFsn != null) {
+                    cptFSN.put(sourceId, configFsn);
+                } else if (enFsn != null) {
                     cptFSN.put(sourceId, enFsn);
-                } else if (userSelectedDefaultTerm != null) {
-                    cptFSN.put(sourceId, userSelectedDefaultTerm);
                 } else {
                     cptFSN.put(sourceId, lastTerm);
                 }
-
 			}
 		}
 	}
@@ -791,6 +788,7 @@ public class TransformerDiskBased {
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
 			cpt.setLeafInferred(!notLeafInferred.contains(cptId));
 			cpt.setLeafStated(!notLeafStated.contains(cptId));
+            cpt.setFsn(cptFSN.get(cptId));
 			listLD = descriptions.get(cptId);
 			listD = new ArrayList<Description>();
 
@@ -1141,6 +1139,7 @@ public class TransformerDiskBased {
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());
 				d.setConceptActive(concept.isActive());
+                d.setDefinitionStatus(concept.getDefinitionStatus());
                 d.setFsn(cptFSN.get(conceptId));
 				d.setSemanticTag("");
 				if (d.getFsn().endsWith(")")) {
@@ -1253,6 +1252,11 @@ public class TransformerDiskBased {
 		this.defaultTermType = defaultTermType;
 	}
 
+    public Long getDefaultLangRefset() {
+        return defaultLangRefset;
+    }
 
-
+    public void setDefaultLangRefset(Long defaultLangRefset) {
+        this.defaultLangRefset = defaultLangRefset;
+    }
 }

@@ -19,6 +19,7 @@ public class TextIndexDescription extends Description {
     private Long typeId;
     private List<String> words;
     private List<Long> refsetIds;
+    String definitionStatus;
 
     public TextIndexDescription() {
     }
@@ -78,5 +79,13 @@ public class TextIndexDescription extends Description {
 
     public void setRefsetIds(List<Long> refsetIds) {
         this.refsetIds = refsetIds;
+    }
+
+    public String getDefinitionStatus() {
+        return definitionStatus;
+    }
+
+    public void setDefinitionStatus(String definitionStatus) {
+        this.definitionStatus = definitionStatus;
     }
 }

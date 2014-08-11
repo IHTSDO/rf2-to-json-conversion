@@ -19,6 +19,7 @@ public class Concept extends ConceptDescriptor {
     List<Relationship> statedRelationships;
     boolean isLeafInferred;
     boolean isLeafStated;
+    String fsn;
     
     public Concept() {
     }
@@ -69,5 +70,13 @@ public class Concept extends ConceptDescriptor {
 
     public void setLeafStated(boolean isLeafStated) {
         this.isLeafStated = isLeafStated;
+    }
+
+    public String getFsn() {
+        return fsn;
+    }
+
+    public void setFsn(String fsn) {
+        this.fsn = fsn;
     }
 }

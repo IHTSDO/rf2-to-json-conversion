@@ -22,17 +22,17 @@ public class GMDNRunner {
         config.setExpirationTime("20150201");
         config.setNormalizeTextIndex(true);
         HashSet<String> baselineFolders = new HashSet<String>();
-        baselineFolders.add("/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
+        baselineFolders.add("/Users/alo/Downloads/Releases/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
         config.setFoldersBaselineLoad(baselineFolders);
         config.setModulesToIgnoreBaselineLoad(new ArrayList<Long>());
         HashSet<String> extensionFolders = new HashSet<String>();
-        extensionFolders.add("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
-        extensionFolders.add("/Volumes/Macintosh HD2/Multi-english-data/RF2TechnologyPreview/Snapshot");
+        extensionFolders.add("/Users/alo/NetBeansProjects/gmdn-analyzer/output/rf2");
+        extensionFolders.add("/Users/alo/NetBeansProjects/gmdn-analyzer/output/SnomedCT_MedicalDevicesTechnologyPreview_INT_20140131/RF2TechnologyPreview/Snapshot");
         config.setFoldersExtensionLoad(extensionFolders);
         ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
         config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
 
-        config.setOutputFolder("/Volumes/Macintosh HD2/Multi-english-data/gmdn-rf2");
+        config.setOutputFolder("/Users/alo/Downloads/Releases/gmdn-json");
 
         TransformerDiskBased tr = new TransformerDiskBased();
 
