@@ -14,9 +14,9 @@ public class EsRunner {
     public static void main(String[] args) throws Exception {
         TransformerConfig config = new TransformerConfig();
         config.setDatabaseName("es-edition");
-        config.setDefaultTermDescriptionType(900000000000003001L);
+        config.setDefaultTermDescriptionType("900000000000003001");
         config.setDefaultTermLangCode("es");
-        config.setDefaultTermLanguageRefset(900000000000509007L);
+        config.setDefaultTermLanguageRefset("900000000000509007");
         config.setEditionName("Spanish Edition");
         config.setEffectiveTime("20140430");
         config.setExpirationTime("20141231");
@@ -24,11 +24,11 @@ public class EsRunner {
         HashSet<String> baselineFolders = new HashSet<String>();
         baselineFolders.add("/Users/alo/Downloads/Releases/SnomedCT_Release_INT_20140131/RF2Release/Snapshot");
         config.setFoldersBaselineLoad(baselineFolders);
-        config.setModulesToIgnoreBaselineLoad(new ArrayList<Long>());
+        config.setModulesToIgnoreBaselineLoad(new ArrayList<String>());
         HashSet<String> extensionFolders = new HashSet<String>();
         extensionFolders.add("/Users/alo/Downloads/Releases/SnomedCT_Release-es_INT_20140430/RF2Release/Snapshot");
         config.setFoldersExtensionLoad(extensionFolders);
-        ArrayList<Long> modulesToIgnore = new ArrayList<Long>();
+        ArrayList<String> modulesToIgnore = new ArrayList<String>();
         config.setModulesToIgnoreExtensionLoad(modulesToIgnore);
 
         config.setOutputFolder("/Users/alo/Downloads/Releases/es-json");

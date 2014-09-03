@@ -11,37 +11,37 @@ package org.ihtsdo.json.model;
  */
 public class LightDescription extends Component {
 
-    Long descriptionId;
-    Long conceptId;
-    Long type;
+    String descriptionId;
+    String conceptId;
+    String type;
     String term;
-    Long ics;
+    String ics;
     String lang;
 
     public LightDescription() {
     }
 
-    public Long getDescriptionId() {
+    public String getDescriptionId() {
         return descriptionId;
     }
 
-    public void setDescriptionId(Long descriptionId) {
+    public void setDescriptionId(String descriptionId) {
         this.descriptionId = descriptionId;
     }
 
-    public Long getConceptId() {
+    public String getConceptId() {
         return conceptId;
     }
 
-    public void setConceptId(Long conceptId) {
+    public void setConceptId(String conceptId) {
         this.conceptId = conceptId;
     }
 
-    public Long getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Long type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -53,11 +53,11 @@ public class LightDescription extends Component {
         this.term = term;
     }
 
-    public Long getIcs() {
+    public String getIcs() {
         return ics;
     }
 
-    public void setIcs(Long ics) {
+    public void setIcs(String ics) {
         this.ics = ics;
     }
 

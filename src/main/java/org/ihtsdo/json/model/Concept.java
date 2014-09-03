@@ -20,7 +20,11 @@ public class Concept extends ConceptDescriptor {
     boolean isLeafInferred;
     boolean isLeafStated;
     String fsn;
-    
+
+    String semtag;
+    List<String> inferredAncestors;
+    List<String> statedAncestors;
+
     public Concept() {
     }
 
@@ -78,5 +82,29 @@ public class Concept extends ConceptDescriptor {
 
     public void setFsn(String fsn) {
         this.fsn = fsn;
+    }
+
+    public String getSemtag() {
+        return semtag;
+    }
+
+    public void setSemtag(String semtag) {
+        this.semtag = semtag;
+    }
+
+    public List<String> getInferredAncestors() {
+        return inferredAncestors;
+    }
+
+    public void setInferredAncestors(List<String> inferredAncestors) {
+        this.inferredAncestors = inferredAncestors;
+    }
+
+    public List<String> getStatedAncestors() {
+        return statedAncestors;
+    }
+
+    public void setStatedAncestors(List<String> statedAncestors) {
+        this.statedAncestors = statedAncestors;
     }
 }

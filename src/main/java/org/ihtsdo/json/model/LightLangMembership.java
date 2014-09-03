@@ -13,25 +13,25 @@ import java.util.UUID;
  */
 public class LightLangMembership extends Component {
 
-    private Long descriptionId;	
-	private Long refset;
-    private Long acceptability;
-	public Long getDescriptionId() {
+    private String descriptionId;
+	private String refset;
+    private String acceptability;
+	public String getDescriptionId() {
 		return descriptionId;
 	}
-	public void setDescriptionId(Long descriptionId) {
+	public void setDescriptionId(String descriptionId) {
 		this.descriptionId = descriptionId;
 	}
-	public Long getRefset() {
+	public String getRefset() {
 		return refset;
 	}
-	public void setRefset(Long refset) {
+	public void setRefset(String refset) {
 		this.refset = refset;
 	}
-	public Long getAcceptability() {
+	public String getAcceptability() {
 		return acceptability;
 	}
-	public void setAcceptability(Long acceptability) {
+	public void setAcceptability(String acceptability) {
 		this.acceptability = acceptability;
 	}
     

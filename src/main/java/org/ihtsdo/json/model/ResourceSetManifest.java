@@ -18,18 +18,18 @@ public class ResourceSetManifest implements Serializable {
     private String expirationDate;
     private List<ConceptDescriptor> modules;
     private List<ConceptDescriptor> languageRefsets;
-    private List<ConceptDescriptor> refsets;
-    private Map<Long, String> languageRefsetsAbbrev;
+    private List<RefsetDescriptor> refsets;
+    private Map<String, String> languageRefsetsAbbrev;
     private String defaultTermLangCode;
-    private Long defaultTermType;
-    private Long defaultTermLangRefset;
+    private String defaultTermType;
+    private String defaultTermLangRefset;
     private boolean textIndexNormalized;
 
     public ResourceSetManifest() {
         modules = new ArrayList<ConceptDescriptor>();
         languageRefsets = new ArrayList<ConceptDescriptor>();
-        refsets = new ArrayList<ConceptDescriptor>();
-        languageRefsetsAbbrev = new HashMap<Long, String>();
+        refsets = new ArrayList<RefsetDescriptor>();
+        languageRefsetsAbbrev = new HashMap<String, String>();
     }
 
     public String getResourceSetName() {
@@ -88,19 +88,19 @@ public class ResourceSetManifest implements Serializable {
         this.languageRefsets = languageRefsets;
     }
 
-    public List<ConceptDescriptor> getRefsets() {
+    public List<RefsetDescriptor> getRefsets() {
         return refsets;
     }
 
-    public void setRefsets(List<ConceptDescriptor> refsets) {
+    public void setRefsets(List<RefsetDescriptor> refsets) {
         this.refsets = refsets;
     }
 
-    public Map<Long, String> getLanguageRefsetsAbbrev() {
+    public Map<String, String> getLanguageRefsetsAbbrev() {
         return languageRefsetsAbbrev;
     }
 
-    public void setLanguageRefsetsAbbrev(Map<Long, String> languageRefsetsAbbrev) {
+    public void setLanguageRefsetsAbbrev(Map<String, String> languageRefsetsAbbrev) {
         this.languageRefsetsAbbrev = languageRefsetsAbbrev;
     }
 
@@ -112,19 +112,19 @@ public class ResourceSetManifest implements Serializable {
         this.defaultTermLangCode = defaultTermLangCode;
     }
 
-    public Long getDefaultTermType() {
+    public String getDefaultTermType() {
         return defaultTermType;
     }
 
-    public void setDefaultTermType(Long defaultTermType) {
+    public void setDefaultTermType(String defaultTermType) {
         this.defaultTermType = defaultTermType;
     }
 
-    public Long getDefaultTermLangRefset() {
+    public String getDefaultTermLangRefset() {
         return defaultTermLangRefset;
     }
 
-    public void setDefaultTermLangRefset(Long defaultTermLangRefset) {
+    public void setDefaultTermLangRefset(String defaultTermLangRefset) {
         this.defaultTermLangRefset = defaultTermLangRefset;
     }
 

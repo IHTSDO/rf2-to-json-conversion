@@ -17,7 +17,7 @@ public class Component implements Serializable {
     private UUID uuid;
     private Boolean active;
     private String effectiveTime;
-    private Long module;
+    private String module;
     
     public Component() {
     }
@@ -38,14 +38,6 @@ public class Component implements Serializable {
 		this.active = active;
 	}
 
-	public Long getModule() {
-		return module;
-	}
-
-	public void setModule(Long module) {
-		this.module = module;
-	}
-
 	public UUID getUuid() {
         return uuid;
     }
@@ -54,4 +46,11 @@ public class Component implements Serializable {
         this.uuid = uuid;
     }
 
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
 }

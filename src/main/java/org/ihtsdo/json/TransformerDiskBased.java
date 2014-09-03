@@ -25,35 +25,37 @@ public class TransformerDiskBased {
 	private String MODIFIER = "Existential restriction";
 	private String sep = System.getProperty("line.separator");
 
-	private Map<Long, ConceptDescriptor> concepts;
-	private Map<Long, List<LightDescription>> descriptions;
-	private Map<Long, List<LightRelationship>> relationships;
-	private Map<Long, List<LightRefsetMembership>> simpleMembers;
-	private Map<Long, List<LightRefsetMembership>> simpleMapMembers;
-	private Map<Long, List<LightLangMembership>> languageMembers;
+	private Map<String, ConceptDescriptor> concepts;
+	private Map<String, List<LightDescription>> descriptions;
+	private Map<String, List<LightRelationship>> relationships;
+	private Map<String, List<LightRefsetMembership>> simpleMembers;
+	private Map<String, List<LightRefsetMembership>> simpleMapMembers;
+	private Map<String, List<LightLangMembership>> languageMembers;
 	private Map<String, String> langCodes;
 
+    private Map<String, Integer> refsetsCount;
+
 	private String defaultLangCode = "en";
-	public Long fsnType = 900000000000003001L;
-	public Long synType = 900000000000013009L;
-	private Long inferred = 900000000000011006l;
-	private Long stated = 900000000000010007l;
-	private Long isaSCTId=116680003l;
-	private Long defaultTermType = fsnType;
-    private Long defaultLangRefset = 900000000000509007L;
-	private Map<Long, List<LightDescription>> tdefMembers;
-	private Map<Long, List<LightRefsetMembership>> attrMembers;
-	private Map<Long, List<LightRefsetMembership>> assocMembers;
-	private ArrayList<Long> listA;
+	public String fsnType = "900000000000003001";
+	public String synType = "900000000000013009";
+	private String inferred = "900000000000011006";
+	private String stated = "900000000000010007";
+	private String isaSCTId = "116680003";
+	private String defaultTermType = fsnType;
+    private String defaultLangRefset = "900000000000509007";
+	private Map<String, List<LightDescription>> tdefMembers;
+	private Map<String, List<LightRefsetMembership>> attrMembers;
+	private Map<String, List<LightRefsetMembership>> assocMembers;
+	private ArrayList<String> listA;
 	private Map<String, String> charConv;
-	private Map<Long, String> cptFSN;
-	private HashSet<Long> notLeafInferred;
-	private HashSet<Long> notLeafStated;
+	private Map<String, String> cptFSN;
+	private HashSet<String> notLeafInferred;
+	private HashSet<String> notLeafStated;
     private String valConfig;
     private ResourceSetManifest manifest;
-    private Set<Long> refsetsSet;
-    private Set<Long> langRefsetsSet;
-    private Set<Long> modulesSet;
+    private Set<String> refsetsSet;
+    private Set<String> langRefsetsSet;
+    private Set<String> modulesSet;
 
 
 
@@ -70,18 +72,34 @@ public class TransformerDiskBased {
 	}
 
     public void convert(TransformerConfig config) throws Exception {
-        concepts = DBMaker.newTempHashMap();
-        descriptions = DBMaker.newTempHashMap();
-        relationships = DBMaker.newTempHashMap();
-        simpleMembers = DBMaker.newTempHashMap();
-        assocMembers = DBMaker.newTempHashMap();
-        attrMembers = DBMaker.newTempHashMap();
-        tdefMembers = DBMaker.newTempHashMap();
-        simpleMapMembers = DBMaker.newTempHashMap();
-        languageMembers = DBMaker.newTempHashMap();
-        notLeafInferred=new HashSet<Long>();
-        notLeafStated=new HashSet<Long>();
-        cptFSN = DBMaker.newTempHashMap();
+        if (config.isProcessInMemory()) {
+            concepts = new HashMap<String, ConceptDescriptor>();
+            descriptions = new HashMap<String, List<LightDescription>>();
+            relationships = new HashMap<String, List<LightRelationship>>();
+            simpleMembers = new HashMap<String, List<LightRefsetMembership>>();
+            assocMembers = new HashMap<String, List<LightRefsetMembership>>();
+            attrMembers = new HashMap<String, List<LightRefsetMembership>>();
+            tdefMembers = new HashMap<String, List<LightDescription>>();
+            simpleMapMembers = new HashMap<String, List<LightRefsetMembership>>();
+            languageMembers = new HashMap<String, List<LightLangMembership>>();
+            cptFSN = new HashMap<String, String>();
+        } else {
+            concepts = DBMaker.newTempHashMap();
+            descriptions = DBMaker.newTempHashMap();
+            relationships = DBMaker.newTempHashMap();
+            simpleMembers = DBMaker.newTempHashMap();
+            assocMembers = DBMaker.newTempHashMap();
+            attrMembers = DBMaker.newTempHashMap();
+            tdefMembers = DBMaker.newTempHashMap();
+            simpleMapMembers = DBMaker.newTempHashMap();
+            languageMembers = DBMaker.newTempHashMap();
+            cptFSN = DBMaker.newTempHashMap();
+        }
+
+        notLeafInferred=new HashSet<String>();
+        notLeafStated=new HashSet<String>();
+
+        refsetsCount = new HashMap<String, Integer>();
 
         setDefaultLangCode(config.getDefaultTermLangCode());
         setDefaultTermType(config.getDefaultTermDescriptionType());
@@ -98,9 +116,9 @@ public class TransformerDiskBased {
         manifest.setDefaultTermType(config.getDefaultTermDescriptionType());
         manifest.setResourceSetName(config.getEditionName());
 
-        refsetsSet = new HashSet<Long>();
-        langRefsetsSet = new HashSet<Long>();
-        modulesSet = new HashSet<Long>();
+        refsetsSet = new HashSet<String>();
+        langRefsetsSet = new HashSet<String>();
+        modulesSet = new HashSet<String>();
 
         System.out.println("######## Processing Baseline ########");
         HashSet<String> files = getFilesFromFolders(config.getFoldersBaselineLoad());
@@ -119,9 +137,10 @@ public class TransformerDiskBased {
         completeDefaultTerm();
         File output = new File(config.getOutputFolder());
         output.mkdirs();
-        createConceptsJsonFile(config.getOutputFolder() + "/concepts.json");
+        createConceptsJsonFile(config.getOutputFolder() + "/concepts.json", config.isCreateCompleteConceptsFile());
         createTextIndexFile(config.getOutputFolder() + "/text-index.json");
         createManifestFile(config.getOutputFolder() + "/manifest.json");
+//        createTClosures(files, config.getOutputFolder() + "/inferredTransitiveClosure.json", config.getOutputFolder() + "/statedTransitiveClosure.json");
 
     }
 
@@ -150,7 +169,7 @@ public class TransformerDiskBased {
 		System.gc();
 	}
 
-    private void processFiles(HashSet<String> files, List<Long> modulesToIgnore) throws IOException, Exception {
+    private void processFiles(HashSet<String> files, List<String> modulesToIgnore) throws IOException, Exception {
         for (String file:files){
             String pattern=FileHelper.getFileTypeByHeader(new File(file));
 
@@ -205,8 +224,8 @@ public class TransformerDiskBased {
 	
 	private void getFilesForTransClosureProcess(HashSet<String> folders) throws IOException, Exception {
 
-		concepts = new HashMap<Long, ConceptDescriptor>();
-		relationships = new HashMap<Long, List<LightRelationship>>();
+		concepts = new HashMap<String, ConceptDescriptor>();
+		relationships = new HashMap<String, List<LightRelationship>>();
 		FileHelper fHelper=new FileHelper();
 		for (String folder:folders){
 			File dir=new File(folder);
@@ -226,7 +245,7 @@ public class TransformerDiskBased {
 
 	}
 
-	public void loadConceptsFile(File conceptsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadConceptsFile(File conceptsFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Concepts: " + conceptsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(conceptsFile), "UTF8"));
 		try {
@@ -239,16 +258,16 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
 				ConceptDescriptor loopConcept = new ConceptDescriptor();
-				Long conceptId = Long.parseLong(columns[0]);
+				String conceptId = columns[0];
 				loopConcept.setConceptId(conceptId);
 				loopConcept.setActive(columns[2].equals("1"));
 				loopConcept.setEffectiveTime(columns[1]);
-				loopConcept.setModule(Long.parseLong(columns[3]));
+				loopConcept.setModule(columns[3]);
                 modulesSet.add(loopConcept.getModule());
 				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
 				concepts.put(conceptId, loopConcept);
@@ -265,7 +284,7 @@ public class TransformerDiskBased {
 		}
 	}
 
-	public void loadDescriptionsFile(File descriptionsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadDescriptionsFile(File descriptionsFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Descriptions: " + descriptionsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(descriptionsFile), "UTF8"));
 		int descriptionsCount = 0;
@@ -279,22 +298,22 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
 				LightDescription loopDescription = new LightDescription();
-				loopDescription.setDescriptionId(Long.parseLong(columns[0]));
+				loopDescription.setDescriptionId(columns[0]);
 				act = columns[2].equals("1");
 				loopDescription.setActive(act);
 				loopDescription.setEffectiveTime(columns[1]);
-				Long sourceId = Long.parseLong(columns[4]);
+				String sourceId = columns[4];
 				loopDescription.setConceptId(sourceId);
-				loopDescription.setType(Long.parseLong(columns[6]));
+				loopDescription.setType(columns[6]);
 				loopDescription.setTerm(columns[7]);
-				loopDescription.setIcs(Long.parseLong(columns[8]));
-				loopDescription.setModule(Long.parseLong(columns[3]));
-                modulesSet.add(Long.parseLong(columns[3]));
+				loopDescription.setIcs(columns[8]);
+				loopDescription.setModule(columns[3]);
+                modulesSet.add(columns[3]);
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = descriptions.get(sourceId);
 				if (list == null) {
@@ -320,7 +339,9 @@ public class TransformerDiskBased {
 		boolean act;
 		String type;
 		String lang;
-		for (Long sourceId:concepts.keySet()){
+        System.out.println("Starting Default Terms computation");
+        int count = 0;
+		for (String sourceId:concepts.keySet()){
 			List<LightDescription> lDescriptions = descriptions.get(sourceId);
 			if (lDescriptions!=null){
                 String lastTerm = "No descriptions";
@@ -348,8 +369,8 @@ public class TransformerDiskBased {
                         List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
                         if (listLLM != null) {
                             for (LightLangMembership llm : listLLM) {
-                                if (llm.getAcceptability().equals(900000000000548007L)) {
-                                    if (desc.getType().equals(900000000000003001L)) {
+                                if (llm.getAcceptability().equals("900000000000548007")) {
+                                    if (desc.getType().equals("900000000000003001")) {
                                         configFsn = desc.getTerm();
                                     }
                                     userSelectedDefaultTermByRefset = desc.getTerm();
@@ -381,10 +402,17 @@ public class TransformerDiskBased {
                 } else {
                     cptFSN.put(sourceId, lastTerm);
                 }
+
+                if (count % 100000 == 0) {
+                    System.out.print(".");
+                }
+                count++;
 			}
 		}
+        System.out.println(".");
+        System.out.println("Default Terms computation completed");
 	}
-	public void loadTextDefinitionFile(File textDefinitionFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadTextDefinitionFile(File textDefinitionFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(textDefinitionFile), "UTF8"));
 		int descriptionsCount = 0;
@@ -398,22 +426,22 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
 				LightDescription loopDescription = new LightDescription();
-				loopDescription.setDescriptionId(Long.parseLong(columns[0]));
+				loopDescription.setDescriptionId(columns[0]);
 				act = columns[2].equals("1");
 				loopDescription.setActive(act);
 				loopDescription.setEffectiveTime(columns[1]);
-				Long sourceId = Long.parseLong(columns[4]);
+				String sourceId = columns[4];
 				loopDescription.setConceptId(sourceId);
-				loopDescription.setType(Long.parseLong(columns[6]));
+				loopDescription.setType(columns[6]);
 				loopDescription.setTerm(columns[7]);
-				loopDescription.setIcs(Long.parseLong(columns[8]));
-				loopDescription.setModule(Long.parseLong(columns[3]));
-                modulesSet.add(Long.parseLong(columns[3]));
+				loopDescription.setIcs(columns[8]);
+				loopDescription.setModule(columns[3]);
+                modulesSet.add(columns[3]);
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = tdefMembers.get(sourceId);
 				if (list == null) {
@@ -434,7 +462,7 @@ public class TransformerDiskBased {
 			br.close();
 		}
 	}
-	public void loadRelationshipsFile(File relationshipsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadRelationshipsFile(File relationshipsFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Relationships: " + relationshipsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(relationshipsFile), "UTF8"));
 		try {
@@ -447,7 +475,7 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
@@ -455,17 +483,17 @@ public class TransformerDiskBased {
 
 				loopRelationship.setActive(columns[2].equals("1"));
 				loopRelationship.setEffectiveTime(columns[1]);
-				loopRelationship.setModule(Long.parseLong(columns[3]));
-                modulesSet.add(Long.parseLong(columns[3]));
-				Long targetId=Long.parseLong(columns[5]);
+				loopRelationship.setModule(columns[3]);
+                modulesSet.add(columns[3]);
+				String targetId=columns[5];
 				loopRelationship.setTarget(targetId);
-				Long type=Long.parseLong(columns[7]);
+				String type=columns[7];
 				loopRelationship.setType(type);
-				loopRelationship.setModifier(Long.parseLong(columns[9]));
+				loopRelationship.setModifier(columns[9]);
 				loopRelationship.setGroupId(Integer.parseInt(columns[6]));
-				Long sourceId = Long.parseLong(columns[4]);
+				String sourceId = columns[4];
 				loopRelationship.setSourceId(sourceId);
-				Long charType=Long.parseLong(columns[8]);
+				String charType=columns[8];
 				loopRelationship.setCharType(charType);
 
 				List<LightRelationship> relList = relationships.get(sourceId);
@@ -495,7 +523,7 @@ public class TransformerDiskBased {
 		}
 	}
 
-	public void loadSimpleRefsetFile(File simpleRefsetFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadSimpleRefsetFile(File simpleRefsetFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Simple Refset Members: " + simpleRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleRefsetFile), "UTF8"));
 		try {
@@ -508,7 +536,7 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
@@ -519,19 +547,25 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
-                    modulesSet.add(Long.parseLong(columns[3]));
-					Long sourceId = Long.parseLong(columns[5]);
+					loopMember.setModule(columns[3]);
+                    modulesSet.add(columns[3]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-                    refsetsSet.add(Long.parseLong(columns[4]));
+					loopMember.setRefset(columns[4]);
+                    refsetsSet.add(columns[4]);
 
 					List<LightRefsetMembership> list = simpleMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightRefsetMembership>();
 					}
 					list.add(loopMember);
-					simpleMembers.put(Long.parseLong(columns[5]), list);
+					simpleMembers.put(columns[5], list);
+
+                    if (!refsetsCount.containsKey(loopMember.getRefset())) {
+                        refsetsCount.put(loopMember.getRefset(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -546,7 +580,7 @@ public class TransformerDiskBased {
 		}
 	}
 
-	public void loadAssociationFile(File associationsFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadAssociationFile(File associationsFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Association Refset Members: " + associationsFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(associationsFile), "UTF8"));
 		try {
@@ -559,7 +593,7 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
@@ -570,20 +604,20 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
-                    modulesSet.add(Long.parseLong(columns[3]));
-					Long sourceId = Long.parseLong(columns[5]);
+					loopMember.setModule(columns[3]);
+                    modulesSet.add(columns[3]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-                    refsetsSet.add(Long.parseLong(columns[4]));
-					loopMember.setCidValue(Long.parseLong(columns[6]));
+					loopMember.setRefset(columns[4]);
+                    refsetsSet.add(columns[4]);
+					loopMember.setCidValue(columns[6]);
 
 					List<LightRefsetMembership> list = assocMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightRefsetMembership>();
 					}
 					list.add(loopMember);
-					assocMembers.put(Long.parseLong(columns[5]), list);
+					assocMembers.put(columns[5], list);
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -598,7 +632,7 @@ public class TransformerDiskBased {
 		}
 	}
 
-	public void loadAttributeFile(File attributeFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadAttributeFile(File attributeFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Attribute Refset Members: " + attributeFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(attributeFile), "UTF8"));
 		try {
@@ -611,7 +645,7 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
@@ -622,20 +656,20 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
-                    modulesSet.add(Long.parseLong(columns[3]));
-					Long sourceId = Long.parseLong(columns[5]);
+					loopMember.setModule(columns[3]);
+                    modulesSet.add(columns[3]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-                    refsetsSet.add(Long.parseLong(columns[4]));
-					loopMember.setCidValue(Long.parseLong(columns[6]));
+					loopMember.setRefset(columns[4]);
+                    refsetsSet.add(columns[4]);
+					loopMember.setCidValue(columns[6]);
 
 					List<LightRefsetMembership> list = attrMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightRefsetMembership>();
 					}
 					list.add(loopMember);
-					attrMembers.put(Long.parseLong(columns[5]), list);
+					attrMembers.put(columns[5], list);
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -649,7 +683,7 @@ public class TransformerDiskBased {
 			br.close();
 		}
 	}
-	public void loadSimpleMapRefsetFile(File simpleMapRefsetFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadSimpleMapRefsetFile(File simpleMapRefsetFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting SimpleMap Refset Members: " + simpleMapRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(simpleMapRefsetFile), "UTF8"));
 		try {
@@ -662,7 +696,7 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
@@ -673,12 +707,12 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
-                    modulesSet.add(Long.parseLong(columns[3]));
-					Long sourceId = Long.parseLong(columns[5]);
+					loopMember.setModule(columns[3]);
+                    modulesSet.add(columns[3]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-                    refsetsSet.add(Long.parseLong(columns[4]));
+					loopMember.setRefset(columns[4]);
+                    refsetsSet.add(columns[4]);
 					loopMember.setOtherValue(columns[6]);
 
 					List<LightRefsetMembership> list = simpleMapMembers.get(sourceId);
@@ -701,7 +735,7 @@ public class TransformerDiskBased {
 		}
 	}
 
-	public void loadLanguageRefsetFile(File languageRefsetFile, List<Long> modulesToIgnore) throws FileNotFoundException, IOException {
+	public void loadLanguageRefsetFile(File languageRefsetFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Language Refset Members: " + languageRefsetFile.getName());
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(languageRefsetFile), "UTF8"));
 		try {
@@ -714,7 +748,7 @@ public class TransformerDiskBased {
 					continue;
 				}
 				String[] columns = line.split("\\t");
-                if (modulesToIgnore.contains(Long.parseLong(columns[3]))) {
+                if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
@@ -724,13 +758,13 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
-                    modulesSet.add(Long.parseLong(columns[3]));
-					Long sourceId = Long.parseLong(columns[5]);
+					loopMember.setModule(columns[3]);
+                    modulesSet.add(columns[3]);
+					String sourceId = columns[5];
 					loopMember.setDescriptionId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-                    langRefsetsSet.add(Long.parseLong(columns[4]));
-					loopMember.setAcceptability(Long.parseLong(columns[6]));
+					loopMember.setRefset(columns[4]);
+                    langRefsetsSet.add(columns[4]);
+					loopMember.setAcceptability(columns[6]);
 					List<LightLangMembership> list = languageMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightLangMembership>();
@@ -751,8 +785,9 @@ public class TransformerDiskBased {
 		}
 	}
 
-	public void createConceptsJsonFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	public void createConceptsJsonFile(String fileName, boolean createCompleteVersion) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		System.out.println("Starting creation of " + fileName);
+        getCharConvTable();
 		FileOutputStream fos = new FileOutputStream(fileName);
 		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 		BufferedWriter bw = new BufferedWriter(osw);
@@ -772,7 +807,7 @@ public class TransformerDiskBased {
 
         int count = 0;
         boolean firstWritten = false;
-		for (Long cptId : concepts.keySet()) {
+		for (String cptId : concepts.keySet()) {
             count++;
             if (count % 10000 == 0) {
                 System.out.print(".");
@@ -789,11 +824,22 @@ public class TransformerDiskBased {
 			cpt.setLeafInferred(!notLeafInferred.contains(cptId));
 			cpt.setLeafStated(!notLeafStated.contains(cptId));
             cpt.setFsn(cptFSN.get(cptId));
+
+            if (createCompleteVersion) {
+                listA = new ArrayList<String>();
+                getAncestors(cptId,inferred);
+                cpt.setInferredAncestors(listA);
+                listA = new ArrayList<String>();
+                getAncestors(cptId,stated);
+                cpt.setStatedAncestors(listA);
+            }
+
+
 			listLD = descriptions.get(cptId);
 			listD = new ArrayList<Description>();
 
 			if (listLD != null) {
-				Long descId;
+				String descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
 					d.setActive(ldesc.isActive());
@@ -807,6 +853,22 @@ public class TransformerDiskBased {
 					d.setModule(ldesc.getModule());
 					d.setType(concepts.get(ldesc.getType()));
 					d.setLang(ldesc.getLang());
+
+                    if (createCompleteVersion) {
+                        cpt.setFsn(cptFSN.get(cptId));
+                        if (cptFSN.get(cptId).endsWith(")")) {
+                            cpt.setSemtag(cpt.getFsn().substring(cpt.getFsn().lastIndexOf("(") + 1, cpt.getFsn().length() - 1));
+                        }
+                        String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
+                        if (manifest.isTextIndexNormalized()) {
+                            String convertedTerm = convertTerm(cleanTerm);
+                            String[] tokens = convertedTerm.toLowerCase().split("\\s+");
+                            d.setWords(Arrays.asList(tokens));
+                        } else {
+                            String[] tokens = cleanTerm.toLowerCase().split("\\s+");
+                            d.setWords(Arrays.asList(tokens));
+                        }
+                    }
 
 					listLLM = languageMembers.get(descId);
 					listLM = new ArrayList<LangMembership>();
@@ -865,7 +927,7 @@ public class TransformerDiskBased {
 
 			listLD = tdefMembers.get(cptId);
 			if (listLD != null) {
-				Long descId;
+				String descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
 					d.setActive(ldesc.isActive());
@@ -916,18 +978,34 @@ public class TransformerDiskBased {
 			listR = new ArrayList<Relationship>();
 			if (listLR != null) {
 				for (LightRelationship lrel : listLR) {
-					if (lrel.getCharType().equals(900000000000010007L)) {
-						Relationship d = new Relationship();
-						d.setEffectiveTime(lrel.getEffectiveTime());
-						d.setActive(lrel.isActive());
-						d.setModule(lrel.getModule());
-						d.setGroupId(lrel.getGroupId());
-						d.setModifier(MODIFIER);
-						d.setSourceId(cptId);
-						d.setTarget(concepts.get(lrel.getTarget()));
-						d.setType(concepts.get(lrel.getType()));
-						d.setCharType(concepts.get(lrel.getCharType()));
-						listR.add(d);
+					if (lrel.getCharType().equals("900000000000010007")) {
+						Relationship r = new Relationship();
+						r.setEffectiveTime(lrel.getEffectiveTime());
+						r.setActive(lrel.isActive());
+						r.setModule(lrel.getModule());
+						r.setGroupId(lrel.getGroupId());
+						r.setModifier(MODIFIER);
+						r.setSourceId(cptId);
+						r.setTarget(concepts.get(lrel.getTarget()));
+						r.setType(concepts.get(lrel.getType()));
+						r.setCharType(concepts.get(lrel.getCharType()));
+
+                        if (createCompleteVersion) {
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getType(),inferred);
+                            r.setTypeInferredAncestors(listA);
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getType(),stated);
+                            r.setTypeStatedAncestors(listA);
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getTarget(),inferred);
+                            r.setTargetInferredAncestors(listA);
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getTarget(),stated);
+                            r.setTargetStatedAncestors(listA);
+                        }
+
+						listR.add(r);
 					}
 				}
 
@@ -944,18 +1022,34 @@ public class TransformerDiskBased {
 			listR = new ArrayList<Relationship>();
 			if (listLR != null) {
 				for (LightRelationship lrel : listLR) {
-					if (lrel.getCharType().equals(900000000000011006L)) {
-						Relationship d = new Relationship();
-						d.setEffectiveTime(lrel.getEffectiveTime());
-						d.setActive(lrel.isActive());
-						d.setModule(lrel.getModule());
-						d.setGroupId(lrel.getGroupId());
-						d.setModifier(MODIFIER);
-						d.setSourceId(cptId);
-						d.setTarget(concepts.get(lrel.getTarget()));
-						d.setType(concepts.get(lrel.getType()));
-						d.setCharType(concepts.get(lrel.getCharType()));
-						listR.add(d);
+					if (lrel.getCharType().equals("900000000000011006")) {
+						Relationship r = new Relationship();
+						r.setEffectiveTime(lrel.getEffectiveTime());
+						r.setActive(lrel.isActive());
+						r.setModule(lrel.getModule());
+						r.setGroupId(lrel.getGroupId());
+						r.setModifier(MODIFIER);
+						r.setSourceId(cptId);
+						r.setTarget(concepts.get(lrel.getTarget()));
+						r.setType(concepts.get(lrel.getType()));
+						r.setCharType(concepts.get(lrel.getCharType()));
+
+                        if (createCompleteVersion) {
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getType(),inferred);
+                            r.setTypeInferredAncestors(listA);
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getType(),stated);
+                            r.setTypeStatedAncestors(listA);
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getTarget(),inferred);
+                            r.setTargetInferredAncestors(listA);
+                            listA = new ArrayList<String>();
+                            getAncestors(lrel.getTarget(),stated);
+                            r.setTargetStatedAncestors(listA);
+                        }
+
+						listR.add(r);
 					}
 				}
 
@@ -1064,7 +1158,7 @@ public class TransformerDiskBased {
 		this.defaultLangCode = defaultLangCode;
 	}
 
-	private void createTClosure(String fileName,Long charType) throws IOException {
+	private void createTClosure(String fileName,String charType) throws IOException {
 
 		System.out.println("Transitive Closure creation from " + fileName);
 		FileOutputStream fos = new FileOutputStream(fileName);
@@ -1074,9 +1168,9 @@ public class TransformerDiskBased {
 
 
 //		int count = 0;
-		for (Long cptId : concepts.keySet()) {		
+		for (String cptId : concepts.keySet()) {		
 
-			listA = new ArrayList<Long>();
+			listA = new ArrayList<String>();
 			getAncestors(cptId,charType);
 			if (!listA.isEmpty()){
 				ConceptAncestor ca=new ConceptAncestor();
@@ -1091,7 +1185,7 @@ public class TransformerDiskBased {
 		System.out.println(fileName + " Done");
 	}
 
-	private void getAncestors(Long cptId,Long charType) {
+	private void getAncestors(String cptId,String charType) {
 
 		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
 
@@ -1101,7 +1195,7 @@ public class TransformerDiskBased {
 				if (lrel.getCharType().equals(charType) &&
 						lrel.getType().equals(isaSCTId) &&
 						lrel.isActive()) {
-					Long tgt=lrel.getTarget();
+					String tgt=lrel.getTarget();
 					if (!listA.contains(tgt)){
 						listA.add(tgt);
 						getAncestors(tgt,charType);
@@ -1120,7 +1214,7 @@ public class TransformerDiskBased {
 		BufferedWriter bw = new BufferedWriter(osw);
 		Gson gson = new Gson();
         int count = 0;
-		for (long conceptId : descriptions.keySet()) {
+		for (String conceptId : descriptions.keySet()) {
             count++;
             if (count % 10000 == 0) {
                 System.out.print(".");
@@ -1134,7 +1228,7 @@ public class TransformerDiskBased {
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
 				d.setModule(ldesc.getModule());
-				//TODO: using long lang names to support compatibility with Mongo 2.4.x text indexes
+				//TODO: using String lang names to support compatibility with Mongo 2.4.x text indexes
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());
@@ -1154,7 +1248,7 @@ public class TransformerDiskBased {
                     String[] tokens = cleanTerm.toLowerCase().split("\\s+");
                     d.setWords(Arrays.asList(tokens));
                 }
-                d.setRefsetIds(new ArrayList<Long>());
+                d.setRefsetIds(new ArrayList<String>());
 
                 // Refset index assumes that only active members are included in the db.
                 List<LightRefsetMembership> listLRM = simpleMembers.get(concept.getConceptId());
@@ -1199,14 +1293,14 @@ public class TransformerDiskBased {
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
 
-        for (Long moduleId : modulesSet) {
+        for (String moduleId : modulesSet) {
             manifest.getModules().add(concepts.get(moduleId));
         }
-        for (Long langRefsetId : langRefsetsSet) {
+        for (String langRefsetId : langRefsetsSet) {
             manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
         }
-        for (Long refsetId : refsetsSet) {
-            manifest.getRefsets().add(concepts.get(refsetId));
+        for (String refsetId : refsetsSet) {
+            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId)));
         }
         bw.append(gson.toJson(manifest).toString());
 
@@ -1244,19 +1338,19 @@ public class TransformerDiskBased {
 		System.gc();
 	}
 
-	public Long getDefaultTermType() {
+	public String getDefaultTermType() {
 		return defaultTermType;
 	}
 
-	public void setDefaultTermType(Long defaultTermType) {
+	public void setDefaultTermType(String defaultTermType) {
 		this.defaultTermType = defaultTermType;
 	}
 
-    public Long getDefaultLangRefset() {
+    public String getDefaultLangRefset() {
         return defaultLangRefset;
     }
 
-    public void setDefaultLangRefset(Long defaultLangRefset) {
+    public void setDefaultLangRefset(String defaultLangRefset) {
         this.defaultLangRefset = defaultLangRefset;
     }
 }

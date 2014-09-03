@@ -4,19 +4,19 @@ import java.util.List;
 
 public class ConceptAncestor {
 
-	private Long conceptId;
-	private List<Long> ancestor;
+	private String conceptId;
+	private List<String> ancestor;
 	
-	public Long getConceptId() {
+	public String getConceptId() {
 		return conceptId;
 	}
-	public void setConceptId(Long conceptId) {
+	public void setConceptId(String conceptId) {
 		this.conceptId = conceptId;
 	}
-	public List<Long> getAncestor() {
+	public List<String> getAncestor() {
 		return ancestor;
 	}
-	public void setAncestor(List<Long> ancestor) {
+	public void setAncestor(List<String> ancestor) {
 		this.ancestor = ancestor;
 	}
 }

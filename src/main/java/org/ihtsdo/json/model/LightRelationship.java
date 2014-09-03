@@ -7,28 +7,28 @@ package org.ihtsdo.json.model;
 
 public class LightRelationship extends Component {
 
-    private Long type;
-    private Long target;
-    private Long sourceId;
+    private String type;
+    private String target;
+    private String sourceId;
     private Integer groupId;
-    private Long charType;
-    private Long modifier;
-	public Long getType() {
+    private String charType;
+    private String modifier;
+	public String getType() {
 		return type;
 	}
-	public void setType(Long type) {
+	public void setType(String type) {
 		this.type = type;
 	}
-	public Long getTarget() {
+	public String getTarget() {
 		return target;
 	}
-	public void setTarget(Long target) {
+	public void setTarget(String target) {
 		this.target = target;
 	}
-	public Long getSourceId() {
+	public String getSourceId() {
 		return sourceId;
 	}
-	public void setSourceId(Long sourceId) {
+	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
 	}
 	public Integer getGroupId() {
@@ -37,16 +37,16 @@ public class LightRelationship extends Component {
 	public void setGroupId(Integer groupId) {
 		this.groupId = groupId;
 	}
-	public Long getCharType() {
+	public String getCharType() {
 		return charType;
 	}
-	public void setCharType(Long charType) {
+	public void setCharType(String charType) {
 		this.charType = charType;
 	}
-	public Long getModifier() {
+	public String getModifier() {
 		return modifier;
 	}
-	public void setModifier(Long modifier) {
+	public void setModifier(String modifier) {
 		this.modifier = modifier;
 	}
 

@@ -48,43 +48,43 @@ public class Transformer {
 	private String MODIFIER = "Existential restriction";
 	private String sep = System.getProperty("line.separator");
 
-	private Map<Long, ConceptDescriptor> concepts;
-	private Map<Long, List<LightDescription>> descriptions;
-	private Map<Long, List<LightRelationship>> relationships;
-	private Map<Long, List<LightRefsetMembership>> simpleMembers;
-	private Map<Long, List<LightRefsetMembership>> simpleMapMembers;
-	private Map<Long, List<LightLangMembership>> languageMembers;
+	private Map<String, ConceptDescriptor> concepts;
+	private Map<String, List<LightDescription>> descriptions;
+	private Map<String, List<LightRelationship>> relationships;
+	private Map<String, List<LightRefsetMembership>> simpleMembers;
+	private Map<String, List<LightRefsetMembership>> simpleMapMembers;
+	private Map<String, List<LightLangMembership>> languageMembers;
 	private Map<String, String> langCodes;
 
 	private String defaultLangCode = "en";
 	public String fsnType = "900000000000003001";
 	public String synType = "900000000000013009";
-	private Long inferred = 900000000000011006l;
-	private Long stated = 900000000000010007l;
-	private Long isaSCTId=116680003l;
+	private String inferred = "900000000000011006";
+	private String stated = "900000000000010007";
+	private String isaSCTId = "116680003";
 	private String defaultTermType = fsnType;
-	private HashMap<Long, List<LightDescription>> tdefMembers;
-	private HashMap<Long, List<LightRefsetMembership>> attrMembers;
-	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
-	private ArrayList<Long> listA;
+	private HashMap<String, List<LightDescription>> tdefMembers;
+	private HashMap<String, List<LightRefsetMembership>> attrMembers;
+	private HashMap<String, List<LightRefsetMembership>> assocMembers;
+	private ArrayList<String> listA;
 	private Map<String, String> charConv;
-	private Map<Long, String> cptFSN;
-	private HashSet<Long> notLeafInferred;
-	private HashSet<Long> notLeafStated;
+	private Map<String, String> cptFSN;
+	private HashSet<String> notLeafInferred;
+	private HashSet<String> notLeafStated;
 
 	public Transformer() {
-		concepts = new HashMap<Long, ConceptDescriptor>();
-		descriptions = new HashMap<Long, List<LightDescription>>();
-		relationships = new HashMap<Long, List<LightRelationship>>();
-		simpleMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		assocMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		attrMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		tdefMembers = new HashMap<Long, List<LightDescription>>();
-		simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
-		languageMembers = new HashMap<Long, List<LightLangMembership>>();
-		notLeafInferred=new HashSet<Long>();
-		notLeafStated=new HashSet<Long>();
-		cptFSN = new HashMap<Long, String>();
+		concepts = new HashMap<String, ConceptDescriptor>();
+		descriptions = new HashMap<String, List<LightDescription>>();
+		relationships = new HashMap<String, List<LightRelationship>>();
+		simpleMembers = new HashMap<String, List<LightRefsetMembership>>();
+		assocMembers = new HashMap<String, List<LightRefsetMembership>>();
+		attrMembers = new HashMap<String, List<LightRefsetMembership>>();
+		tdefMembers = new HashMap<String, List<LightDescription>>();
+		simpleMapMembers = new HashMap<String, List<LightRefsetMembership>>();
+		languageMembers = new HashMap<String, List<LightLangMembership>>();
+		notLeafInferred=new HashSet<String>();
+		notLeafStated=new HashSet<String>();
+		cptFSN = new HashMap<String, String>();
 
 		langCodes = new HashMap<String, String>();
 		langCodes.put("en", "english");
@@ -183,8 +183,8 @@ public class Transformer {
 	
 	private void getFilesForTransClosureProcess(HashSet<String> folders, String validationConfig) throws IOException, Exception {
 
-		concepts = new HashMap<Long, ConceptDescriptor>();
-		relationships = new HashMap<Long, List<LightRelationship>>();
+		concepts = new HashMap<String, ConceptDescriptor>();
+		relationships = new HashMap<String, List<LightRelationship>>();
 		File config=new File(validationConfig);
 		FileHelper fHelper=new FileHelper();
 		for (String folder:folders){
@@ -218,11 +218,11 @@ public class Transformer {
 				}
 				String[] columns = line.split("\\t");
 				ConceptDescriptor loopConcept = new ConceptDescriptor();
-				Long conceptId = Long.parseLong(columns[0]);
+				String conceptId = columns[0];
 				loopConcept.setConceptId(conceptId);
 				loopConcept.setActive(columns[2].equals("1"));
 				loopConcept.setEffectiveTime(columns[1]);
-				loopConcept.setModule(Long.parseLong(columns[3]));
+				loopConcept.setModule(columns[3]);
 				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
 				concepts.put(conceptId, loopConcept);
 				line = br.readLine();
@@ -253,16 +253,16 @@ public class Transformer {
 				}
 				String[] columns = line.split("\\t");
 				LightDescription loopDescription = new LightDescription();
-				loopDescription.setDescriptionId(Long.parseLong(columns[0]));
+				loopDescription.setDescriptionId(columns[0]);
 				act = columns[2].equals("1");
 				loopDescription.setActive(act);
 				loopDescription.setEffectiveTime(columns[1]);
-				Long sourceId = Long.parseLong(columns[4]);
+				String sourceId = columns[4];
 				loopDescription.setConceptId(sourceId);
-				loopDescription.setType(Long.parseLong(columns[6]));
+				loopDescription.setType(columns[6]);
 				loopDescription.setTerm(columns[7]);
-				loopDescription.setIcs(Long.parseLong(columns[8]));
-				loopDescription.setModule(Long.parseLong(columns[3]));
+				loopDescription.setIcs(columns[8]);
+				loopDescription.setModule(columns[3]);
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = descriptions.get(sourceId);
 				if (list == null) {
@@ -289,7 +289,7 @@ public class Transformer {
 		String type;
 		String lang;
 		ConceptDescriptor cdesc;
-		for (Long sourceId:concepts.keySet()){
+		for (String sourceId:concepts.keySet()){
 			List<LightDescription> lDescriptions = descriptions.get(sourceId);
 			if (lDescriptions!=null){
 				for (LightDescription desc:lDescriptions){
@@ -335,16 +335,16 @@ public class Transformer {
 				}
 				String[] columns = line.split("\\t");
 				LightDescription loopDescription = new LightDescription();
-				loopDescription.setDescriptionId(Long.parseLong(columns[0]));
+				loopDescription.setDescriptionId(columns[0]);
 				act = columns[2].equals("1");
 				loopDescription.setActive(act);
 				loopDescription.setEffectiveTime(columns[1]);
-				Long sourceId = Long.parseLong(columns[4]);
+				String sourceId = columns[4];
 				loopDescription.setConceptId(sourceId);
-				loopDescription.setType(Long.parseLong(columns[6]));
+				loopDescription.setType(columns[6]);
 				loopDescription.setTerm(columns[7]);
-				loopDescription.setIcs(Long.parseLong(columns[8]));
-				loopDescription.setModule(Long.parseLong(columns[3]));
+				loopDescription.setIcs(columns[8]);
+				loopDescription.setModule(columns[3]);
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = tdefMembers.get(sourceId);
 				if (list == null) {
@@ -381,16 +381,16 @@ public class Transformer {
 
 				loopRelationship.setActive(columns[2].equals("1"));
 				loopRelationship.setEffectiveTime(columns[1]);
-				loopRelationship.setModule(Long.parseLong(columns[3]));
-				Long targetId=Long.parseLong(columns[5]);
+				loopRelationship.setModule(columns[3]);
+				String targetId=columns[5];
 				loopRelationship.setTarget(targetId);
-				Long type=Long.parseLong(columns[7]);
+				String type=columns[7];
 				loopRelationship.setType(type);
-				loopRelationship.setModifier(Long.parseLong(columns[9]));
+				loopRelationship.setModifier(columns[9]);
 				loopRelationship.setGroupId(Integer.parseInt(columns[6]));
-				Long sourceId = Long.parseLong(columns[4]);
+				String sourceId = columns[4];
 				loopRelationship.setSourceId(sourceId);
-				Long charType=Long.parseLong(columns[8]);
+				String charType=columns[8];
 				loopRelationship.setCharType(charType);
 
 				List<LightRelationship> relList = relationships.get(sourceId);
@@ -440,18 +440,18 @@ public class Transformer {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
+					loopMember.setModule(columns[3]);
 
-					Long sourceId = Long.parseLong(columns[5]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
+					loopMember.setRefset(columns[4]);
 
 					List<LightRefsetMembership> list = simpleMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightRefsetMembership>();
 					}
 					list.add(loopMember);
-					simpleMembers.put(Long.parseLong(columns[5]), list);
+					simpleMembers.put(columns[5], list);
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -485,19 +485,19 @@ public class Transformer {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
+					loopMember.setModule(columns[3]);
 
-					Long sourceId = Long.parseLong(columns[5]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-					loopMember.setCidValue(Long.parseLong(columns[6]));
+					loopMember.setRefset(columns[4]);
+					loopMember.setCidValue(columns[6]);
 
 					List<LightRefsetMembership> list = assocMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightRefsetMembership>();
 					}
 					list.add(loopMember);
-					assocMembers.put(Long.parseLong(columns[5]), list);
+					assocMembers.put(columns[5], list);
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -531,19 +531,19 @@ public class Transformer {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
+					loopMember.setModule(columns[3]);
 
-					Long sourceId = Long.parseLong(columns[5]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-					loopMember.setCidValue(Long.parseLong(columns[6]));
+					loopMember.setRefset(columns[4]);
+					loopMember.setCidValue(columns[6]);
 
 					List<LightRefsetMembership> list = attrMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightRefsetMembership>();
 					}
 					list.add(loopMember);
-					attrMembers.put(Long.parseLong(columns[5]), list);
+					attrMembers.put(columns[5], list);
 					count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -576,11 +576,11 @@ public class Transformer {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
+					loopMember.setModule(columns[3]);
 
-					Long sourceId = Long.parseLong(columns[5]);
+					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
+					loopMember.setRefset(columns[4]);
 					loopMember.setOtherValue(columns[6]);
 
 					List<LightRefsetMembership> list = simpleMapMembers.get(sourceId);
@@ -621,11 +621,11 @@ public class Transformer {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(Long.parseLong(columns[3]));
-					Long sourceId = Long.parseLong(columns[5]);
+					loopMember.setModule(columns[3]);
+					String sourceId = columns[5];
 					loopMember.setDescriptionId(sourceId);
-					loopMember.setRefset(Long.parseLong(columns[4]));
-					loopMember.setAcceptability(Long.parseLong(columns[6]));
+					loopMember.setRefset(columns[4]);
+					loopMember.setAcceptability(columns[6]);
 					List<LightLangMembership> list = languageMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightLangMembership>();
@@ -666,7 +666,7 @@ public class Transformer {
 		List<RefsetMembership> listRM = new ArrayList<RefsetMembership>();
 
 		//        int count = 0;
-		for (Long cptId : concepts.keySet()) {
+		for (String cptId : concepts.keySet()) {
 			//            count++;
 			//if (count > 10) break;
 			Concept cpt = new Concept();
@@ -684,7 +684,7 @@ public class Transformer {
 			listD = new ArrayList<Description>();
 
 			if (listLD != null) {
-				Long descId;
+				String descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
 					d.setActive(ldesc.isActive());
@@ -756,7 +756,7 @@ public class Transformer {
 
 			listLD = tdefMembers.get(cptId);
 			if (listLD != null) {
-				Long descId;
+				String descId;
 				for (LightDescription ldesc : listLD) {
 					Description d = new Description();
 					d.setActive(ldesc.isActive());
@@ -949,7 +949,7 @@ public class Transformer {
 		this.defaultLangCode = defaultLangCode;
 	}
 
-	private void createTClosure(String fileName,Long charType) throws IOException {
+	private void createTClosure(String fileName,String charType) throws IOException {
 
 		System.out.println("Transitive Closure creation from " + fileName);
 		FileOutputStream fos = new FileOutputStream(fileName);
@@ -959,9 +959,9 @@ public class Transformer {
 
 
 		//         int count = 0;
-		for (Long cptId : concepts.keySet()) {		
+		for (String cptId : concepts.keySet()) {		
 
-			listA = new ArrayList<Long>();
+			listA = new ArrayList<String>();
 			getAncestors(cptId,charType);
 			if (!listA.isEmpty()){
 				ConceptAncestor ca=new ConceptAncestor();
@@ -976,7 +976,7 @@ public class Transformer {
 		System.out.println(fileName + " Done");
 	}
 
-	private void getAncestors(Long cptId,Long charType) {
+	private void getAncestors(String cptId,String charType) {
 
 		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
 
@@ -986,7 +986,7 @@ public class Transformer {
 				if (lrel.getCharType().equals(charType) &&
 						lrel.getType().equals(isaSCTId) &&
 						lrel.isActive()) {
-					Long tgt=lrel.getTarget();
+					String tgt=lrel.getTarget();
 					if (!listA.contains(tgt)){
 						listA.add(tgt);
 						getAncestors(tgt,charType);
@@ -1005,7 +1005,7 @@ public class Transformer {
 		BufferedWriter bw = new BufferedWriter(osw);
 		Gson gson = new Gson();
 		//        int count = 0;
-		for (long conceptId : descriptions.keySet()) {
+		for (String conceptId : descriptions.keySet()) {
 			//            count++;
 			//if (count > 10) break;
 			for (LightDescription ldesc : descriptions.get(conceptId)) {
@@ -1017,7 +1017,7 @@ public class Transformer {
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
 				d.setModule(ldesc.getModule());
-				// using long lang names for Mongo 2.4.x text indexes
+				// using String lang names for Mongo 2.4.x text indexes
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
 				d.setConceptModule(concept.getModule());

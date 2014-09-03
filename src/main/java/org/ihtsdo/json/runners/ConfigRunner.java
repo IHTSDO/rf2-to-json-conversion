@@ -31,9 +31,11 @@ public class ConfigRunner {
         TransformerConfig runnableConfig = new TransformerConfig();
 
         runnableConfig.setDefaultTermLangCode(xmlConfig.getString("defaultTermLangCode"));
-        runnableConfig.setDefaultTermDescriptionType(Long.parseLong(xmlConfig.getString("defaultTermDescriptionType")));
-        runnableConfig.setDefaultTermLanguageRefset(Long.parseLong(xmlConfig.getString("defaultTermLanguageRefset")));
+        runnableConfig.setDefaultTermDescriptionType(xmlConfig.getString("defaultTermDescriptionType"));
+        runnableConfig.setDefaultTermLanguageRefset(xmlConfig.getString("defaultTermLanguageRefset"));
         runnableConfig.setNormalizeTextIndex(xmlConfig.getString("normalizeTextIndex").equals("true"));
+        runnableConfig.setCreateCompleteConceptsFile(xmlConfig.getString("createCompleteConceptsFile").equals("true"));
+        runnableConfig.setProcessInMemory(xmlConfig.getString("processInMemory").equals("true"));
         runnableConfig.setEditionName(xmlConfig.getString("editionName"));
         runnableConfig.setDatabaseName(xmlConfig.getString("databaseName"));
         runnableConfig.setEffectiveTime(xmlConfig.getString("effectiveTime"));
@@ -53,12 +55,12 @@ public class ConfigRunner {
 
         prop = xmlConfig.getProperty("modulesToIgnoreBaselineLoad.folder");
         if (prop instanceof Collection) {
-            for (Long loopProp : (Collection<Long>)prop) {
+            for (String loopProp : (Collection<String>)prop) {
                 runnableConfig.getModulesToIgnoreBaselineLoad().add(loopProp);
                 System.out.println(loopProp);
             }
         } else if (prop instanceof String) {
-            runnableConfig.getModulesToIgnoreBaselineLoad().add((Long)prop);
+            runnableConfig.getModulesToIgnoreBaselineLoad().add((String)prop);
             System.out.println(prop);
         }
 
@@ -75,12 +77,12 @@ public class ConfigRunner {
 
         prop = xmlConfig.getProperty("modulesToIgnoreExtensionLoad.folder");
         if (prop instanceof Collection) {
-            for (Long loopProp : (Collection<Long>)prop) {
+            for (String loopProp : (Collection<String>)prop) {
                 runnableConfig.getModulesToIgnoreExtensionLoad().add(loopProp);
                 System.out.println(loopProp);
             }
         } else if (prop instanceof String) {
-            runnableConfig.getModulesToIgnoreExtensionLoad().add((Long)prop);
+            runnableConfig.getModulesToIgnoreExtensionLoad().add((String)prop);
             System.out.println(prop);
         }
 

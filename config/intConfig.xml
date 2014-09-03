@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
-    <createCompleteConceptsFile>false</createCompleteConceptsFile>
-    <editionName>UKTC Edition</editionName>
-    <databaseName>uktc-edition</databaseName>
-    <effectiveTime>20140401</effectiveTime>
+    <createCompleteConceptsFile>true</createCompleteConceptsFile>
+    <editionName>International Edition</editionName>
+    <databaseName>en-edition</databaseName>
+    <effectiveTime>20140131</effectiveTime>
     <expirationTime>20150201</expirationTime>
-    <outputFolder>/Volumes/Macintosh HD2/Multi-english-data/UKTC</outputFolder>
+    <outputFolder>/Users/alo/Downloads/Releases/en-json</outputFolder>
     <foldersBaselineLoad>
-        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
+        <folder>/Users/alo/Downloads/Releases/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
     <foldersExtensionLoad>
-        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot</folder>
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>

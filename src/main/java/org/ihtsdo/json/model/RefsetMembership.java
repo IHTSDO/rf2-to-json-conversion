@@ -25,7 +25,7 @@ public class RefsetMembership extends Component {
 		}
 	}
 	private String type;
-	private Long referencedComponentId;
+	private String referencedComponentId;
 	private ConceptDescriptor refset;
 	private ConceptDescriptor cidValue;
 	private String otherValue;
@@ -66,11 +66,11 @@ public class RefsetMembership extends Component {
 		this.otherValue = otherValue;
 	}
 
-	public Long getReferencedComponentId() {
+	public String getReferencedComponentId() {
 		return referencedComponentId;
 	}
 
-	public void setReferencedComponentId(Long referencedComponentId) {
+	public void setReferencedComponentId(String referencedComponentId) {
 		this.referencedComponentId = referencedComponentId;
 	}
 

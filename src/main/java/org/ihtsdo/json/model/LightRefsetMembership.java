@@ -25,9 +25,9 @@ public class LightRefsetMembership extends Component {
 		}
 	}
 	private String type;
-	private Long referencedComponentId;
-	private Long refset;
-	private Long cidValue;
+	private String referencedComponentId;
+	private String refset;
+	private String cidValue;
 	private String otherValue;
 	public String getType() {
 		return type;
@@ -35,22 +35,22 @@ public class LightRefsetMembership extends Component {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public Long getReferencedComponentId() {
+	public String getReferencedComponentId() {
 		return referencedComponentId;
 	}
-	public void setReferencedComponentId(Long referencedComponentId) {
+	public void setReferencedComponentId(String referencedComponentId) {
 		this.referencedComponentId = referencedComponentId;
 	}
-	public Long getRefset() {
+	public String getRefset() {
 		return refset;
 	}
-	public void setRefset(Long refset) {
+	public void setRefset(String refset) {
 		this.refset = refset;
 	}
-	public Long getCidValue() {
+	public String getCidValue() {
 		return cidValue;
 	}
-	public void setCidValue(Long cidValue) {
+	public void setCidValue(String cidValue) {
 		this.cidValue = cidValue;
 	}
 	public String getOtherValue() {

@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class Description extends Component {
 
-    Long descriptionId;
-    Long conceptId;
+    String descriptionId;
+    String conceptId;
     ConceptDescriptor type;
     String lang;
     String term;
@@ -23,22 +23,24 @@ public class Description extends Component {
     List<LangMembership> langMemberships;
     List<RefsetMembership> refsetMemberships;
 
+    private List<String> words;
+
     public Description() {
     }
 
-    public Long getDescriptionId() {
+    public String getDescriptionId() {
         return descriptionId;
     }
 
-    public void setDescriptionId(Long descriptionId) {
+    public void setDescriptionId(String descriptionId) {
         this.descriptionId = descriptionId;
     }
 
-    public Long getConceptId() {
+    public String getConceptId() {
         return conceptId;
     }
 
-    public void setConceptId(Long conceptId) {
+    public void setConceptId(String conceptId) {
         this.conceptId = conceptId;
     }
 
@@ -98,4 +100,11 @@ public class Description extends Component {
 		this.refsetMemberships = refsetMemberships;
 	}
 
+    public List<String> getWords() {
+        return words;
+    }
+
+    public void setWords(List<String> words) {
+        this.words = words;
+    }
 }

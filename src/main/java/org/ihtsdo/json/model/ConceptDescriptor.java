@@ -2,13 +2,13 @@ package org.ihtsdo.json.model;
 
 public class ConceptDescriptor extends Component{
 
-	Long conceptId;
+    String conceptId;
 	String defaultTerm;
     String definitionStatus;
-	public Long getConceptId() {
+	public String getConceptId() {
 		return conceptId;
 	}
-	public void setConceptId(Long conceptId) {
+	public void setConceptId(String conceptId) {
 		this.conceptId = conceptId;
 	}
 	public String getDefaultTerm() {

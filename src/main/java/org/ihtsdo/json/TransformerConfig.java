@@ -9,26 +9,28 @@ import java.util.HashSet;
 public class TransformerConfig {
 
     private String defaultTermLangCode;
-    private Long defaultTermDescriptionType;
-    private Long defaultTermLanguageRefset;
+    private String defaultTermDescriptionType;
+    private String defaultTermLanguageRefset;
     private boolean normalizeTextIndex;
     private String editionName;
     private String databaseName;
     private String effectiveTime;
     private String expirationTime;
     private String outputFolder;
+    private boolean createCompleteConceptsFile;
+    private boolean processInMemory;
 
     private HashSet<String> foldersBaselineLoad;
-    private ArrayList<Long> modulesToIgnoreBaselineLoad;
+    private ArrayList<String> modulesToIgnoreBaselineLoad;
 
     private HashSet<String> foldersExtensionLoad;
-    private ArrayList<Long> modulesToIgnoreExtensionLoad;
+    private ArrayList<String> modulesToIgnoreExtensionLoad;
 
     public TransformerConfig() {
         foldersBaselineLoad = new HashSet<String>();
-        modulesToIgnoreBaselineLoad = new ArrayList<Long>();
+        modulesToIgnoreBaselineLoad = new ArrayList<String>();
         foldersExtensionLoad = new HashSet<String>();
-        modulesToIgnoreExtensionLoad = new ArrayList<Long>();
+        modulesToIgnoreExtensionLoad = new ArrayList<String>();
     }
 
     public String getDefaultTermLangCode() {
@@ -39,19 +41,19 @@ public class TransformerConfig {
         this.defaultTermLangCode = defaultTermLangCode;
     }
 
-    public Long getDefaultTermDescriptionType() {
+    public String getDefaultTermDescriptionType() {
         return defaultTermDescriptionType;
     }
 
-    public void setDefaultTermDescriptionType(Long defaultTermDescriptionType) {
+    public void setDefaultTermDescriptionType(String defaultTermDescriptionType) {
         this.defaultTermDescriptionType = defaultTermDescriptionType;
     }
 
-    public Long getDefaultTermLanguageRefset() {
+    public String getDefaultTermLanguageRefset() {
         return defaultTermLanguageRefset;
     }
 
-    public void setDefaultTermLanguageRefset(Long defaultTermLanguageRefset) {
+    public void setDefaultTermLanguageRefset(String defaultTermLanguageRefset) {
         this.defaultTermLanguageRefset = defaultTermLanguageRefset;
     }
 
@@ -103,11 +105,11 @@ public class TransformerConfig {
         this.foldersBaselineLoad = foldersBaselineLoad;
     }
 
-    public ArrayList<Long> getModulesToIgnoreBaselineLoad() {
+    public ArrayList<String> getModulesToIgnoreBaselineLoad() {
         return modulesToIgnoreBaselineLoad;
     }
 
-    public void setModulesToIgnoreBaselineLoad(ArrayList<Long> modulesToIgnoreBaselineLoad) {
+    public void setModulesToIgnoreBaselineLoad(ArrayList<String> modulesToIgnoreBaselineLoad) {
         this.modulesToIgnoreBaselineLoad = modulesToIgnoreBaselineLoad;
     }
 
@@ -119,11 +121,11 @@ public class TransformerConfig {
         this.foldersExtensionLoad = foldersExtensionLoad;
     }
 
-    public ArrayList<Long> getModulesToIgnoreExtensionLoad() {
+    public ArrayList<String> getModulesToIgnoreExtensionLoad() {
         return modulesToIgnoreExtensionLoad;
     }
 
-    public void setModulesToIgnoreExtensionLoad(ArrayList<Long> modulesToIgnoreExtensionLoad) {
+    public void setModulesToIgnoreExtensionLoad(ArrayList<String> modulesToIgnoreExtensionLoad) {
         this.modulesToIgnoreExtensionLoad = modulesToIgnoreExtensionLoad;
     }
 
@@ -133,5 +135,21 @@ public class TransformerConfig {
 
     public void setOutputFolder(String outputFolder) {
         this.outputFolder = outputFolder;
+    }
+
+    public boolean isCreateCompleteConceptsFile() {
+        return createCompleteConceptsFile;
+    }
+
+    public void setCreateCompleteConceptsFile(boolean createCompleteConceptsFile) {
+        this.createCompleteConceptsFile = createCompleteConceptsFile;
+    }
+
+    public boolean isProcessInMemory() {
+        return processInMemory;
+    }
+
+    public void setProcessInMemory(boolean processInMemory) {
+        this.processInMemory = processInMemory;
     }
 }

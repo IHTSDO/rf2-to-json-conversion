@@ -16,21 +16,20 @@ public class TextIndexDescription extends Description {
     private String fsn;
     private String semanticTag;
     private boolean conceptActive;
-    private Long typeId;
-    private List<String> words;
-    private List<Long> refsetIds;
+    private String typeId;
+    private List<String> refsetIds;
     String definitionStatus;
 
     public TextIndexDescription() {
     }
     
-    private Long conceptModule;
+    private String conceptModule;
 
-	public Long getConceptModule() {
+	public String getConceptModule() {
 		return conceptModule;
 	}
 
-	public void setConceptModule(Long conceptModule) {
+	public void setConceptModule(String conceptModule) {
 		this.conceptModule = conceptModule;
 	}
     public String getFsn() {
@@ -57,27 +56,19 @@ public class TextIndexDescription extends Description {
         this.conceptActive = conceptActive;
     }
 
-    public List<String> getWords() {
-        return words;
-    }
-
-    public void setWords(List<String> words) {
-        this.words = words;
-    }
-
-    public Long getTypeId() {
+    public String getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(Long typeId) {
+    public void setTypeId(String typeId) {
         this.typeId = typeId;
     }
 
-    public List<Long> getRefsetIds() {
+    public List<String> getRefsetIds() {
         return refsetIds;
     }
 
-    public void setRefsetIds(List<Long> refsetIds) {
+    public void setRefsetIds(List<String> refsetIds) {
         this.refsetIds = refsetIds;
     }
 

@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 public class LangMembership extends Component {
 
-    private Long descriptionId;	
+    private String descriptionId;
 	private ConceptDescriptor refset;
     private ConceptDescriptor acceptability;
     
@@ -38,11 +38,11 @@ public class LangMembership extends Component {
         super();
     }
 
-    public Long getDescriptionId() {
+    public String getDescriptionId() {
         return descriptionId;
     }
 
-    public void setDescriptionId(Long descriptionId) {
+    public void setDescriptionId(String descriptionId) {
         this.descriptionId = descriptionId;
     }
 
