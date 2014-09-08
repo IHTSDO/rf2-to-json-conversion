@@ -371,7 +371,7 @@ public class TransformerDiskBased {
                         List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
                         if (listLLM != null) {
                             for (LightLangMembership llm : listLLM) {
-                                if (llm.getAcceptability().equals("900000000000548007")) {
+                                if (llm.getAcceptability().equals("900000000000548007") && llm.getRefset().equals(defaultLangRefset)) {
                                     if (desc.getType().equals("900000000000003001")) {
                                         configFsn = desc.getTerm();
                                     }
