@@ -7,6 +7,7 @@ package org.ihtsdo.json.model;
 public class RefsetDescriptor extends ConceptDescriptor {
 
     Integer count;
+    String type;
 
     public RefsetDescriptor(ConceptDescriptor concept, Integer count) {
         this.setDefinitionStatus(concept.getDefinitionStatus());
@@ -25,6 +26,14 @@ public class RefsetDescriptor extends ConceptDescriptor {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
 

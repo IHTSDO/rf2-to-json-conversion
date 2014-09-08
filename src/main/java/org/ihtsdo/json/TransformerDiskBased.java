@@ -34,6 +34,7 @@ public class TransformerDiskBased {
 	private Map<String, String> langCodes;
 
     private Map<String, Integer> refsetsCount;
+    private Map<String, String> refsetsTypes;
 
 	private String defaultLangCode = "en";
 	public String fsnType = "900000000000003001";
@@ -100,6 +101,7 @@ public class TransformerDiskBased {
         notLeafStated=new HashSet<String>();
 
         refsetsCount = new HashMap<String, Integer>();
+        refsetsTypes = new HashMap<String, String>();
 
         setDefaultLangCode(config.getDefaultTermLangCode());
         setDefaultTermType(config.getDefaultTermDescriptionType());
@@ -553,6 +555,7 @@ public class TransformerDiskBased {
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(columns[4]);
                     refsetsSet.add(columns[4]);
+                    refsetsTypes.put(columns[4], LightRefsetMembership.RefsetMembershipType.SIMPLE_REFSET.name());
 
 					List<LightRefsetMembership> list = simpleMembers.get(sourceId);
 					if (list == null) {
@@ -610,7 +613,9 @@ public class TransformerDiskBased {
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(columns[4]);
                     refsetsSet.add(columns[4]);
-					loopMember.setCidValue(columns[6]);
+                    refsetsTypes.put(columns[4], LightRefsetMembership.RefsetMembershipType.ASSOCIATION.name());
+
+                    loopMember.setCidValue(columns[6]);
 
 					List<LightRefsetMembership> list = assocMembers.get(sourceId);
 					if (list == null) {
@@ -618,7 +623,13 @@ public class TransformerDiskBased {
 					}
 					list.add(loopMember);
 					assocMembers.put(columns[5], list);
-					count++;
+
+                    if (!refsetsCount.containsKey(loopMember.getRefset())) {
+                        refsetsCount.put(loopMember.getRefset(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+
+                    count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
 					}
@@ -662,7 +673,9 @@ public class TransformerDiskBased {
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(columns[4]);
                     refsetsSet.add(columns[4]);
-					loopMember.setCidValue(columns[6]);
+                    refsetsTypes.put(columns[4], LightRefsetMembership.RefsetMembershipType.ATTRIBUTE_VALUE.name());
+
+                    loopMember.setCidValue(columns[6]);
 
 					List<LightRefsetMembership> list = attrMembers.get(sourceId);
 					if (list == null) {
@@ -670,7 +683,13 @@ public class TransformerDiskBased {
 					}
 					list.add(loopMember);
 					attrMembers.put(columns[5], list);
-					count++;
+
+                    if (!refsetsCount.containsKey(loopMember.getRefset())) {
+                        refsetsCount.put(loopMember.getRefset(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+
+                    count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
 					}
@@ -713,7 +732,9 @@ public class TransformerDiskBased {
 					loopMember.setReferencedComponentId(sourceId);
 					loopMember.setRefset(columns[4]);
                     refsetsSet.add(columns[4]);
-					loopMember.setOtherValue(columns[6]);
+                    refsetsTypes.put(columns[4], LightRefsetMembership.RefsetMembershipType.SIMPLEMAP.name());
+
+                    loopMember.setOtherValue(columns[6]);
 
 					List<LightRefsetMembership> list = simpleMapMembers.get(sourceId);
 					if (list == null) {
@@ -721,7 +742,13 @@ public class TransformerDiskBased {
 					}
 					list.add(loopMember);
 					simpleMapMembers.put(sourceId, list);
-					count++;
+
+                    if (!refsetsCount.containsKey(loopMember.getRefset())) {
+                        refsetsCount.put(loopMember.getRefset(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+
+                    count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
 					}
@@ -764,7 +791,8 @@ public class TransformerDiskBased {
 					loopMember.setDescriptionId(sourceId);
 					loopMember.setRefset(columns[4]);
                     langRefsetsSet.add(columns[4]);
-					loopMember.setAcceptability(columns[6]);
+
+                    loopMember.setAcceptability(columns[6]);
 					List<LightLangMembership> list = languageMembers.get(sourceId);
 					if (list == null) {
 						list = new ArrayList<LightLangMembership>();
