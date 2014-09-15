@@ -73,7 +73,9 @@ The results will be a set of .json files in the output folder.
 Importing data
 --------------
 
-This project includes a script file for importing the resulting .json files into MongoDB, and creating the necessary indexes. This sentence needs to be executed from the folder that contains the .json files.
+The snapshot API requires a MongoDB database to store the denormalized representation contained in the .json files. MongoDb 2.6.x is required to leverage its latest adavances in full text search.
+
+This project includes a script file for importing the resulting .json files into MongoDB, and creating the necessary indexes. This sentence needs to be executed from the folder that contains the .json files. The script will use the `mongoimport` command provided by mongoDB, it is expected to be in the path, as well as `mongo` runtime.
 
 ```./import.sh en-edition 20140731```
 
