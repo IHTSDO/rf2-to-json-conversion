@@ -73,7 +73,7 @@ The results will be a set of .json files in the output folder.
 Importing data
 --------------
 
-This project includes a script file for importing the resulting .json files into MongoDB, and creating the necessary indexes.
+This project includes a script file for importing the resulting .json files into MongoDB, and creating the necessary indexes. This sentence needs to be executed from the folder that contains the .json files.
 
 ```./import.sh en-edition 20140731```
 
