@@ -5,16 +5,43 @@
  */
 package org.ihtsdo.json;
 
-import com.google.gson.Gson;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.ihtsdo.json.model.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.ihtsdo.json.model.Concept;
+import org.ihtsdo.json.model.ConceptAncestor;
+import org.ihtsdo.json.model.ConceptDescriptor;
+import org.ihtsdo.json.model.Description;
+import org.ihtsdo.json.model.LangMembership;
+import org.ihtsdo.json.model.LightDescription;
+import org.ihtsdo.json.model.LightLangMembership;
+import org.ihtsdo.json.model.LightRefsetMembership;
+import org.ihtsdo.json.model.LightRelationship;
+import org.ihtsdo.json.model.RefsetDescriptor;
+import org.ihtsdo.json.model.RefsetMembership;
+import org.ihtsdo.json.model.Relationship;
 import org.ihtsdo.json.model.ResourceSetManifest;
+import org.ihtsdo.json.model.TextIndexDescription;
 import org.ihtsdo.json.utils.FileHelper;
 import org.mapdb.DBMaker;
 
-import java.io.*;
-import java.net.URL;
-import java.util.*;
+import com.google.gson.Gson;
 
 /**
  *
@@ -28,6 +55,7 @@ public class TransformerDiskBased {
 	private Map<String, ConceptDescriptor> concepts;
 	private Map<String, List<LightDescription>> descriptions;
 	private Map<String, List<LightRelationship>> relationships;
+	private Map<String, List<LightRelationship>> targetRelationships;
 	private Map<String, List<LightRefsetMembership>> simpleMembers;
 	private Map<String, List<LightRefsetMembership>> simpleMapMembers;
 	private Map<String, List<LightLangMembership>> languageMembers;
@@ -77,6 +105,7 @@ public class TransformerDiskBased {
             concepts = new HashMap<String, ConceptDescriptor>();
             descriptions = new HashMap<String, List<LightDescription>>();
             relationships = new HashMap<String, List<LightRelationship>>();
+            targetRelationships = new HashMap<String, List<LightRelationship>>();
             simpleMembers = new HashMap<String, List<LightRefsetMembership>>();
             assocMembers = new HashMap<String, List<LightRefsetMembership>>();
             attrMembers = new HashMap<String, List<LightRefsetMembership>>();
@@ -88,6 +117,7 @@ public class TransformerDiskBased {
             concepts = DBMaker.newTempHashMap();
             descriptions = DBMaker.newTempHashMap();
             relationships = DBMaker.newTempHashMap();
+            targetRelationships = DBMaker.newTempHashMap();
             simpleMembers = DBMaker.newTempHashMap();
             assocMembers = DBMaker.newTempHashMap();
             attrMembers = DBMaker.newTempHashMap();
@@ -367,7 +397,6 @@ public class TransformerDiskBased {
                     }
 
                     if (act && type.equals(defaultTermType.toString())) {
-                        boolean isPreferred = false;
                         List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
                         if (listLLM != null) {
                             for (LightLangMembership llm : listLLM) {
@@ -504,7 +533,16 @@ public class TransformerDiskBased {
 				}
 				relList.add(loopRelationship);
 				relationships.put(sourceId, relList);
-				
+
+				if ( type.equals(isaSCTId) &&
+						columns[2].equals("1")){
+					List<LightRelationship> targetRelList = targetRelationships.get(targetId);
+					if (targetRelList == null) {
+						targetRelList = new ArrayList<LightRelationship>();
+					}
+					targetRelList.add(loopRelationship);
+					targetRelationships.put(targetId, targetRelList);
+				}
 				if (loopRelationship.isActive() && type.equals(isaSCTId)){
 					if ( charType.equals(inferred)){
 						notLeafInferred.add(targetId);
@@ -860,6 +898,12 @@ public class TransformerDiskBased {
                 listA = new ArrayList<String>();
                 getAncestors(cptId,stated);
                 cpt.setStatedAncestors(listA);
+                listA = new ArrayList<String>();
+                getDescendants(cptId,inferred);
+                cpt.setInferredDescendants(listA);
+                listA = new ArrayList<String>();
+                getDescendants(cptId,stated);
+                cpt.setStatedDescendants(listA);
             }
 
 
@@ -1176,6 +1220,25 @@ public class TransformerDiskBased {
 		bw.close();
         System.out.println(".");
 		System.out.println(fileName + " Done");
+	}
+
+	private void getDescendants(String cptId, String charType) {
+
+		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
+
+		listLR = targetRelationships.get(cptId);
+		if (listLR != null) {
+			for (LightRelationship lrel : listLR) {
+				if (lrel.getCharType().equals(charType)) {
+					String sourceId=lrel.getSourceId();
+					if (!listA.contains(sourceId)){
+						listA.add(sourceId);
+						getDescendants(sourceId,charType);
+					}
+				}
+			}
+		}
+		return ;		
 	}
 
 	public String getDefaultLangCode() {

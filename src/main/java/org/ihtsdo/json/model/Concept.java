@@ -24,6 +24,8 @@ public class Concept extends ConceptDescriptor {
     String semtag;
     List<String> inferredAncestors;
     List<String> statedAncestors;
+    List<String> inferredDescendants;
+    List<String> statedDescendants;
 
     public Concept() {
     }
@@ -107,4 +109,20 @@ public class Concept extends ConceptDescriptor {
     public void setStatedAncestors(List<String> statedAncestors) {
         this.statedAncestors = statedAncestors;
     }
+
+	public List<String> getInferredDescendants() {
+		return inferredDescendants;
+	}
+
+	public void setInferredDescendants(List<String> inferredDescendants) {
+		this.inferredDescendants = inferredDescendants;
+	}
+
+	public List<String> getStatedDescendants() {
+		return statedDescendants;
+	}
+
+	public void setStatedDescendants(List<String> statedDescendants) {
+		this.statedDescendants = statedDescendants;
+	}
 }
