@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <defaultTermLangCode>en</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
+    <editionName>Multi-English Edition</editionName>
+    <databaseName>multi-edition</databaseName>
+    <effectiveTime>$EFF_TIME</effectiveTime>
+    <expirationTime>$EXP_TIME</expirationTime>
+    <outputFolder>$OUTPUT_FOLDER/</outputFolder>
+    <foldersBaselineLoad>
+        <folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+    </foldersBaselineLoad>
+    <modulesToIgnoreBaselineLoad>
+    </modulesToIgnoreBaselineLoad>
+    <foldersExtensionLoad>
+        <folder>$PATH_TO_EXTENSION_RELEASE1/Snapshot</folder>
+        <folder>$PATH_TO_EXTENSION_RELEASE2/Snapshot</folder>
+        <folder>$PATH_TO_EXTENSION_RELEASE3/Snapshot</folder>
+    </foldersExtensionLoad>
+    <modulesToIgnoreExtensionLoad>
+		<module>900000000000207008</module>
+		<module>900000000000012004</module>
+    </modulesToIgnoreExtensionLoad>
+	<processInMemory>false</processInMemory>
+	<createCompleteConceptsFile>false</createCompleteConceptsFile>
+</config>

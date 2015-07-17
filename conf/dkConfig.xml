@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <defaultTermLangCode>da</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>554461000005103</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
+    <editionName>Danish Edition</editionName>
+    <databaseName>dk-edition</databaseName>
+    <effectiveTime>$EFF_TIME</effectiveTime>
+    <expirationTime>$EXP_TIME</expirationTime>
+    <outputFolder>da-edition</outputFolder>
+    <foldersBaselineLoad>
+	<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+    <folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+    </foldersBaselineLoad>
+    <modulesToIgnoreBaselineLoad>
+    </modulesToIgnoreBaselineLoad>
+    <foldersExtensionLoad>
+    </foldersExtensionLoad>
+    <modulesToIgnoreExtensionLoad>
+    </modulesToIgnoreExtensionLoad>
+	<processInMemory>true</processInMemory>
+	<createCompleteConceptsFile>false</createCompleteConceptsFile>
+</config>

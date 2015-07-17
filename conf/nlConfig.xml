@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <defaultTermLangCode>nl</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>31000146106</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
+    <editionName>NL Edition</editionName>
+    <databaseName>nl-edition</databaseName>
+    <effectiveTime>$EFF_TIME</effectiveTime>
+    <expirationTime>$EXP_TIME</expirationTime>
+    <outputFolder>nl-edition</outputFolder>
+    <foldersBaselineLoad>
+        <folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+        <folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+    </foldersBaselineLoad>
+    <modulesToIgnoreBaselineLoad>
+    </modulesToIgnoreBaselineLoad>
+    <foldersExtensionLoad>
+        
+    </foldersExtensionLoad>
+    <modulesToIgnoreExtensionLoad>
+    </modulesToIgnoreExtensionLoad>
+	<processInMemory>true</processInMemory>
+	<createCompleteConceptsFile>false</createCompleteConceptsFile>
+</config>
