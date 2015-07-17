@@ -3,6 +3,26 @@ RF2 to json conversion utility
 
 Conversion of SNOMED CT RF2 files to a JSON format, including pre-computed indexes for common search strategies
 
+See Below for manual instructions
+---------------------------------
+
+Easy Use instructions:
+----------------------
+
+Assumes the use of Ubuntu or a debian linux
+This build will build to jars and to a .deb file which will contain the jar and a variety of script files
+
+Steps:
+------
+
+1) Get the .deb onto the linux machine by either adding the the ihtsdo repository or 
+by building the .deb yourself using maven. 
+
+sudo echo "deb https://maven.ihtsdotools.org/content/repositories/releases/ ./" >   /etc/apt/sources.list.d/ihtsdo.releases.list
+sudo wget -O - https://maven.ihtsdotools.org/service/local/repositories/releases/content/apt-key.gpg.key | apt-key add -
+sudo apt-get update
+sudo apt-get install 
+
 Building
 --------
 

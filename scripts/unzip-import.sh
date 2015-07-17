@@ -14,8 +14,6 @@ editon=""
 #The import date e.g. 20150531
 impDate=""
 
- ./import.sh au-edition au-edition20150531
-
 # Prints a message to stdout with the current date and time.
 echo_date() {
 	echo -e "[`date +\"%Y-%m-%d %H:%M:%S\"`] $@"
