@@ -10,9 +10,9 @@ import_script="import.sh"
 # The tgz file name
 zip_fn="json.tgz"
 # The edition e.g. au-edition
-editon=""
+edition=""
 #The import date e.g. 20150531
-impDate=""
+importDate=""
 
 # Prints a message to stdout with the current date and time.
 echo_date() {
@@ -36,12 +36,12 @@ main() {
 
 check_arguments() {
 
-	if [ "x$editon" = "x" ]; then
-		error_exit "Please set the variable editon before running this script. Exiting with error."
+	if [ "x$edition" = "x" ]; then
+		error_exit "Please set the variable edition before running this script. Exiting with error."
 	fi
 
-	if [ "x$impDate" = "x" ]; then
-		error_exit "Please set the variable impDate before running this script. Exiting with error."
+	if [ "x$importDate" = "x" ]; then
+		error_exit "Please set the variable importDate before running this script. Exiting with error."
 	fi
 
 }
@@ -53,7 +53,7 @@ tar -zxvf $zip_fn
 
 importmongo() { 
 echo "Importing into mongo with  $scpvar"
-$json_dir/$import_script $editon $impDate
+$json_dir/$import_script $edition $importDate
 }
 
 # Ensures that only a single instance is running at any time

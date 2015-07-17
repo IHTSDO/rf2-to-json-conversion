@@ -14,7 +14,7 @@ unzip_script="unzip-import.sh"
 # Make sure in advance that you can ssh to desturl as destuser.
 # destuser - if left blank then as current user
 destuser=""
-desturl="va-ims.ihtsdotools.org"
+desturl=""
 destdir="~/"
 
 scpvar=$destuser@$desturl:$destdir
@@ -35,6 +35,7 @@ error_exit() {
 # Main script starts here.
 main() {
 	echo_date "----------------------------"
+        check_arguments
 	copyscripts
         targzip
         scptgz
