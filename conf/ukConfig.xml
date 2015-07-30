@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <defaultTermLangCode>uk</defaultTermLangCode>
+    <processInMemory>false</processInMemory>
+    <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>999001251000000103</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
-    <editionName>United Kingdom Edition</editionName>
+    <createCompleteConceptsFile>false</createCompleteConceptsFile>
+    <editionName>UK Edition</editionName>
     <databaseName>uk-edition</databaseName>
-    <effectiveTime>$EFF_TIME</effectiveTime>
-    <expirationTime>$EXP_TIME</expirationTime>
+    <effectiveTime>20150401</effectiveTime>
+    <expirationTime>20160501</expirationTime>
     <outputFolder>uk-edition</outputFolder>
     <foldersBaselineLoad>
-    	<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
-	    <folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
@@ -19,6 +21,4 @@
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>
-    <processInMemory>true</processInMemory>
-	<createCompleteConceptsFile>false</createCompleteConceptsFile>
 </config>

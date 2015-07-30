@@ -1322,7 +1322,7 @@ public class TransformerDiskBased {
 				//TODO: using String lang names to support compatibility with Mongo 2.4.x text indexes
 				d.setLang(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
-				d.setConceptModule(concept.getModule());
+                                d.setConceptModule(concept.getModule());
 				d.setConceptActive(concept.isActive());
                 d.setDefinitionStatus(concept.getDefinitionStatus());
                 d.setFsn(cptFSN.get(conceptId));

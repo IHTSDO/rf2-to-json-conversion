@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>true</processInMemory>
-    <defaultTermLangCode>sv</defaultTermLangCode>
-    <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
-    <defaultTermLanguageRefset>46011000052107</defaultTermLanguageRefset>
-    <normalizeTextIndex>false</normalizeTextIndex>
+    <processInMemory>false</processInMemory>
+    <defaultTermLangCode>au</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>32570271000036106</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
-    <editionName>Swedish Edition</editionName>
-    <databaseName>se-edition</databaseName>
+    <editionName>AU Edition</editionName>
+    <databaseName>au-edition</databaseName>
     <effectiveTime>20150531</effectiveTime>
     <expirationTime>20160601</expirationTime>
-    <outputFolder>se-edition</outputFolder>
+    <outputFolder>au-edition</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
     	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>

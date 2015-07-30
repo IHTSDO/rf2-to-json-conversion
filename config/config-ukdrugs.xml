@@ -3,21 +3,21 @@
     <processInMemory>false</processInMemory>
     <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
-    <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
+    <defaultTermLanguageRefset>999001251000000103</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>UKTC Edition</editionName>
-    <databaseName>uktc-edition</databaseName>
-    <effectiveTime>20140401</effectiveTime>
-    <expirationTime>20150201</expirationTime>
-    <outputFolder>/Volumes/Macintosh HD2/Multi-english-data/UKTC</outputFolder>
+    <databaseName>uk-edition</databaseName>
+    <effectiveTime>20150401</effectiveTime>
+    <expirationTime>20160501</expirationTime>
+    <outputFolder>/Users/rory/Dev/Releases/uk</outputFolder>
     <foldersBaselineLoad>
-        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
+        <folder>/Users/rory/Dev/Releases/SnomedCT_RF2Release_INT_20150131/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
     <foldersExtensionLoad>
-        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot</folder>
+    	<folder>/Users/rory/Downloads/SnomedCT2_GB1000001_20150429/RF2Release/Snapshot</folder>
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>

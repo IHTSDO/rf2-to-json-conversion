@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>true</processInMemory>
+    <processInMemory>false</processInMemory>
     <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
-    <createCompleteConceptsFile>true</createCompleteConceptsFile>
-    <editionName>International Edition</editionName>
-    <databaseName>en-edition</databaseName>
-    <effectiveTime>20140131</effectiveTime>
-    <expirationTime>20150201</expirationTime>
-    <outputFolder>/Users/alo/Downloads/Releases/en-json</outputFolder>
+    <createCompleteConceptsFile>false</createCompleteConceptsFile>
+    <editionName>US Edition</editionName>
+    <databaseName>us-edition</databaseName>
+    <effectiveTime>20150301</effectiveTime>
+    <expirationTime>20160302</expirationTime>
+    <outputFolder>us-edition</outputFolder>
     <foldersBaselineLoad>
-        <folder>/Users/alo/Downloads/Releases/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
+		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
     <foldersExtensionLoad>
+    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>
