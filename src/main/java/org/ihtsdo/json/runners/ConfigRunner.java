@@ -17,7 +17,7 @@ public class ConfigRunner {
             config = args[0];
         }
         if (config == null) {
-            config = "config/intConfig.xml";
+            config = "config/enCaConfig.xml";
 //            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
 //            System.exit(-1);
         }
