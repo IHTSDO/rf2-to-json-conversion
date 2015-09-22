@@ -21,9 +21,9 @@ public class ConfigRunner {
             config = args[0];
         }
         if (config == null) {
-            //config = "config/sampleConfig.xml";
-            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
-            System.exit(-1);
+            config = "config/intConfig.xml";
+//            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
+//            System.exit(-1);
         }
         System.out.println("Running with config: " + config);
         XMLConfiguration xmlConfig = new XMLConfiguration(config);
