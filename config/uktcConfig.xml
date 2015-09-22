@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
@@ -8,16 +8,16 @@
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>UKTC Edition</editionName>
     <databaseName>uktc-edition</databaseName>
-    <effectiveTime>20140401</effectiveTime>
-    <expirationTime>20150201</expirationTime>
+    <effectiveTime>20141001</effectiveTime>
+    <expirationTime>20151001</expirationTime>
     <outputFolder>/Volumes/Macintosh HD2/Multi-english-data/UKTC</outputFolder>
     <foldersBaselineLoad>
-        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
+        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_18/SnomedCT_Release_INT_20140731/RF2Release/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
     <foldersExtensionLoad>
-        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_17/SnomedCT2_GB1000000_20140401/RF2Release/Snapshot</folder>
+        <folder>/Volumes/Macintosh HD2/Downloads/uk_sct2cl_18/SnomedCT2_GB1000000_20141001/RF2Release/Snapshot</folder>
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>
