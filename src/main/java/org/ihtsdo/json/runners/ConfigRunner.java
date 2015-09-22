@@ -1,14 +1,10 @@
 package org.ihtsdo.json.runners;
 
+import java.util.Collection;
+
 import org.apache.commons.configuration.XMLConfiguration;
 import org.ihtsdo.json.TransformerConfig;
 import org.ihtsdo.json.TransformerDiskBased;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by alo on 8/4/14.
@@ -21,7 +17,7 @@ public class ConfigRunner {
             config = args[0];
         }
         if (config == null) {
-            config = "config/enCaConfig.xml";
+            config = "config/intConfig.xml";
 //            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
 //            System.exit(-1);
         }

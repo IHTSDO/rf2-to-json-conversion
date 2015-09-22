@@ -371,77 +371,82 @@ public class TransformerDiskBased {
 		boolean act;
 		String type;
 		String lang;
-        System.out.println("Starting Default Terms computation");
-        int count = 0;
+		System.out.println("Starting Default Terms computation");
+		int count = 0;
 		for (String sourceId:concepts.keySet()){
 			List<LightDescription> lDescriptions = descriptions.get(sourceId);
 			if (lDescriptions!=null){
-                String lastTerm = "No descriptions";
-                String enFsn = null;
-                String configFsn = null;
-                String userSelectedDefaultTermByLangCode = null;
-                String userSelectedDefaultTermByRefset = null;
+				String lastTerm = "No descriptions";
+				String enFsn = null;
+				String langFsn = null;
+				String configFsn = null;
+				String userSelectedDefaultTermByLangCode = null;
+				String userSelectedDefaultTermByRefset = null;
 				for (LightDescription desc:lDescriptions){
-					
+
 					act=desc.isActive();
 					type=String.valueOf(desc.getType());
 					lang=desc.getLang();
 
 
-                    if (act && type.equals("900000000000003001") && lang.equals("en")) {
-                        enFsn = desc.getTerm();
-                    }
+					if (act && type.equals("900000000000003001") && lang.equals("en")) {
+						enFsn = desc.getTerm();
+					}
+					if (act && type.equals("900000000000003001") && lang.equals(defaultLangCode)) {
+						langFsn = desc.getTerm();
+					}
+					if (act && type.equals(defaultTermType.toString()) && lang.equals(defaultLangCode)) {
+						userSelectedDefaultTermByLangCode = desc.getTerm();
+					}
 
-                    if (act && type.equals(defaultTermType.toString()) && lang.equals(defaultLangCode)) {
-                        userSelectedDefaultTermByLangCode = desc.getTerm();
-                    }
+					if (act && type.equals(defaultTermType.toString())) {
+						List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
+						if (listLLM != null) {
+							for (LightLangMembership llm : listLLM) {
+								if (llm.getAcceptability().equals("900000000000548007") && llm.getRefset().equals(defaultLangRefset)) {
+									if (desc.getType().equals("900000000000003001")) {
+										configFsn = desc.getTerm();
+									}
+									userSelectedDefaultTermByRefset = desc.getTerm();
+								}
+							}
+						}
+					}
 
-                    if (act && type.equals(defaultTermType.toString())) {
-                        List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
-                        if (listLLM != null) {
-                            for (LightLangMembership llm : listLLM) {
-                                if (llm.getAcceptability().equals("900000000000548007") && llm.getRefset().equals(defaultLangRefset)) {
-                                    if (desc.getType().equals("900000000000003001")) {
-                                        configFsn = desc.getTerm();
-                                    }
-                                    userSelectedDefaultTermByRefset = desc.getTerm();
-                                }
-                            }
-                        }
-                    }
-
-                    lastTerm = desc.getTerm();
+					lastTerm = desc.getTerm();
 
 				}
-                ConceptDescriptor loopConcept = concepts.get(sourceId);
+				ConceptDescriptor loopConcept = concepts.get(sourceId);
 
-                if (userSelectedDefaultTermByRefset != null) {
-                    loopConcept.setDefaultTerm(userSelectedDefaultTermByRefset);
-                } else if (userSelectedDefaultTermByLangCode != null) {
-                    loopConcept.setDefaultTerm(userSelectedDefaultTermByLangCode);
-                } else if (enFsn != null) {
-                    loopConcept.setDefaultTerm(enFsn);
-                } else {
-                    loopConcept.setDefaultTerm(lastTerm);
-                }
-                concepts.put(sourceId, loopConcept);
+				if (userSelectedDefaultTermByRefset != null) {
+					loopConcept.setDefaultTerm(userSelectedDefaultTermByRefset);
+				} else if (userSelectedDefaultTermByLangCode != null) {
+					loopConcept.setDefaultTerm(userSelectedDefaultTermByLangCode);
+				} else if (enFsn != null) {
+					loopConcept.setDefaultTerm(enFsn);
+				} else {
+					loopConcept.setDefaultTerm(lastTerm);
+				}
+				concepts.put(sourceId, loopConcept);
 
-                if (configFsn != null) {
-                    cptFSN.put(sourceId, configFsn);
-                } else if (enFsn != null) {
-                    cptFSN.put(sourceId, enFsn);
-                } else {
-                    cptFSN.put(sourceId, lastTerm);
-                }
+				if (configFsn != null) {
+					cptFSN.put(sourceId, configFsn);
+				}else if (langFsn!=null){
+					cptFSN.put(sourceId, langFsn);
+				} else if (enFsn != null) {
+					cptFSN.put(sourceId, enFsn);
+				} else {
+					cptFSN.put(sourceId, lastTerm);
+				}
 
-                if (count % 100000 == 0) {
-                    System.out.print(".");
-                }
-                count++;
+				if (count % 100000 == 0) {
+					System.out.print(".");
+				}
+				count++;
 			}
 		}
-        System.out.println(".");
-        System.out.println("Default Terms computation completed");
+		System.out.println(".");
+		System.out.println("Default Terms computation completed");
 	}
 	public void loadTextDefinitionFile(File textDefinitionFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());

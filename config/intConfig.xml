@@ -7,12 +7,12 @@
     <normalizeTextIndex>true</normalizeTextIndex>
     <createCompleteConceptsFile>true</createCompleteConceptsFile>
     <editionName>International Edition</editionName>
-    <databaseName>en-edition</databaseName>
-    <effectiveTime>20140131</effectiveTime>
+    <databaseName>en-complete</databaseName>
+    <effectiveTime>20140731</effectiveTime>
     <expirationTime>20150201</expirationTime>
-    <outputFolder>/Users/alo/Downloads/Releases/en-json</outputFolder>
+    <outputFolder>/Users/ar/Downloads/en-json</outputFolder>
     <foldersBaselineLoad>
-        <folder>/Users/alo/Downloads/Releases/SnomedCT_Release_INT_20140131/RF2Release/Snapshot</folder>
+        <folder>/Users/ar/Downloads/SnomedCT_Release_INT_20140731/RF2Release/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
