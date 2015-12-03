@@ -23,7 +23,7 @@ Create a config.xml for the conversion execution, it requires to define the loca
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
-    <createCompleteConceptsFile>true</createCompleteConceptsFile>
+    <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>International Edition</editionName>
     <databaseName>en-edition</databaseName>
     <effectiveTime>20140131</effectiveTime>
