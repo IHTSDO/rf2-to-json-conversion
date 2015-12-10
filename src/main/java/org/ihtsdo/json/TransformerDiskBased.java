@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.json.model.Concept;
-import org.ihtsdo.json.model.ConceptAncestor;
 import org.ihtsdo.json.model.ConceptDescriptor;
 import org.ihtsdo.json.model.Description;
 import org.ihtsdo.json.model.LangMembership;
@@ -39,6 +38,7 @@ import org.ihtsdo.json.model.Relationship;
 import org.ihtsdo.json.model.ResourceSetManifest;
 import org.ihtsdo.json.model.TextIndexDescription;
 import org.ihtsdo.json.utils.FileHelper;
+import org.ihtsdo.json.utils.TClosure;
 import org.mapdb.DBMaker;
 
 import com.google.gson.Gson;
@@ -49,6 +49,8 @@ import com.google.gson.Gson;
  */
 public class TransformerDiskBased {
 
+	private static final String CONCEPT_MODEL_ATTRIBUTE = "410662002";
+	private static final String ATTRIBUTE = "246061005";
 	private String MODIFIER = "Existential restriction";
 	private String sep = System.getProperty("line.separator");
 
@@ -75,18 +77,17 @@ public class TransformerDiskBased {
 	private Map<String, List<LightDescription>> tdefMembers;
 	private Map<String, List<LightRefsetMembership>> attrMembers;
 	private Map<String, List<LightRefsetMembership>> assocMembers;
-	private ArrayList<String> listA;
+	private List<String> listA;
 	private Map<String, String> charConv;
 	private Map<String, String> cptFSN;
 	private HashSet<String> notLeafInferred;
 	private HashSet<String> notLeafStated;
-    private String valConfig;
     private ResourceSetManifest manifest;
     private Set<String> refsetsSet;
     private Set<String> langRefsetsSet;
     private Set<String> modulesSet;
-
-
+	private Map<String,List<String>> calculatedInferredAncestors;
+	private Map<String,List<String>> calculatedStatedAncestors;
 
     public TransformerDiskBased() throws IOException {
 		langCodes = new HashMap<String, String>();
@@ -97,7 +98,6 @@ public class TransformerDiskBased {
 		langCodes.put("fr", "french");
 		langCodes.put("nl", "dutch");
 
-        valConfig= "config/validation-rules.xml";
 	}
 
     public void convert(TransformerConfig config) throws Exception {
@@ -113,6 +113,8 @@ public class TransformerDiskBased {
             simpleMapMembers = new HashMap<String, List<LightRefsetMembership>>();
             languageMembers = new HashMap<String, List<LightLangMembership>>();
             cptFSN = new HashMap<String, String>();
+			calculatedInferredAncestors=new HashMap<String, List<String>>();
+			calculatedStatedAncestors=new HashMap<String, List<String>>();
         } else {
             concepts = DBMaker.newTempHashMap();
             descriptions = DBMaker.newTempHashMap();
@@ -125,6 +127,8 @@ public class TransformerDiskBased {
             simpleMapMembers = DBMaker.newTempHashMap();
             languageMembers = DBMaker.newTempHashMap();
             cptFSN = DBMaker.newTempHashMap();
+			calculatedInferredAncestors=DBMaker.newTempHashMap();
+			calculatedStatedAncestors=DBMaker.newTempHashMap();
         }
 
         notLeafInferred=new HashSet<String>();
@@ -166,15 +170,33 @@ public class TransformerDiskBased {
             System.out.println("######## No Extensions options configured ########");
         }
 
+		getDescendantsCount();
         completeDefaultTerm();
         File output = new File(config.getOutputFolder());
         output.mkdirs();
         createConceptsJsonFile(config.getOutputFolder() + "/concepts.json", config.isCreateCompleteConceptsFile());
         createTextIndexFile(config.getOutputFolder() + "/text-index.json");
         createManifestFile(config.getOutputFolder() + "/manifest.json");
-//        createTClosures(files, config.getOutputFolder() + "/inferredTransitiveClosure.json", config.getOutputFolder() + "/statedTransitiveClosure.json");
 
     }
+
+	private void getDescendantsCount() throws FileNotFoundException, IOException {
+		TClosure tc=new TClosure(relationships, inferred);
+		for (String conceptId:concepts.keySet()){
+			ConceptDescriptor cd=concepts.get(conceptId);
+			int descend=tc.getDescendantsCount(Long.parseLong(conceptId));
+			cd.setInferredDescendants(descend);
+		}
+		tc=null;
+		tc=new TClosure(relationships, stated);
+		for (String conceptId:concepts.keySet()){
+			ConceptDescriptor cd=concepts.get(conceptId);
+			int descend=tc.getDescendantsCount(Long.parseLong(conceptId));
+			cd.setStatedDescendants(descend);
+		}
+		
+		tc=null;
+	}
 
     public static void deleteDir(File dir) {
         if (dir.isDirectory()) {
@@ -242,38 +264,6 @@ public class TransformerDiskBased {
             result.addAll(files);
 		}
         return result;
-
-	}
-
-	public void createTClosures(HashSet<String> folders, String transitiveClosureInferredFile,String transitiveClosureStatedFile) throws Exception {
-		if (relationships==null || relationships.size()==0){
-			getFilesForTransClosureProcess(folders);
-		}
-		createTClosure(transitiveClosureInferredFile,inferred);
-		createTClosure(transitiveClosureStatedFile,stated);
-
-	}
-	
-	private void getFilesForTransClosureProcess(HashSet<String> folders) throws IOException, Exception {
-
-		concepts = new HashMap<String, ConceptDescriptor>();
-		relationships = new HashMap<String, List<LightRelationship>>();
-		FileHelper fHelper=new FileHelper();
-		for (String folder:folders){
-			File dir=new File(folder);
-			HashSet<String> files=new HashSet<String>();
-			fHelper.findAllFiles(dir, files);
-
-			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file));
-
-				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file), null);
-				}else if(pattern.equals("rf2-concepts")){
-					loadConceptsFile(new File(file), null);
-				}else{}
-			}
-		}
 
 	}
 
@@ -551,7 +541,7 @@ public class TransformerDiskBased {
 				if (loopRelationship.isActive() && type.equals(isaSCTId)){
 					if ( charType.equals(inferred)){
 						notLeafInferred.add(targetId);
-					}else{
+					}else if ( charType.equals(stated)){
 						notLeafStated.add(targetId);
 					}
 				}
@@ -895,20 +885,14 @@ public class TransformerDiskBased {
 			cpt.setLeafInferred(!notLeafInferred.contains(cptId));
 			cpt.setLeafStated(!notLeafStated.contains(cptId));
             cpt.setFsn(cptFSN.get(cptId));
+			cpt.setStatedDescendants(cptdesc.getStatedDescendants());
+			cpt.setInferredDescendants(cptdesc.getInferredDescendants());
 
             if (createCompleteVersion) {
-                listA = new ArrayList<String>();
-                getAncestors(cptId,inferred);
-                cpt.setInferredAncestors(listA);
-                listA = new ArrayList<String>();
-                getAncestors(cptId,stated);
-                cpt.setStatedAncestors(listA);
-                listA = new ArrayList<String>();
-                getDescendants(cptId,inferred);
-                cpt.setInferredDescendants(listA);
-                listA = new ArrayList<String>();
-                getDescendants(cptId,stated);
-                cpt.setStatedDescendants(listA);
+				listA = getInferredAncestors(cptId,false);
+				cpt.setInferredAncestors(listA);
+				listA = getStatedAncestors(cptId,false);
+				cpt.setStatedAncestors(listA);
             }
 
 
@@ -1068,19 +1052,15 @@ public class TransformerDiskBased {
 						r.setCharType(concepts.get(lrel.getCharType()));
 
                         if (createCompleteVersion) {
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),inferred);
-                            r.setTypeInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),stated);
-                            r.setTypeStatedAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),inferred);
-                            r.setTargetInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),stated);
-                            r.setTargetStatedAncestors(listA);
-                        }
+							listA = getInferredAncestors(lrel.getType(), true);
+							r.setTypeInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getType(),true);
+							r.setTypeStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getTarget(),false);
+							r.setTargetInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getTarget(),false);
+							r.setTargetStatedAncestors(listA);
+						}
 
 						listR.add(r);
 					}
@@ -1112,18 +1092,14 @@ public class TransformerDiskBased {
 						r.setCharType(concepts.get(lrel.getCharType()));
 
                         if (createCompleteVersion) {
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),inferred);
-                            r.setTypeInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),stated);
-                            r.setTypeStatedAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),inferred);
-                            r.setTargetInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),stated);
-                            r.setTargetStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getType(), true);
+							r.setTypeInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getType(),true);
+							r.setTypeStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getTarget(),false);
+							r.setTargetInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getTarget(),false);
+							r.setTargetStatedAncestors(listA);
                         }
 
 						listR.add(r);
@@ -1139,6 +1115,45 @@ public class TransformerDiskBased {
 				cpt.setRelationships(null);
 			}
 
+			listLR = relationships.get(cptId);
+			listR = new ArrayList<Relationship>();
+			if (listLR != null) {
+				for (LightRelationship lrel : listLR) {
+					if (lrel.getCharType().equals("900000000000227009")) {
+						Relationship r = new Relationship();
+						r.setEffectiveTime(lrel.getEffectiveTime());
+						r.setActive(lrel.isActive());
+						r.setModule(lrel.getModule());
+						r.setGroupId(lrel.getGroupId());
+						r.setModifier(MODIFIER);
+						r.setSourceId(cptId);
+						r.setTarget(concepts.get(lrel.getTarget()));
+						r.setType(concepts.get(lrel.getType()));
+						r.setCharType(concepts.get(lrel.getCharType()));
+
+                        if (createCompleteVersion) {
+							listA = getInferredAncestors(lrel.getType(), true);
+							r.setTypeInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getType(),true);
+							r.setTypeStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getTarget(),false);
+							r.setTargetInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getTarget(),false);
+							r.setTargetStatedAncestors(listA);
+                        }
+
+						listR.add(r);
+					}
+				}
+
+				if (listR.isEmpty()) {
+					cpt.setAdditionalRelationships(null);
+				} else {
+					cpt.setAdditionalRelationships(listR);
+				}
+			} else {
+				cpt.setAdditionalRelationships(null);
+			}
 			listLRM = simpleMembers.get(cptId);
 			listRM = new ArrayList<RefsetMembership>();
 			if (listLRM != null) {
@@ -1223,27 +1238,10 @@ public class TransformerDiskBased {
             }
 		}
 		bw.close();
+		calculatedStatedAncestors=null;
+		calculatedInferredAncestors=null;
         System.out.println(".");
 		System.out.println(fileName + " Done");
-	}
-
-	private void getDescendants(String cptId, String charType) {
-
-		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
-
-		listLR = targetRelationships.get(cptId);
-		if (listLR != null) {
-			for (LightRelationship lrel : listLR) {
-				if (lrel.getCharType().equals(charType)) {
-					String sourceId=lrel.getSourceId();
-					if (!listA.contains(sourceId)){
-						listA.add(sourceId);
-						getDescendants(sourceId,charType);
-					}
-				}
-			}
-		}
-		return ;		
 	}
 
 	public String getDefaultLangCode() {
@@ -1254,52 +1252,71 @@ public class TransformerDiskBased {
 		this.defaultLangCode = defaultLangCode;
 	}
 
-	private void createTClosure(String fileName,String charType) throws IOException {
-
-		System.out.println("Transitive Closure creation from " + fileName);
-		FileOutputStream fos = new FileOutputStream(fileName);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-		BufferedWriter bw = new BufferedWriter(osw);
-		Gson gson = new Gson();
-
-
-//		int count = 0;
-		for (String cptId : concepts.keySet()) {		
-
-			listA = new ArrayList<String>();
-			getAncestors(cptId,charType);
-			if (!listA.isEmpty()){
-				ConceptAncestor ca=new ConceptAncestor();
-
-				ca.setConceptId(cptId);
-				ca.setAncestor(listA);
-				bw.append(gson.toJson(ca).toString());
-				bw.append(sep);
-			}
+	private List<String> getInferredAncestors(String cptId,boolean isType) {
+		if (calculatedInferredAncestors.containsKey(cptId)){
+			return calculatedInferredAncestors.get(cptId);
 		}
-		bw.close();
-		System.out.println(fileName + " Done");
-	}
-
-	private void getAncestors(String cptId,String charType) {
-
+		List<String> ret=new ArrayList<String>();
 		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
 
 		listLR = relationships.get(cptId);
 		if (listLR != null) {
 			for (LightRelationship lrel : listLR) {
-				if (lrel.getCharType().equals(charType) &&
+				if (lrel.getCharType().equals(inferred) &&
 						lrel.getType().equals(isaSCTId) &&
 						lrel.isActive()) {
 					String tgt=lrel.getTarget();
-					if (!listA.contains(tgt)){
-						listA.add(tgt);
-						getAncestors(tgt,charType);
+					if (isType && (tgt.equals(CONCEPT_MODEL_ATTRIBUTE) || tgt.equals(ATTRIBUTE))){
+						continue;
+					}
+					if (!ret.contains(tgt)){
+						List<String> tmpl=getInferredAncestors(tgt, isType);
+						for (String id:tmpl){
+							if (!ret.contains(id)){
+								ret.add(id);
+							}
+						}
+						ret.add(tgt);
 					}
 				}
 			}
 		}
-		return ;
+		calculatedInferredAncestors.put(cptId, ret);
+		return ret;
+	}
+
+	private List<String> getStatedAncestors(String cptId,boolean isType) {
+
+		if (calculatedStatedAncestors.containsKey(cptId)){
+			return calculatedStatedAncestors.get(cptId);
+		}
+		List<String> ret=new ArrayList<String>();
+		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
+
+		listLR = relationships.get(cptId);
+		if (listLR != null) {
+			for (LightRelationship lrel : listLR) {
+				if (lrel.getCharType().equals(stated) &&
+						lrel.getType().equals(isaSCTId) &&
+						lrel.isActive()) {
+					String tgt=lrel.getTarget();
+					if (isType && (tgt.equals(CONCEPT_MODEL_ATTRIBUTE) || tgt.equals(ATTRIBUTE))){
+						continue;
+					}
+					if (!ret.contains(tgt)){
+						List<String> tmpl=getStatedAncestors(tgt,isType);
+						for (String id:tmpl){
+							if (!ret.contains(id)){
+								ret.add(id);
+							}
+						}
+						ret.add(tgt);
+					}
+				}
+			}
+		}
+		calculatedStatedAncestors.put(cptId, ret);
+		return ret ;
 	}
 
 	public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {

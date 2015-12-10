@@ -17,6 +17,7 @@ public class Concept extends ConceptDescriptor {
     List<Description> descriptions;
     List<Relationship> relationships;
     List<Relationship> statedRelationships;
+    List<Relationship> additionalRelationships;
     boolean isLeafInferred;
     boolean isLeafStated;
     String fsn;
@@ -24,8 +25,6 @@ public class Concept extends ConceptDescriptor {
     String semtag;
     List<String> inferredAncestors;
     List<String> statedAncestors;
-    List<String> inferredDescendants;
-    List<String> statedDescendants;
 
     public Concept() {
     }
@@ -110,19 +109,12 @@ public class Concept extends ConceptDescriptor {
         this.statedAncestors = statedAncestors;
     }
 
-	public List<String> getInferredDescendants() {
-		return inferredDescendants;
+	public List<Relationship> getAdditionalRelationships() {
+		return additionalRelationships;
 	}
 
-	public void setInferredDescendants(List<String> inferredDescendants) {
-		this.inferredDescendants = inferredDescendants;
-	}
-
-	public List<String> getStatedDescendants() {
-		return statedDescendants;
-	}
-
-	public void setStatedDescendants(List<String> statedDescendants) {
-		this.statedDescendants = statedDescendants;
+	public void setAdditionalRelationships(
+			List<Relationship> additionalRelationships) {
+		this.additionalRelationships = additionalRelationships;
 	}
 }
