@@ -88,6 +88,9 @@ public class TransformerDiskBased {
     private Set<String> modulesSet;
 	private Map<String,List<String>> calculatedInferredAncestors;
 	private Map<String,List<String>> calculatedStatedAncestors;
+	private Map<String,List<String>> calculatedInferredAncestorsForRelType;
+	private Map<String,List<String>> calculatedStatedAncestorsForRelType;
+	private String[] wordSeparators;
 
     public TransformerDiskBased() throws IOException {
 		langCodes = new HashMap<String, String>();
@@ -97,6 +100,7 @@ public class TransformerDiskBased {
 		langCodes.put("sv", "swedish");
 		langCodes.put("fr", "french");
 		langCodes.put("nl", "dutch");
+		wordSeparators=new String[]{"-"};
 
 	}
 
@@ -115,6 +119,8 @@ public class TransformerDiskBased {
             cptFSN = new HashMap<String, String>();
 			calculatedInferredAncestors=new HashMap<String, List<String>>();
 			calculatedStatedAncestors=new HashMap<String, List<String>>();
+			calculatedInferredAncestorsForRelType=new HashMap<String, List<String>>();
+			calculatedStatedAncestorsForRelType=new HashMap<String, List<String>>();
         } else {
             concepts = DBMaker.newTempHashMap();
             descriptions = DBMaker.newTempHashMap();
@@ -129,6 +135,8 @@ public class TransformerDiskBased {
             cptFSN = DBMaker.newTempHashMap();
 			calculatedInferredAncestors=DBMaker.newTempHashMap();
 			calculatedStatedAncestors=DBMaker.newTempHashMap();
+			calculatedInferredAncestorsForRelType=DBMaker.newTempHashMap();
+			calculatedStatedAncestorsForRelType=DBMaker.newTempHashMap();
         }
 
         notLeafInferred=new HashSet<String>();
@@ -1240,6 +1248,8 @@ public class TransformerDiskBased {
 		bw.close();
 		calculatedStatedAncestors=null;
 		calculatedInferredAncestors=null;
+		calculatedStatedAncestorsForRelType=null;
+		calculatedInferredAncestorsForRelType=null;
         System.out.println(".");
 		System.out.println(fileName + " Done");
 	}
@@ -1253,8 +1263,15 @@ public class TransformerDiskBased {
 	}
 
 	private List<String> getInferredAncestors(String cptId,boolean isType) {
-		if (calculatedInferredAncestors.containsKey(cptId)){
-			return calculatedInferredAncestors.get(cptId);
+		if (isType){
+			if (calculatedInferredAncestorsForRelType.containsKey(cptId)){
+				return calculatedInferredAncestorsForRelType.get(cptId);
+			}
+		}else{
+
+			if (calculatedInferredAncestors.containsKey(cptId)){
+				return calculatedInferredAncestors.get(cptId);
+			}
 		}
 		List<String> ret=new ArrayList<String>();
 		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
@@ -1281,14 +1298,23 @@ public class TransformerDiskBased {
 				}
 			}
 		}
-		calculatedInferredAncestors.put(cptId, ret);
+		if(isType ){
+			calculatedInferredAncestorsForRelType.put(cptId, ret);
+		}else{
+			calculatedInferredAncestors.put(cptId, ret);
+		}
 		return ret;
 	}
 
 	private List<String> getStatedAncestors(String cptId,boolean isType) {
-
-		if (calculatedStatedAncestors.containsKey(cptId)){
-			return calculatedStatedAncestors.get(cptId);
+		if (isType){
+			if (calculatedStatedAncestorsForRelType.containsKey(cptId)){
+				return calculatedStatedAncestorsForRelType.get(cptId);
+			}
+		}else{
+			if (calculatedStatedAncestors.containsKey(cptId)){
+				return calculatedStatedAncestors.get(cptId);
+			}
 		}
 		List<String> ret=new ArrayList<String>();
 		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
@@ -1315,7 +1341,11 @@ public class TransformerDiskBased {
 				}
 			}
 		}
-		calculatedStatedAncestors.put(cptId, ret);
+		if (isType){
+			calculatedStatedAncestorsForRelType.put(cptId, ret);
+		}else{
+			calculatedStatedAncestors.put(cptId, ret);
+		}
 		return ret ;
 	}
 
@@ -1352,15 +1382,7 @@ public class TransformerDiskBased {
 				if (d.getFsn().endsWith(")")) {
 					d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
 				}
-				String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
-				if (manifest.isTextIndexNormalized()) {
-                    String convertedTerm = convertTerm(cleanTerm);
-                    String[] tokens = convertedTerm.toLowerCase().split("\\s+");
-                    d.setWords(Arrays.asList(tokens));
-                } else {
-                    String[] tokens = cleanTerm.toLowerCase().split("\\s+");
-                    d.setWords(Arrays.asList(tokens));
-                }
+				setIndexWords(d);
                 d.setRefsetIds(new ArrayList<String>());
 
                 // Refset index assumes that only active members are included in the db.
@@ -1399,6 +1421,40 @@ public class TransformerDiskBased {
 		System.out.println(fileName + " Done");
 	}
 
+	private void setIndexWords(TextIndexDescription d) {
+		String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
+		String[] tokens;
+		if (manifest.isTextIndexNormalized()) {
+		    String convertedTerm = convertTerm(cleanTerm);
+		    tokens = convertedTerm.toLowerCase().split("\\s+");
+		} else {
+		    tokens = cleanTerm.toLowerCase().split("\\s+");
+		}
+		HashSet<String> uniqueToken=getTokens(tokens);
+		String[] arrtmp=new String[uniqueToken.size()];
+		d.setWords(Arrays.asList(uniqueToken.toArray(arrtmp)));
+	}
+	
+	private HashSet<String> getTokens(String[] token){
+		HashSet<String> uniqueToken=new HashSet<String>();
+		for (String word:token){
+			for (String separator:wordSeparators){
+				if (word.indexOf(separator)>-1){
+					String[] spl=word.split(separator);
+//					if recursive then
+//					HashSet<String> tmp=getTokens(spl);
+//					uniqueToken.addAll(tmp);
+//					else
+					for (String w:spl){
+						uniqueToken.add(w);
+					}
+				}
+				
+			}
+			uniqueToken.add(word);
+		}
+		return uniqueToken;
+	}
     public void createManifestFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         System.out.println("Starting creation of " + fileName);
         FileOutputStream fos = new FileOutputStream(fileName);
