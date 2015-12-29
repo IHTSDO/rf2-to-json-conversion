@@ -815,9 +815,11 @@ public class Transformer {
 						d.setGroupId(lrel.getGroupId());
 						d.setModifier(MODIFIER);
 						d.setSourceId(cptId);
+
 						d.setTarget(concepts.get(lrel.getTarget()));
 						d.setType(concepts.get(lrel.getType()));
 						d.setCharType(concepts.get(lrel.getCharType()));
+						d.setTargetMemberships(getMemberships(lrel.getTarget()));
 						listR.add(d);
 					}
 				}
@@ -843,9 +845,11 @@ public class Transformer {
 						d.setGroupId(lrel.getGroupId());
 						d.setModifier(MODIFIER);
 						d.setSourceId(cptId);
+
 						d.setTarget(concepts.get(lrel.getTarget()));
 						d.setType(concepts.get(lrel.getType()));
 						d.setCharType(concepts.get(lrel.getCharType()));
+						d.setTargetMemberships(getMemberships(lrel.getTarget()));
 						listR.add(d);
 					}
 				}
@@ -939,6 +943,21 @@ public class Transformer {
 		}
 		bw.close();
 		System.out.println(fileName + " Done");
+	}
+
+	private List<String> getMemberships(String target) {
+		List<String>ret;
+		List<LightRefsetMembership> listLRM = simpleMembers.get(target);
+		if (listLRM != null) {
+			ret=new ArrayList<String>();
+			for (LightRefsetMembership lrm : listLRM) {
+				ret.add(lrm.getRefset());
+			}
+			if (ret.size()>0){
+				return ret;
+			}
+		}
+		return null;
 	}
 
 	public String getDefaultLangCode() {

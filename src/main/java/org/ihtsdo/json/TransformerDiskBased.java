@@ -1058,7 +1058,7 @@ public class TransformerDiskBased {
 						r.setTarget(concepts.get(lrel.getTarget()));
 						r.setType(concepts.get(lrel.getType()));
 						r.setCharType(concepts.get(lrel.getCharType()));
-
+						r.setTargetMemberships(getMemberships(lrel.getTarget()));
                         if (createCompleteVersion) {
 							listA = getInferredAncestors(lrel.getType(), true);
 							r.setTypeInferredAncestors(listA);
@@ -1098,6 +1098,7 @@ public class TransformerDiskBased {
 						r.setTarget(concepts.get(lrel.getTarget()));
 						r.setType(concepts.get(lrel.getType()));
 						r.setCharType(concepts.get(lrel.getCharType()));
+						r.setTargetMemberships(getMemberships(lrel.getTarget()));
 
                         if (createCompleteVersion) {
 							listA = getInferredAncestors(lrel.getType(), true);
@@ -1138,6 +1139,7 @@ public class TransformerDiskBased {
 						r.setTarget(concepts.get(lrel.getTarget()));
 						r.setType(concepts.get(lrel.getType()));
 						r.setCharType(concepts.get(lrel.getCharType()));
+						r.setTargetMemberships(getMemberships(lrel.getTarget()));
 
                         if (createCompleteVersion) {
 							listA = getInferredAncestors(lrel.getType(), true);
@@ -1252,6 +1254,21 @@ public class TransformerDiskBased {
 		calculatedInferredAncestorsForRelType=null;
         System.out.println(".");
 		System.out.println(fileName + " Done");
+	}
+
+	private List<String> getMemberships(String target) {
+		List<String>ret;
+		List<LightRefsetMembership> listLRM = simpleMembers.get(target);
+		if (listLRM != null) {
+			ret=new ArrayList<String>();
+			for (LightRefsetMembership lrm : listLRM) {
+				ret.add(lrm.getRefset());
+			}
+			if (ret.size()>0){
+				return ret;
+			}
+		}
+		return null;
 	}
 
 	public String getDefaultLangCode() {
