@@ -1305,15 +1305,21 @@ public class TransformerDiskBased {
 					}
 					if (!ret.contains(tgt)){
 						List<String> tmpl=getInferredAncestors(tgt, isType);
-						for (String id:tmpl){
-							if (!ret.contains(id)){
-								ret.add(id);
+						if (tmpl!=null){
+							for (String id:tmpl){
+								if (!ret.contains(id)){
+									ret.add(id);
+								}
 							}
 						}
 						ret.add(tgt);
 					}
 				}
 			}
+		}
+
+		if (ret.size()==0){
+			ret=null;
 		}
 		if(isType ){
 			calculatedInferredAncestorsForRelType.put(cptId, ret);
@@ -1348,15 +1354,20 @@ public class TransformerDiskBased {
 					}
 					if (!ret.contains(tgt)){
 						List<String> tmpl=getStatedAncestors(tgt,isType);
-						for (String id:tmpl){
-							if (!ret.contains(id)){
-								ret.add(id);
+						if (tmpl!=null){
+							for (String id:tmpl){
+								if (!ret.contains(id)){
+									ret.add(id);
+								}
 							}
 						}
 						ret.add(tgt);
 					}
 				}
 			}
+		}
+		if (ret.size()==0){
+			ret=null;
 		}
 		if (isType){
 			calculatedStatedAncestorsForRelType.put(cptId, ret);
@@ -1479,15 +1490,42 @@ public class TransformerDiskBased {
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
 
-        for (String moduleId : modulesSet) {
-            manifest.getModules().add(concepts.get(moduleId));
-        }
-        for (String langRefsetId : langRefsetsSet) {
-            manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
-        }
-        for (String refsetId : refsetsSet) {
-            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId)));
-        }
+		if (modulesSet!=null){
+			for (String moduleId : modulesSet) {
+
+				ConceptDescriptor conceptDesc=concepts.get(moduleId);
+				if (conceptDesc==null){
+					System.out.println("ModuleId not in concept list:" + moduleId);
+					continue;
+				}
+				manifest.getModules().add(concepts.get(moduleId));
+			}
+		}
+		if (langRefsetsSet!=null){
+			for (String langRefsetId : langRefsetsSet) {
+
+				ConceptDescriptor conceptDesc=concepts.get(langRefsetId);
+				if (conceptDesc==null){
+					System.out.println("Lang RefsetId not in concept list:" + langRefsetId);
+					continue;
+				}
+				manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
+			}
+		}
+		String type="";
+		if (refsetsSet!=null){
+			for (String refsetId : refsetsSet) {
+				type=refsetsTypes.get(refsetId);
+				ConceptDescriptor conceptDesc=concepts.get(refsetId);
+				if (conceptDesc==null){
+					System.out.println("RefsetId not in concept list:" + refsetId);
+					continue;
+				}
+				RefsetDescriptor refsetDescriptor=new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId));
+				refsetDescriptor.setType(type);
+				manifest.getRefsets().add(refsetDescriptor);
+			}
+		}
         bw.append(gson.toJson(manifest).toString());
 
         bw.close();
