@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>

@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.json.model.Concept;
-import org.ihtsdo.json.model.ConceptAncestor;
 import org.ihtsdo.json.model.ConceptDescriptor;
 import org.ihtsdo.json.model.Description;
 import org.ihtsdo.json.model.LangMembership;
@@ -39,6 +38,7 @@ import org.ihtsdo.json.model.Relationship;
 import org.ihtsdo.json.model.ResourceSetManifest;
 import org.ihtsdo.json.model.TextIndexDescription;
 import org.ihtsdo.json.utils.FileHelper;
+import org.ihtsdo.json.utils.TClosure;
 import org.mapdb.DBMaker;
 
 import com.google.gson.Gson;
@@ -49,6 +49,8 @@ import com.google.gson.Gson;
  */
 public class TransformerDiskBased {
 
+	private static final String CONCEPT_MODEL_ATTRIBUTE = "410662002";
+	private static final String ATTRIBUTE = "246061005";
 	private String MODIFIER = "Existential restriction";
 	private String sep = System.getProperty("line.separator");
 
@@ -75,18 +77,20 @@ public class TransformerDiskBased {
 	private Map<String, List<LightDescription>> tdefMembers;
 	private Map<String, List<LightRefsetMembership>> attrMembers;
 	private Map<String, List<LightRefsetMembership>> assocMembers;
-	private ArrayList<String> listA;
+	private List<String> listA;
 	private Map<String, String> charConv;
 	private Map<String, String> cptFSN;
 	private HashSet<String> notLeafInferred;
 	private HashSet<String> notLeafStated;
-    private String valConfig;
     private ResourceSetManifest manifest;
     private Set<String> refsetsSet;
     private Set<String> langRefsetsSet;
     private Set<String> modulesSet;
-
-
+	private Map<String,List<String>> calculatedInferredAncestors;
+	private Map<String,List<String>> calculatedStatedAncestors;
+	private Map<String,List<String>> calculatedInferredAncestorsForRelType;
+	private Map<String,List<String>> calculatedStatedAncestorsForRelType;
+	private String[] wordSeparators;
 
     public TransformerDiskBased() throws IOException {
 		langCodes = new HashMap<String, String>();
@@ -96,8 +100,8 @@ public class TransformerDiskBased {
 		langCodes.put("sv", "swedish");
 		langCodes.put("fr", "french");
 		langCodes.put("nl", "dutch");
+		wordSeparators=new String[]{"-"};
 
-        valConfig= "config/validation-rules.xml";
 	}
 
     public void convert(TransformerConfig config) throws Exception {
@@ -113,6 +117,10 @@ public class TransformerDiskBased {
             simpleMapMembers = new HashMap<String, List<LightRefsetMembership>>();
             languageMembers = new HashMap<String, List<LightLangMembership>>();
             cptFSN = new HashMap<String, String>();
+			calculatedInferredAncestors=new HashMap<String, List<String>>();
+			calculatedStatedAncestors=new HashMap<String, List<String>>();
+			calculatedInferredAncestorsForRelType=new HashMap<String, List<String>>();
+			calculatedStatedAncestorsForRelType=new HashMap<String, List<String>>();
         } else {
             concepts = DBMaker.newTempHashMap();
             descriptions = DBMaker.newTempHashMap();
@@ -125,6 +133,10 @@ public class TransformerDiskBased {
             simpleMapMembers = DBMaker.newTempHashMap();
             languageMembers = DBMaker.newTempHashMap();
             cptFSN = DBMaker.newTempHashMap();
+			calculatedInferredAncestors=DBMaker.newTempHashMap();
+			calculatedStatedAncestors=DBMaker.newTempHashMap();
+			calculatedInferredAncestorsForRelType=DBMaker.newTempHashMap();
+			calculatedStatedAncestorsForRelType=DBMaker.newTempHashMap();
         }
 
         notLeafInferred=new HashSet<String>();
@@ -166,15 +178,33 @@ public class TransformerDiskBased {
             System.out.println("######## No Extensions options configured ########");
         }
 
+		getDescendantsCount();
         completeDefaultTerm();
         File output = new File(config.getOutputFolder());
         output.mkdirs();
         createConceptsJsonFile(config.getOutputFolder() + "/concepts.json", config.isCreateCompleteConceptsFile());
         createTextIndexFile(config.getOutputFolder() + "/text-index.json");
         createManifestFile(config.getOutputFolder() + "/manifest.json");
-//        createTClosures(files, config.getOutputFolder() + "/inferredTransitiveClosure.json", config.getOutputFolder() + "/statedTransitiveClosure.json");
 
     }
+
+	private void getDescendantsCount() throws FileNotFoundException, IOException {
+		TClosure tc=new TClosure(relationships, inferred);
+		for (String conceptId:concepts.keySet()){
+			ConceptDescriptor cd=concepts.get(conceptId);
+			int descend=tc.getDescendantsCount(Long.parseLong(conceptId));
+			cd.setInferredDescendants(descend);
+		}
+		tc=null;
+		tc=new TClosure(relationships, stated);
+		for (String conceptId:concepts.keySet()){
+			ConceptDescriptor cd=concepts.get(conceptId);
+			int descend=tc.getDescendantsCount(Long.parseLong(conceptId));
+			cd.setStatedDescendants(descend);
+		}
+		
+		tc=null;
+	}
 
     public static void deleteDir(File dir) {
         if (dir.isDirectory()) {
@@ -242,38 +272,6 @@ public class TransformerDiskBased {
             result.addAll(files);
 		}
         return result;
-
-	}
-
-	public void createTClosures(HashSet<String> folders, String transitiveClosureInferredFile,String transitiveClosureStatedFile) throws Exception {
-		if (relationships==null || relationships.size()==0){
-			getFilesForTransClosureProcess(folders);
-		}
-		createTClosure(transitiveClosureInferredFile,inferred);
-		createTClosure(transitiveClosureStatedFile,stated);
-
-	}
-	
-	private void getFilesForTransClosureProcess(HashSet<String> folders) throws IOException, Exception {
-
-		concepts = new HashMap<String, ConceptDescriptor>();
-		relationships = new HashMap<String, List<LightRelationship>>();
-		FileHelper fHelper=new FileHelper();
-		for (String folder:folders){
-			File dir=new File(folder);
-			HashSet<String> files=new HashSet<String>();
-			fHelper.findAllFiles(dir, files);
-
-			for (String file:files){
-				String pattern=FileHelper.getFileTypeByHeader(new File(file));
-
-				if (pattern.equals("rf2-relationships")){
-					loadRelationshipsFile(new File(file), null);
-				}else if(pattern.equals("rf2-concepts")){
-					loadConceptsFile(new File(file), null);
-				}else{}
-			}
-		}
 
 	}
 
@@ -371,77 +369,82 @@ public class TransformerDiskBased {
 		boolean act;
 		String type;
 		String lang;
-        System.out.println("Starting Default Terms computation");
-        int count = 0;
+		System.out.println("Starting Default Terms computation");
+		int count = 0;
 		for (String sourceId:concepts.keySet()){
 			List<LightDescription> lDescriptions = descriptions.get(sourceId);
 			if (lDescriptions!=null){
-                String lastTerm = "No descriptions";
-                String enFsn = null;
-                String configFsn = null;
-                String userSelectedDefaultTermByLangCode = null;
-                String userSelectedDefaultTermByRefset = null;
+				String lastTerm = "No descriptions";
+				String enFsn = null;
+				String langFsn = null;
+				String configFsn = null;
+				String userSelectedDefaultTermByLangCode = null;
+				String userSelectedDefaultTermByRefset = null;
 				for (LightDescription desc:lDescriptions){
-					
+
 					act=desc.isActive();
 					type=String.valueOf(desc.getType());
 					lang=desc.getLang();
 
 
-                    if (act && type.equals("900000000000003001") && lang.equals("en")) {
-                        enFsn = desc.getTerm();
-                    }
+					if (act && type.equals("900000000000003001") && lang.equals("en")) {
+						enFsn = desc.getTerm();
+					}
+					if (act && type.equals("900000000000003001") && lang.equals(defaultLangCode)) {
+						langFsn = desc.getTerm();
+					}
+					if (act && type.equals(defaultTermType.toString()) && lang.equals(defaultLangCode)) {
+						userSelectedDefaultTermByLangCode = desc.getTerm();
+					}
 
-                    if (act && type.equals(defaultTermType.toString()) && lang.equals(defaultLangCode)) {
-                        userSelectedDefaultTermByLangCode = desc.getTerm();
-                    }
+					if (act && type.equals(defaultTermType.toString())) {
+						List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
+						if (listLLM != null) {
+							for (LightLangMembership llm : listLLM) {
+								if (llm.getAcceptability().equals("900000000000548007") && llm.getRefset().equals(defaultLangRefset)) {
+									if (desc.getType().equals("900000000000003001")) {
+										configFsn = desc.getTerm();
+									}
+									userSelectedDefaultTermByRefset = desc.getTerm();
+								}
+							}
+						}
+					}
 
-                    if (act && type.equals(defaultTermType.toString())) {
-                        List<LightLangMembership> listLLM = languageMembers.get(desc.getDescriptionId());
-                        if (listLLM != null) {
-                            for (LightLangMembership llm : listLLM) {
-                                if (llm.getAcceptability().equals("900000000000548007") && llm.getRefset().equals(defaultLangRefset)) {
-                                    if (desc.getType().equals("900000000000003001")) {
-                                        configFsn = desc.getTerm();
-                                    }
-                                    userSelectedDefaultTermByRefset = desc.getTerm();
-                                }
-                            }
-                        }
-                    }
-
-                    lastTerm = desc.getTerm();
+					lastTerm = desc.getTerm();
 
 				}
-                ConceptDescriptor loopConcept = concepts.get(sourceId);
+				ConceptDescriptor loopConcept = concepts.get(sourceId);
 
-                if (userSelectedDefaultTermByRefset != null) {
-                    loopConcept.setDefaultTerm(userSelectedDefaultTermByRefset);
-                } else if (userSelectedDefaultTermByLangCode != null) {
-                    loopConcept.setDefaultTerm(userSelectedDefaultTermByLangCode);
-                } else if (enFsn != null) {
-                    loopConcept.setDefaultTerm(enFsn);
-                } else {
-                    loopConcept.setDefaultTerm(lastTerm);
-                }
-                concepts.put(sourceId, loopConcept);
+				if (userSelectedDefaultTermByRefset != null) {
+					loopConcept.setDefaultTerm(userSelectedDefaultTermByRefset);
+				} else if (userSelectedDefaultTermByLangCode != null) {
+					loopConcept.setDefaultTerm(userSelectedDefaultTermByLangCode);
+				} else if (enFsn != null) {
+					loopConcept.setDefaultTerm(enFsn);
+				} else {
+					loopConcept.setDefaultTerm(lastTerm);
+				}
+				concepts.put(sourceId, loopConcept);
 
-                if (configFsn != null) {
-                    cptFSN.put(sourceId, configFsn);
-                } else if (enFsn != null) {
-                    cptFSN.put(sourceId, enFsn);
-                } else {
-                    cptFSN.put(sourceId, lastTerm);
-                }
+				if (configFsn != null) {
+					cptFSN.put(sourceId, configFsn);
+				}else if (langFsn!=null){
+					cptFSN.put(sourceId, langFsn);
+				} else if (enFsn != null) {
+					cptFSN.put(sourceId, enFsn);
+				} else {
+					cptFSN.put(sourceId, lastTerm);
+				}
 
-                if (count % 100000 == 0) {
-                    System.out.print(".");
-                }
-                count++;
+				if (count % 100000 == 0) {
+					System.out.print(".");
+				}
+				count++;
 			}
 		}
-        System.out.println(".");
-        System.out.println("Default Terms computation completed");
+		System.out.println(".");
+		System.out.println("Default Terms computation completed");
 	}
 	public void loadTextDefinitionFile(File textDefinitionFile, List<String> modulesToIgnore) throws FileNotFoundException, IOException {
 		System.out.println("Starting Text Definitions: " + textDefinitionFile.getName());
@@ -546,7 +549,7 @@ public class TransformerDiskBased {
 				if (loopRelationship.isActive() && type.equals(isaSCTId)){
 					if ( charType.equals(inferred)){
 						notLeafInferred.add(targetId);
-					}else{
+					}else if ( charType.equals(stated)){
 						notLeafStated.add(targetId);
 					}
 				}
@@ -890,20 +893,14 @@ public class TransformerDiskBased {
 			cpt.setLeafInferred(!notLeafInferred.contains(cptId));
 			cpt.setLeafStated(!notLeafStated.contains(cptId));
             cpt.setFsn(cptFSN.get(cptId));
+			cpt.setStatedDescendants(cptdesc.getStatedDescendants());
+			cpt.setInferredDescendants(cptdesc.getInferredDescendants());
 
             if (createCompleteVersion) {
-                listA = new ArrayList<String>();
-                getAncestors(cptId,inferred);
-                cpt.setInferredAncestors(listA);
-                listA = new ArrayList<String>();
-                getAncestors(cptId,stated);
-                cpt.setStatedAncestors(listA);
-                listA = new ArrayList<String>();
-                getDescendants(cptId,inferred);
-                cpt.setInferredDescendants(listA);
-                listA = new ArrayList<String>();
-                getDescendants(cptId,stated);
-                cpt.setStatedDescendants(listA);
+				listA = getInferredAncestors(cptId,false);
+				cpt.setInferredAncestors(listA);
+				listA = getStatedAncestors(cptId,false);
+				cpt.setStatedAncestors(listA);
             }
 
 
@@ -1061,21 +1058,17 @@ public class TransformerDiskBased {
 						r.setTarget(concepts.get(lrel.getTarget()));
 						r.setType(concepts.get(lrel.getType()));
 						r.setCharType(concepts.get(lrel.getCharType()));
-
+						r.setTargetMemberships(getMemberships(lrel.getTarget()));
                         if (createCompleteVersion) {
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),inferred);
-                            r.setTypeInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),stated);
-                            r.setTypeStatedAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),inferred);
-                            r.setTargetInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),stated);
-                            r.setTargetStatedAncestors(listA);
-                        }
+							listA = getInferredAncestors(lrel.getType(), true);
+							r.setTypeInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getType(),true);
+							r.setTypeStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getTarget(),false);
+							r.setTargetInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getTarget(),false);
+							r.setTargetStatedAncestors(listA);
+						}
 
 						listR.add(r);
 					}
@@ -1105,20 +1098,17 @@ public class TransformerDiskBased {
 						r.setTarget(concepts.get(lrel.getTarget()));
 						r.setType(concepts.get(lrel.getType()));
 						r.setCharType(concepts.get(lrel.getCharType()));
+						r.setTargetMemberships(getMemberships(lrel.getTarget()));
 
                         if (createCompleteVersion) {
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),inferred);
-                            r.setTypeInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getType(),stated);
-                            r.setTypeStatedAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),inferred);
-                            r.setTargetInferredAncestors(listA);
-                            listA = new ArrayList<String>();
-                            getAncestors(lrel.getTarget(),stated);
-                            r.setTargetStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getType(), true);
+							r.setTypeInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getType(),true);
+							r.setTypeStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getTarget(),false);
+							r.setTargetInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getTarget(),false);
+							r.setTargetStatedAncestors(listA);
                         }
 
 						listR.add(r);
@@ -1134,6 +1124,46 @@ public class TransformerDiskBased {
 				cpt.setRelationships(null);
 			}
 
+			listLR = relationships.get(cptId);
+			listR = new ArrayList<Relationship>();
+			if (listLR != null) {
+				for (LightRelationship lrel : listLR) {
+					if (lrel.getCharType().equals("900000000000227009")) {
+						Relationship r = new Relationship();
+						r.setEffectiveTime(lrel.getEffectiveTime());
+						r.setActive(lrel.isActive());
+						r.setModule(lrel.getModule());
+						r.setGroupId(lrel.getGroupId());
+						r.setModifier(MODIFIER);
+						r.setSourceId(cptId);
+						r.setTarget(concepts.get(lrel.getTarget()));
+						r.setType(concepts.get(lrel.getType()));
+						r.setCharType(concepts.get(lrel.getCharType()));
+						r.setTargetMemberships(getMemberships(lrel.getTarget()));
+
+                        if (createCompleteVersion) {
+							listA = getInferredAncestors(lrel.getType(), true);
+							r.setTypeInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getType(),true);
+							r.setTypeStatedAncestors(listA);
+							listA = getInferredAncestors(lrel.getTarget(),false);
+							r.setTargetInferredAncestors(listA);
+							listA = getStatedAncestors(lrel.getTarget(),false);
+							r.setTargetStatedAncestors(listA);
+                        }
+
+						listR.add(r);
+					}
+				}
+
+				if (listR.isEmpty()) {
+					cpt.setAdditionalRelationships(null);
+				} else {
+					cpt.setAdditionalRelationships(listR);
+				}
+			} else {
+				cpt.setAdditionalRelationships(null);
+			}
 			listLRM = simpleMembers.get(cptId);
 			listRM = new ArrayList<RefsetMembership>();
 			if (listLRM != null) {
@@ -1218,27 +1248,27 @@ public class TransformerDiskBased {
             }
 		}
 		bw.close();
+		calculatedStatedAncestors=null;
+		calculatedInferredAncestors=null;
+		calculatedStatedAncestorsForRelType=null;
+		calculatedInferredAncestorsForRelType=null;
         System.out.println(".");
 		System.out.println(fileName + " Done");
 	}
 
-	private void getDescendants(String cptId, String charType) {
-
-		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
-
-		listLR = targetRelationships.get(cptId);
-		if (listLR != null) {
-			for (LightRelationship lrel : listLR) {
-				if (lrel.getCharType().equals(charType)) {
-					String sourceId=lrel.getSourceId();
-					if (!listA.contains(sourceId)){
-						listA.add(sourceId);
-						getDescendants(sourceId,charType);
-					}
-				}
+	private List<String> getMemberships(String target) {
+		List<String>ret;
+		List<LightRefsetMembership> listLRM = simpleMembers.get(target);
+		if (listLRM != null) {
+			ret=new ArrayList<String>();
+			for (LightRefsetMembership lrm : listLRM) {
+				ret.add(lrm.getRefset());
+			}
+			if (ret.size()>0){
+				return ret;
 			}
 		}
-		return ;		
+		return null;
 	}
 
 	public String getDefaultLangCode() {
@@ -1249,52 +1279,102 @@ public class TransformerDiskBased {
 		this.defaultLangCode = defaultLangCode;
 	}
 
-	private void createTClosure(String fileName,String charType) throws IOException {
+	private List<String> getInferredAncestors(String cptId,boolean isType) {
+		if (isType){
+			if (calculatedInferredAncestorsForRelType.containsKey(cptId)){
+				return calculatedInferredAncestorsForRelType.get(cptId);
+			}
+		}else{
 
-		System.out.println("Transitive Closure creation from " + fileName);
-		FileOutputStream fos = new FileOutputStream(fileName);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-		BufferedWriter bw = new BufferedWriter(osw);
-		Gson gson = new Gson();
-
-
-//		int count = 0;
-		for (String cptId : concepts.keySet()) {		
-
-			listA = new ArrayList<String>();
-			getAncestors(cptId,charType);
-			if (!listA.isEmpty()){
-				ConceptAncestor ca=new ConceptAncestor();
-
-				ca.setConceptId(cptId);
-				ca.setAncestor(listA);
-				bw.append(gson.toJson(ca).toString());
-				bw.append(sep);
+			if (calculatedInferredAncestors.containsKey(cptId)){
+				return calculatedInferredAncestors.get(cptId);
 			}
 		}
-		bw.close();
-		System.out.println(fileName + " Done");
-	}
-
-	private void getAncestors(String cptId,String charType) {
-
+		List<String> ret=new ArrayList<String>();
 		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
 
 		listLR = relationships.get(cptId);
 		if (listLR != null) {
 			for (LightRelationship lrel : listLR) {
-				if (lrel.getCharType().equals(charType) &&
+				if (lrel.getCharType().equals(inferred) &&
 						lrel.getType().equals(isaSCTId) &&
 						lrel.isActive()) {
 					String tgt=lrel.getTarget();
-					if (!listA.contains(tgt)){
-						listA.add(tgt);
-						getAncestors(tgt,charType);
+					if (isType && (tgt.equals(CONCEPT_MODEL_ATTRIBUTE) || tgt.equals(ATTRIBUTE))){
+						continue;
+					}
+					if (!ret.contains(tgt)){
+						List<String> tmpl=getInferredAncestors(tgt, isType);
+						if (tmpl!=null){
+							for (String id:tmpl){
+								if (!ret.contains(id)){
+									ret.add(id);
+								}
+							}
+						}
+						ret.add(tgt);
 					}
 				}
 			}
 		}
-		return ;
+
+		if (ret.size()==0){
+			ret=null;
+		}
+		if(isType ){
+			calculatedInferredAncestorsForRelType.put(cptId, ret);
+		}else{
+			calculatedInferredAncestors.put(cptId, ret);
+		}
+		return ret;
+	}
+
+	private List<String> getStatedAncestors(String cptId,boolean isType) {
+		if (isType){
+			if (calculatedStatedAncestorsForRelType.containsKey(cptId)){
+				return calculatedStatedAncestorsForRelType.get(cptId);
+			}
+		}else{
+			if (calculatedStatedAncestors.containsKey(cptId)){
+				return calculatedStatedAncestors.get(cptId);
+			}
+		}
+		List<String> ret=new ArrayList<String>();
+		List<LightRelationship> listLR = new ArrayList<LightRelationship>();
+
+		listLR = relationships.get(cptId);
+		if (listLR != null) {
+			for (LightRelationship lrel : listLR) {
+				if (lrel.getCharType().equals(stated) &&
+						lrel.getType().equals(isaSCTId) &&
+						lrel.isActive()) {
+					String tgt=lrel.getTarget();
+					if (isType && (tgt.equals(CONCEPT_MODEL_ATTRIBUTE) || tgt.equals(ATTRIBUTE))){
+						continue;
+					}
+					if (!ret.contains(tgt)){
+						List<String> tmpl=getStatedAncestors(tgt,isType);
+						if (tmpl!=null){
+							for (String id:tmpl){
+								if (!ret.contains(id)){
+									ret.add(id);
+								}
+							}
+						}
+						ret.add(tgt);
+					}
+				}
+			}
+		}
+		if (ret.size()==0){
+			ret=null;
+		}
+		if (isType){
+			calculatedStatedAncestorsForRelType.put(cptId, ret);
+		}else{
+			calculatedStatedAncestors.put(cptId, ret);
+		}
+		return ret ;
 	}
 
 	public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
@@ -1330,15 +1410,7 @@ public class TransformerDiskBased {
 				if (d.getFsn().endsWith(")")) {
 					d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
 				}
-				String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
-				if (manifest.isTextIndexNormalized()) {
-                    String convertedTerm = convertTerm(cleanTerm);
-                    String[] tokens = convertedTerm.toLowerCase().split("\\s+");
-                    d.setWords(Arrays.asList(tokens));
-                } else {
-                    String[] tokens = cleanTerm.toLowerCase().split("\\s+");
-                    d.setWords(Arrays.asList(tokens));
-                }
+				setIndexWords(d);
                 d.setRefsetIds(new ArrayList<String>());
 
                 // Refset index assumes that only active members are included in the db.
@@ -1377,6 +1449,40 @@ public class TransformerDiskBased {
 		System.out.println(fileName + " Done");
 	}
 
+	private void setIndexWords(TextIndexDescription d) {
+		String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
+		String[] tokens;
+		if (manifest.isTextIndexNormalized()) {
+		    String convertedTerm = convertTerm(cleanTerm);
+		    tokens = convertedTerm.toLowerCase().split("\\s+");
+		} else {
+		    tokens = cleanTerm.toLowerCase().split("\\s+");
+		}
+		HashSet<String> uniqueToken=getTokens(tokens);
+		String[] arrtmp=new String[uniqueToken.size()];
+		d.setWords(Arrays.asList(uniqueToken.toArray(arrtmp)));
+	}
+	
+	private HashSet<String> getTokens(String[] token){
+		HashSet<String> uniqueToken=new HashSet<String>();
+		for (String word:token){
+			for (String separator:wordSeparators){
+				if (word.indexOf(separator)>-1){
+					String[] spl=word.split(separator);
+//					if recursive then
+//					HashSet<String> tmp=getTokens(spl);
+//					uniqueToken.addAll(tmp);
+//					else
+					for (String w:spl){
+						uniqueToken.add(w);
+					}
+				}
+				
+			}
+			uniqueToken.add(word);
+		}
+		return uniqueToken;
+	}
     public void createManifestFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         System.out.println("Starting creation of " + fileName);
         FileOutputStream fos = new FileOutputStream(fileName);
@@ -1384,15 +1490,42 @@ public class TransformerDiskBased {
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
 
-        for (String moduleId : modulesSet) {
-            manifest.getModules().add(concepts.get(moduleId));
-        }
-        for (String langRefsetId : langRefsetsSet) {
-            manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
-        }
-        for (String refsetId : refsetsSet) {
-            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId)));
-        }
+		if (modulesSet!=null){
+			for (String moduleId : modulesSet) {
+
+				ConceptDescriptor conceptDesc=concepts.get(moduleId);
+				if (conceptDesc==null){
+					System.out.println("ModuleId not in concept list:" + moduleId);
+					continue;
+				}
+				manifest.getModules().add(concepts.get(moduleId));
+			}
+		}
+		if (langRefsetsSet!=null){
+			for (String langRefsetId : langRefsetsSet) {
+
+				ConceptDescriptor conceptDesc=concepts.get(langRefsetId);
+				if (conceptDesc==null){
+					System.out.println("Lang RefsetId not in concept list:" + langRefsetId);
+					continue;
+				}
+				manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
+			}
+		}
+		String type="";
+		if (refsetsSet!=null){
+			for (String refsetId : refsetsSet) {
+				type=refsetsTypes.get(refsetId);
+				ConceptDescriptor conceptDesc=concepts.get(refsetId);
+				if (conceptDesc==null){
+					System.out.println("RefsetId not in concept list:" + refsetId);
+					continue;
+				}
+				RefsetDescriptor refsetDescriptor=new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId));
+				refsetDescriptor.setType(type);
+				manifest.getRefsets().add(refsetDescriptor);
+			}
+		}
         bw.append(gson.toJson(manifest).toString());
 
         bw.close();

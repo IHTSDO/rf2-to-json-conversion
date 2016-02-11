@@ -19,6 +19,7 @@ public class Relationship extends Component {
     private Integer groupId;
     private ConceptDescriptor charType;
     private String modifier;
+    private List<String> targetMemberships;
 
     public Relationship() {
         super();
@@ -103,4 +104,12 @@ public class Relationship extends Component {
     public void setTargetStatedAncestors(List<String> targetStatedAncestors) {
         this.targetStatedAncestors = targetStatedAncestors;
     }
+
+	public List<String> getTargetMemberships() {
+		return targetMemberships;
+	}
+
+	public void setTargetMemberships(List<String> targetMemberships) {
+		this.targetMemberships = targetMemberships;
+	}
 }
