@@ -1,10 +1,9 @@
 package org.ihtsdo.json.runners;
 
-import java.util.Collection;
-
 import org.apache.commons.configuration.XMLConfiguration;
 import org.ihtsdo.json.TransformerConfig;
-import org.ihtsdo.json.TransformerDiskBased;
+import java.util.Collection;
+import org.ihtsdo.json.MultiMapTransformer;
 
 /**
  * Created by alo on 8/4/14.
@@ -17,9 +16,9 @@ public class ConfigRunner {
             config = args[0];
         }
         if (config == null) {
-            config = "config/enCaConfig.xml";
-//            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
-//            System.exit(-1);
+            //config = "config/sampleConfig.xml";
+            System.err.println("Error: no config provided. Usage: rf2-to-json-conversion [path/to/config.xml]");
+            System.exit(-1);
         }
         System.out.println("Running with config: " + config);
         XMLConfiguration xmlConfig = new XMLConfiguration(config);
@@ -82,7 +81,7 @@ public class ConfigRunner {
             System.out.println(prop);
         }
 
-        TransformerDiskBased tr = new TransformerDiskBased();
+        MultiMapTransformer tr = new MultiMapTransformer();
 
         tr.convert(runnableConfig);
 
