@@ -1,4 +1,4 @@
-RF2 to json conversion utility
+RF2 to json conversion utility [![Build Status](https://travis-ci.org/IHTSDO/rf2-to-json-conversion.svg?branch=master)](https://travis-ci.org/IHTSDO/rf2-to-json-conversion)
 ==============================
 
 Conversion of SNOMED CT RF2 files to a JSON format, including pre-computed indexes for common search strategies
