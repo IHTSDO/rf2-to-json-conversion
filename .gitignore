@@ -16,3 +16,6 @@ pom.xml.next
 release.properties
 .idea
 *.iml
+.classpath
+.project
+.settings
