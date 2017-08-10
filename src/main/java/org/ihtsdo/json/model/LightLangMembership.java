@@ -16,6 +16,7 @@ public class LightLangMembership extends Component {
     private String descriptionId;
 	private String refset;
     private String acceptability;
+    private String stringModule;
 	public String getDescriptionId() {
 		return descriptionId;
 	}
@@ -33,6 +34,12 @@ public class LightLangMembership extends Component {
 	}
 	public void setAcceptability(String acceptability) {
 		this.acceptability = acceptability;
+	}
+	public String getStringModule() {
+		return stringModule;
+	}
+	public void setStringModule(String stringModule) {
+		this.stringModule = stringModule;
 	}
     
 }

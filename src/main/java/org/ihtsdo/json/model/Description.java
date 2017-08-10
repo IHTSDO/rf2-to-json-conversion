@@ -15,12 +15,12 @@ public class Description extends Component {
 
     String descriptionId;
     String conceptId;
-    ConceptDescriptor type;
-    String lang;
+    LightConceptDescriptor type;
+    String languageCode;
     String term;
     Integer length;
-    ConceptDescriptor ics;
-    List<LangMembership> langMemberships;
+    LightConceptDescriptor caseSignificance;
+    List<LangMembership> acceptability;
     List<RefsetMembership> refsetMemberships;
 
     private List<String> words;
@@ -44,11 +44,11 @@ public class Description extends Component {
         this.conceptId = conceptId;
     }
 
-    public ConceptDescriptor getType() {
+    public LightConceptDescriptor getType() {
         return type;
     }
 
-    public void setType(ConceptDescriptor type) {
+    public void setType(LightConceptDescriptor type) {
         this.type = type;
     }
 
@@ -68,28 +68,12 @@ public class Description extends Component {
         this.length = length;
     }
 
-    public ConceptDescriptor getIcs() {
-        return ics;
-    }
-
-    public void setIcs(ConceptDescriptor ics) {
-        this.ics = ics;
-    }
-
     public List<LangMembership> getLangMemberships() {
-        return langMemberships;
+        return acceptability;
     }
 
     public void setLangMemberships(List<LangMembership> langMemberships) {
-        this.langMemberships = langMemberships;
-    }
-
-    public String getLang() {
-        return lang;
-    }
-
-    public void setLang(String lang) {
-        this.lang = lang;
+        this.acceptability = langMemberships;
     }
 
 	public List<RefsetMembership> getRefsetMemberships() {
@@ -107,4 +91,20 @@ public class Description extends Component {
     public void setWords(List<String> words) {
         this.words = words;
     }
+
+	public String getLanguageCode() {
+		return languageCode;
+	}
+
+	public void setLanguageCode(String languageCode) {
+		this.languageCode = languageCode;
+	}
+
+	public LightConceptDescriptor getCaseSignificance() {
+		return caseSignificance;
+	}
+
+	public void setCaseSignificance(LightConceptDescriptor caseSignificance) {
+		this.caseSignificance = caseSignificance;
+	}
 }

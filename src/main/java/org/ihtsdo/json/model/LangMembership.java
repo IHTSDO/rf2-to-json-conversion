@@ -14,25 +14,16 @@ import java.util.UUID;
 public class LangMembership extends Component {
 
     private String descriptionId;
-	private ConceptDescriptor refset;
-    private ConceptDescriptor acceptability;
-    
-	public ConceptDescriptor getRefset() {
-		return refset;
-	}
+	private LightConceptDescriptor languageReferenceSet;
+    private LightConceptDescriptor acceptability;
 
-	public void setRefset(ConceptDescriptor refset) {
-		this.refset = refset;
-	}
-
-	public ConceptDescriptor getAcceptability() {
+	public LightConceptDescriptor getAcceptability() {
 		return acceptability;
 	}
 
-	public void setAcceptability(ConceptDescriptor acceptability) {
+	public void setAcceptability(LightConceptDescriptor acceptability) {
 		this.acceptability = acceptability;
 	}
-
 
     public LangMembership() {
         super();
@@ -45,5 +36,13 @@ public class LangMembership extends Component {
     public void setDescriptionId(String descriptionId) {
         this.descriptionId = descriptionId;
     }
+
+	public LightConceptDescriptor getLanguageReferenceSet() {
+		return languageReferenceSet;
+	}
+
+	public void setLanguageReferenceSet(LightConceptDescriptor languageReferenceSet) {
+		this.languageReferenceSet = languageReferenceSet;
+	}
 
 }

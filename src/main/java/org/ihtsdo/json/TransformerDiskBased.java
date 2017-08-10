@@ -28,6 +28,7 @@ import org.ihtsdo.json.model.Concept;
 import org.ihtsdo.json.model.ConceptDescriptor;
 import org.ihtsdo.json.model.Description;
 import org.ihtsdo.json.model.LangMembership;
+import org.ihtsdo.json.model.LightConceptDescriptor;
 import org.ihtsdo.json.model.LightDescription;
 import org.ihtsdo.json.model.LightLangMembership;
 import org.ihtsdo.json.model.LightRefsetMembership;
@@ -52,12 +53,13 @@ public class TransformerDiskBased {
 	private static final String CONCEPT_MODEL_ATTRIBUTE = "410662002";
 	private static final String ATTRIBUTE = "246061005";
 	private String MODIFIER = "Existential restriction";
+	private String MODIFIER_ID = "900000000000451002";
 	private String sep = System.getProperty("line.separator");
 
 	private Map<String, ConceptDescriptor> concepts;
 	private Map<String, List<LightDescription>> descriptions;
 	private Map<String, List<LightRelationship>> relationships;
-	private Map<String, List<LightRelationship>> targetRelationships;
+	//private Map<String, List<LightRelationship>> targetRelationships;
 	private Map<String, List<LightRefsetMembership>> simpleMembers;
 	private Map<String, List<LightRefsetMembership>> simpleMapMembers;
 	private Map<String, List<LightLangMembership>> languageMembers;
@@ -91,6 +93,9 @@ public class TransformerDiskBased {
 	private Map<String,List<String>> calculatedInferredAncestorsForRelType;
 	private Map<String,List<String>> calculatedStatedAncestorsForRelType;
 	private String[] wordSeparators;
+	private boolean processInMemory;
+	private List<String> emptyList;
+	private String version;
 
     public TransformerDiskBased() throws IOException {
 		langCodes = new HashMap<String, String>();
@@ -105,11 +110,17 @@ public class TransformerDiskBased {
 	}
 
     public void convert(TransformerConfig config) throws Exception {
-        if (config.isProcessInMemory()) {
+    	processInMemory=config.isProcessInMemory();
+    	emptyList=new ArrayList<String>();
+    	version=config.getVersion();
+    	if (version==null){
+    		version="2";
+    	}
+        if (processInMemory) {
             concepts = new HashMap<String, ConceptDescriptor>();
             descriptions = new HashMap<String, List<LightDescription>>();
             relationships = new HashMap<String, List<LightRelationship>>();
-            targetRelationships = new HashMap<String, List<LightRelationship>>();
+            //targetRelationships = new HashMap<String, List<LightRelationship>>();
             simpleMembers = new HashMap<String, List<LightRefsetMembership>>();
             assocMembers = new HashMap<String, List<LightRefsetMembership>>();
             attrMembers = new HashMap<String, List<LightRefsetMembership>>();
@@ -122,16 +133,20 @@ public class TransformerDiskBased {
 			calculatedInferredAncestorsForRelType=new HashMap<String, List<String>>();
 			calculatedStatedAncestorsForRelType=new HashMap<String, List<String>>();
         } else {
-            concepts = DBMaker.newTempHashMap();
+            concepts = new HashMap<String, ConceptDescriptor>();
+            descriptions = new HashMap<String, List<LightDescription>>();
+            relationships = new HashMap<String, List<LightRelationship>>();
+            languageMembers = new HashMap<String, List<LightLangMembership>>();
+           /* concepts = DBMaker.newTempHashMap();
             descriptions = DBMaker.newTempHashMap();
             relationships = DBMaker.newTempHashMap();
-            targetRelationships = DBMaker.newTempHashMap();
+            languageMembers = DBMaker.newTempHashMap();*/
+            //targetRelationships = DBMaker.newTempHashMap();
             simpleMembers = DBMaker.newTempHashMap();
             assocMembers = DBMaker.newTempHashMap();
             attrMembers = DBMaker.newTempHashMap();
             tdefMembers = DBMaker.newTempHashMap();
             simpleMapMembers = DBMaker.newTempHashMap();
-            languageMembers = DBMaker.newTempHashMap();
             cptFSN = DBMaker.newTempHashMap();
 			calculatedInferredAncestors=DBMaker.newTempHashMap();
 			calculatedStatedAncestors=DBMaker.newTempHashMap();
@@ -156,7 +171,7 @@ public class TransformerDiskBased {
         manifest.setDefaultTermLangCode(config.getDefaultTermLangCode());
         manifest.setCollectionName(config.getEffectiveTime());
         manifest.setDefaultTermLangRefset(config.getDefaultTermLanguageRefset());
-        manifest.setExpirationDate(config.getExpirationTime());
+//        manifest.setExpirationDate(config.getExpirationTime());
         manifest.setDefaultTermType(config.getDefaultTermDescriptionType());
         manifest.setResourceSetName(config.getEditionName());
 
@@ -180,6 +195,7 @@ public class TransformerDiskBased {
 
 		getDescendantsCount();
         completeDefaultTerm();
+        completeModuleAndDefStatus();
         File output = new File(config.getOutputFolder());
         output.mkdirs();
         createConceptsJsonFile(config.getOutputFolder() + "/concepts.json", config.isCreateCompleteConceptsFile());
@@ -287,19 +303,27 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
-				ConceptDescriptor loopConcept = new ConceptDescriptor();
 				String conceptId = columns[0];
+                ConceptDescriptor loopConcept;
+				if (concepts.containsKey(conceptId)){
+					loopConcept=concepts.get(conceptId);
+					if (columns[1].compareTo(loopConcept.getEffectiveTime())<=0){
+						line=br.readLine();
+						continue;
+					}
+				}
+				loopConcept = new ConceptDescriptor();
 				loopConcept.setConceptId(conceptId);
 				loopConcept.setActive(columns[2].equals("1"));
 				loopConcept.setEffectiveTime(columns[1]);
-				loopConcept.setModule(columns[3]);
-                modulesSet.add(loopConcept.getModule());
-				loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
+				loopConcept.setModule(newLightConceptDescriptor(columns[3]));
+                modulesSet.add(loopConcept.getModule().getConceptId());
+				loopConcept.setDefinitionStatus(newLightConceptDescriptor(columns[4]));
 				concepts.put(conceptId, loopConcept);
 				count++;
 				if (count % 100000 == 0) {
@@ -327,7 +351,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -342,7 +366,7 @@ public class TransformerDiskBased {
 				loopDescription.setType(columns[6]);
 				loopDescription.setTerm(columns[7]);
 				loopDescription.setIcs(columns[8]);
-				loopDescription.setModule(columns[3]);
+				loopDescription.setStringModule(columns[3]);
                 modulesSet.add(columns[3]);
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = descriptions.get(sourceId);
@@ -365,6 +389,17 @@ public class TransformerDiskBased {
 		}
 	}
 
+	private void completeModuleAndDefStatus(){
+
+		for (String sourceId:concepts.keySet()){
+			String moduleId= concepts.get(sourceId).getModule().getConceptId();
+			concepts.get(sourceId).getModule().setPreferredTerm(concepts.get(moduleId).getPreferredTerm());
+			
+
+			String defStatusId= concepts.get(sourceId).getDefinitionStatus().getConceptId();
+			concepts.get(sourceId).getDefinitionStatus().setPreferredTerm(concepts.get(defStatusId).getPreferredTerm());
+		}
+	}
 	public void completeDefaultTerm(){
 		boolean act;
 		String type;
@@ -417,13 +452,13 @@ public class TransformerDiskBased {
 				ConceptDescriptor loopConcept = concepts.get(sourceId);
 
 				if (userSelectedDefaultTermByRefset != null) {
-					loopConcept.setDefaultTerm(userSelectedDefaultTermByRefset);
+					loopConcept.setPreferredTerm(userSelectedDefaultTermByRefset);
 				} else if (userSelectedDefaultTermByLangCode != null) {
-					loopConcept.setDefaultTerm(userSelectedDefaultTermByLangCode);
+					loopConcept.setPreferredTerm(userSelectedDefaultTermByLangCode);
 				} else if (enFsn != null) {
-					loopConcept.setDefaultTerm(enFsn);
+					loopConcept.setPreferredTerm(enFsn);
 				} else {
-					loopConcept.setDefaultTerm(lastTerm);
+					loopConcept.setPreferredTerm(lastTerm);
 				}
 				concepts.put(sourceId, loopConcept);
 
@@ -459,7 +494,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -474,7 +509,7 @@ public class TransformerDiskBased {
 				loopDescription.setType(columns[6]);
 				loopDescription.setTerm(columns[7]);
 				loopDescription.setIcs(columns[8]);
-				loopDescription.setModule(columns[3]);
+				loopDescription.setStringModule(columns[3]);
                 modulesSet.add(columns[3]);
 				loopDescription.setLang(columns[5]);
 				List<LightDescription> list = tdefMembers.get(sourceId);
@@ -508,16 +543,17 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
                 }
 				LightRelationship loopRelationship = new LightRelationship();
 
+				loopRelationship.setRelationshipId(columns[0]);
 				loopRelationship.setActive(columns[2].equals("1"));
 				loopRelationship.setEffectiveTime(columns[1]);
-				loopRelationship.setModule(columns[3]);
+				loopRelationship.setStringModule(columns[3]);
                 modulesSet.add(columns[3]);
 				String targetId=columns[5];
 				loopRelationship.setTarget(targetId);
@@ -537,7 +573,7 @@ public class TransformerDiskBased {
 				relList.add(loopRelationship);
 				relationships.put(sourceId, relList);
 
-				if ( type.equals(isaSCTId) &&
+				/*if ( type.equals(isaSCTId) &&
 						columns[2].equals("1")){
 					List<LightRelationship> targetRelList = targetRelationships.get(targetId);
 					if (targetRelList == null) {
@@ -545,7 +581,7 @@ public class TransformerDiskBased {
 					}
 					targetRelList.add(loopRelationship);
 					targetRelationships.put(targetId, targetRelList);
-				}
+				}*/
 				if (loopRelationship.isActive() && type.equals(isaSCTId)){
 					if ( charType.equals(inferred)){
 						notLeafInferred.add(targetId);
@@ -578,7 +614,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -590,7 +626,7 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(columns[3]);
+					loopMember.setStringModule(columns[3]);
                     modulesSet.add(columns[3]);
 					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
@@ -608,7 +644,9 @@ public class TransformerDiskBased {
                     if (!refsetsCount.containsKey(loopMember.getRefset())) {
                         refsetsCount.put(loopMember.getRefset(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+    				if (columns[2].equals("1")){
+    					refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+    				}
 
 					count++;
 					if (count % 100000 == 0) {
@@ -636,7 +674,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -648,7 +686,7 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(columns[3]);
+					loopMember.setStringModule(columns[3]);
                     modulesSet.add(columns[3]);
 					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
@@ -668,8 +706,10 @@ public class TransformerDiskBased {
                     if (!refsetsCount.containsKey(loopMember.getRefset())) {
                         refsetsCount.put(loopMember.getRefset(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
 
+    				if (columns[2].equals("1")){
+    					refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+    				}
                     count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -696,7 +736,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -708,7 +748,7 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(columns[3]);
+					loopMember.setStringModule(columns[3]);
                     modulesSet.add(columns[3]);
 					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
@@ -728,8 +768,10 @@ public class TransformerDiskBased {
                     if (!refsetsCount.containsKey(loopMember.getRefset())) {
                         refsetsCount.put(loopMember.getRefset(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
 
+    				if (columns[2].equals("1")){
+    					refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+    				}
                     count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -755,7 +797,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -767,7 +809,7 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(columns[3]);
+					loopMember.setStringModule(columns[3]);
                     modulesSet.add(columns[3]);
 					String sourceId = columns[5];
 					loopMember.setReferencedComponentId(sourceId);
@@ -787,8 +829,10 @@ public class TransformerDiskBased {
                     if (!refsetsCount.containsKey(loopMember.getRefset())) {
                         refsetsCount.put(loopMember.getRefset(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
 
+    				if (columns[2].equals("1")){
+    					refsetsCount.put(loopMember.getRefset(), refsetsCount.get(loopMember.getRefset()) + 1);
+    				}
                     count++;
 					if (count % 100000 == 0) {
 						System.out.print(".");
@@ -815,7 +859,7 @@ public class TransformerDiskBased {
                     line = br.readLine();
 					continue;
 				}
-				String[] columns = line.split("\\t");
+				String[] columns = line.split("\t",-1);
                 if (modulesToIgnore.contains(columns[3])) {
                     line = br.readLine();
                     continue;
@@ -826,7 +870,7 @@ public class TransformerDiskBased {
 
 					loopMember.setActive(columns[2].equals("1"));
 					loopMember.setEffectiveTime(columns[1]);
-					loopMember.setModule(columns[3]);
+					loopMember.setStringModule(columns[3]);
                     modulesSet.add(columns[3]);
 					String sourceId = columns[5];
 					loopMember.setDescriptionId(sourceId);
@@ -884,15 +928,18 @@ public class TransformerDiskBased {
 			Concept cpt = new Concept();
 			ConceptDescriptor cptdesc = concepts.get(cptId);
 
+			cpt.setV(version);
 			cpt.setConceptId(cptId);
 			cpt.setActive(cptdesc.isActive());
-			cpt.setDefaultTerm(cptdesc.getDefaultTerm());
+			cpt.setPreferredTerm(cptdesc.getPreferredTerm());
 			cpt.setEffectiveTime(cptdesc.getEffectiveTime());
 			cpt.setModule(cptdesc.getModule());
+//			cpt.getModule().setPreferredTerm(concepts.get(cptdesc.getModule().getConceptId()).getPreferredTerm());
 			cpt.setDefinitionStatus(cptdesc.getDefinitionStatus());
+//			cpt.getDefinitionStatus().setPreferredTerm(concepts.get(cptdesc.getDefinitionStatus().getConceptId()).getPreferredTerm());
 			cpt.setLeafInferred(!notLeafInferred.contains(cptId));
 			cpt.setLeafStated(!notLeafStated.contains(cptId));
-            cpt.setFsn(cptFSN.get(cptId));
+            cpt.setFullySpecifiedName(cptFSN.get(cptId));
 			cpt.setStatedDescendants(cptdesc.getStatedDescendants());
 			cpt.setInferredDescendants(cptdesc.getInferredDescendants());
 
@@ -916,17 +963,17 @@ public class TransformerDiskBased {
 					descId = ldesc.getDescriptionId();
 					d.setDescriptionId(descId);
 					d.setEffectiveTime(ldesc.getEffectiveTime());
-					d.setIcs(concepts.get(ldesc.getIcs()));
+					d.setCaseSignificance(newLightConceptDescriptor(ldesc.getIcs()));
 					d.setTerm(ldesc.getTerm());
 					d.setLength(ldesc.getTerm().length());
-					d.setModule(ldesc.getModule());
-					d.setType(concepts.get(ldesc.getType()));
-					d.setLang(ldesc.getLang());
+					d.setModule(newLightConceptDescriptor(ldesc.getStringModule()));
+					d.setType(newLightConceptDescriptor(ldesc.getType()));
+					d.setLanguageCode(ldesc.getLang());
 
                     if (createCompleteVersion) {
-                        cpt.setFsn(cptFSN.get(cptId));
+                        cpt.setFullySpecifiedName(cptFSN.get(cptId));
                         if (cptFSN.get(cptId).endsWith(")")) {
-                            cpt.setSemtag(cpt.getFsn().substring(cpt.getFsn().lastIndexOf("(") + 1, cpt.getFsn().length() - 1));
+                            cpt.setSemtag(cpt.getFullySpecifiedName().substring(cpt.getFullySpecifiedName().lastIndexOf("(") + 1, cpt.getFullySpecifiedName().length() - 1));
                         }
                         String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
                         if (manifest.isTextIndexNormalized()) {
@@ -949,9 +996,9 @@ public class TransformerDiskBased {
 							lm.setActive(llm.isActive());
 							lm.setDescriptionId(descId);
 							lm.setEffectiveTime(llm.getEffectiveTime());
-							lm.setModule(llm.getModule());
-							lm.setAcceptability(concepts.get(llm.getAcceptability()));
-							lm.setRefset(concepts.get(llm.getRefset()));
+							lm.setModule(newLightConceptDescriptor(llm.getStringModule()));
+							lm.setAcceptability(newLightConceptDescriptor(llm.getAcceptability()));
+							lm.setLanguageReferenceSet(newLightConceptDescriptor(llm.getRefset()));
 							lm.setUuid(llm.getUuid());
 
 							listLM.add(lm);
@@ -971,13 +1018,13 @@ public class TransformerDiskBased {
 							RefsetMembership rm = new RefsetMembership();
 							rm.setEffectiveTime(lrm.getEffectiveTime());
 							rm.setActive(lrm.isActive());
-							rm.setModule(lrm.getModule());
+							rm.setModule(newLightConceptDescriptor(lrm.getStringModule()));
 							rm.setUuid(lrm.getUuid());
 
 							rm.setReferencedComponentId(descId);
-							rm.setRefset(concepts.get(lrm.getRefset()));
+							rm.setRefset(newLightConceptDescriptor(lrm.getRefset()));
 							rm.setType(lrm.getType());
-							rm.setCidValue(concepts.get(lrm.getCidValue()));
+							rm.setCidValue(newLightConceptDescriptor(lrm.getCidValue()));
 
 							listRM.add(rm);
 						}
@@ -1004,12 +1051,12 @@ public class TransformerDiskBased {
 					descId = ldesc.getDescriptionId();
 					d.setDescriptionId(descId);
 					d.setEffectiveTime(ldesc.getEffectiveTime());
-					d.setIcs(concepts.get(ldesc.getIcs()));
+					d.setCaseSignificance(newLightConceptDescriptor(ldesc.getIcs()));
 					d.setTerm(ldesc.getTerm());
 					d.setLength(ldesc.getTerm().length());
-					d.setModule(ldesc.getModule());
-					d.setType(concepts.get(ldesc.getType()));
-					d.setLang(ldesc.getLang());
+					d.setModule(newLightConceptDescriptor(ldesc.getStringModule()));
+					d.setType(newLightConceptDescriptor(ldesc.getType()));
+					d.setLanguageCode(ldesc.getLang());
 
 					listLLM = languageMembers.get(descId);
 					listLM = new ArrayList<LangMembership>();
@@ -1021,9 +1068,9 @@ public class TransformerDiskBased {
 							lm.setActive(llm.isActive());
 							lm.setDescriptionId(descId);
 							lm.setEffectiveTime(llm.getEffectiveTime());
-							lm.setModule(llm.getModule());
-							lm.setAcceptability(concepts.get(llm.getAcceptability()));
-							lm.setRefset(concepts.get(llm.getRefset()));
+							lm.setModule(newLightConceptDescriptor(llm.getStringModule()));
+							lm.setAcceptability(newLightConceptDescriptor(llm.getAcceptability()));
+							lm.setLanguageReferenceSet(newLightConceptDescriptor(llm.getRefset()));
 							lm.setUuid(llm.getUuid());
 
 							listLM.add(lm);
@@ -1047,19 +1094,21 @@ public class TransformerDiskBased {
 			listR = new ArrayList<Relationship>();
 			if (listLR != null) {
 				for (LightRelationship lrel : listLR) {
-					if (lrel.getCharType().equals("900000000000010007")) {
+//					if (lrel.getCharType().equals("900000000000010007")) {
 						Relationship r = new Relationship();
+						r.setRelationshipId(lrel.getRelationshipId());
 						r.setEffectiveTime(lrel.getEffectiveTime());
 						r.setActive(lrel.isActive());
-						r.setModule(lrel.getModule());
-						r.setGroupId(lrel.getGroupId());
-						r.setModifier(MODIFIER);
+						r.setModule(newLightConceptDescriptor(lrel.getStringModule()));
+						r.setRelationshipGroup(lrel.getGroupId());
+						r.setModifier(newLightConceptDescriptor(MODIFIER_ID));
 						r.setSourceId(cptId);
-						r.setTarget(concepts.get(lrel.getTarget()));
-						r.setType(concepts.get(lrel.getType()));
-						r.setCharType(concepts.get(lrel.getCharType()));
+						r.setDestination(concepts.get(lrel.getTarget()));
+						r.getDestination().setFullySpecifiedName(cptFSN.get(lrel.getTarget()));
+						r.setType(newLightConceptDescriptor(lrel.getType()));
+						r.setCharacteristicType(newLightConceptDescriptor(lrel.getCharType()));
 						r.setTargetMemberships(getMemberships(lrel.getTarget()));
-                        if (createCompleteVersion) {
+                        if (createCompleteVersion && lrel.isActive()) {
 							listA = getInferredAncestors(lrel.getType(), true);
 							r.setTypeInferredAncestors(listA);
 							listA = getStatedAncestors(lrel.getType(),true);
@@ -1071,48 +1120,7 @@ public class TransformerDiskBased {
 						}
 
 						listR.add(r);
-					}
-				}
-
-				if (listR.isEmpty()) {
-					cpt.setStatedRelationships(null);
-				} else {
-					cpt.setStatedRelationships(listR);
-				}
-			} else {
-				cpt.setStatedRelationships(null);
-			}
-
-			listLR = relationships.get(cptId);
-			listR = new ArrayList<Relationship>();
-			if (listLR != null) {
-				for (LightRelationship lrel : listLR) {
-					if (lrel.getCharType().equals("900000000000011006")) {
-						Relationship r = new Relationship();
-						r.setEffectiveTime(lrel.getEffectiveTime());
-						r.setActive(lrel.isActive());
-						r.setModule(lrel.getModule());
-						r.setGroupId(lrel.getGroupId());
-						r.setModifier(MODIFIER);
-						r.setSourceId(cptId);
-						r.setTarget(concepts.get(lrel.getTarget()));
-						r.setType(concepts.get(lrel.getType()));
-						r.setCharType(concepts.get(lrel.getCharType()));
-						r.setTargetMemberships(getMemberships(lrel.getTarget()));
-
-                        if (createCompleteVersion) {
-							listA = getInferredAncestors(lrel.getType(), true);
-							r.setTypeInferredAncestors(listA);
-							listA = getStatedAncestors(lrel.getType(),true);
-							r.setTypeStatedAncestors(listA);
-							listA = getInferredAncestors(lrel.getTarget(),false);
-							r.setTargetInferredAncestors(listA);
-							listA = getStatedAncestors(lrel.getTarget(),false);
-							r.setTargetStatedAncestors(listA);
-                        }
-
-						listR.add(r);
-					}
+//					}
 				}
 
 				if (listR.isEmpty()) {
@@ -1124,46 +1132,86 @@ public class TransformerDiskBased {
 				cpt.setRelationships(null);
 			}
 
-			listLR = relationships.get(cptId);
-			listR = new ArrayList<Relationship>();
-			if (listLR != null) {
-				for (LightRelationship lrel : listLR) {
-					if (lrel.getCharType().equals("900000000000227009")) {
-						Relationship r = new Relationship();
-						r.setEffectiveTime(lrel.getEffectiveTime());
-						r.setActive(lrel.isActive());
-						r.setModule(lrel.getModule());
-						r.setGroupId(lrel.getGroupId());
-						r.setModifier(MODIFIER);
-						r.setSourceId(cptId);
-						r.setTarget(concepts.get(lrel.getTarget()));
-						r.setType(concepts.get(lrel.getType()));
-						r.setCharType(concepts.get(lrel.getCharType()));
-						r.setTargetMemberships(getMemberships(lrel.getTarget()));
-
-                        if (createCompleteVersion) {
-							listA = getInferredAncestors(lrel.getType(), true);
-							r.setTypeInferredAncestors(listA);
-							listA = getStatedAncestors(lrel.getType(),true);
-							r.setTypeStatedAncestors(listA);
-							listA = getInferredAncestors(lrel.getTarget(),false);
-							r.setTargetInferredAncestors(listA);
-							listA = getStatedAncestors(lrel.getTarget(),false);
-							r.setTargetStatedAncestors(listA);
-                        }
-
-						listR.add(r);
-					}
-				}
-
-				if (listR.isEmpty()) {
-					cpt.setAdditionalRelationships(null);
-				} else {
-					cpt.setAdditionalRelationships(listR);
-				}
-			} else {
-				cpt.setAdditionalRelationships(null);
-			}
+//			listLR = relationships.get(cptId);
+//			listR = new ArrayList<Relationship>();
+//			if (listLR != null) {
+//				for (LightRelationship lrel : listLR) {
+//					if (lrel.getCharType().equals("900000000000011006")) {
+//						Relationship r = new Relationship();
+//						r.setEffectiveTime(lrel.getEffectiveTime());
+//						r.setActive(lrel.isActive());
+//						r.setModule(newLightConceptDescriptor(lrel.getStringModule()));
+//						r.setRelationshipGroup(lrel.getGroupId());
+//						r.setModifier(newLightConceptDescriptor(MODIFIER_ID));
+//						r.setSourceId(cptId);
+//						r.setDestination(concepts.get(lrel.getTarget()));
+//						r.setType(newLightConceptDescriptor(lrel.getType()));
+//						r.setCharacteristicType(newLightConceptDescriptor(lrel.getCharType()));
+//						r.setTargetMemberships(getMemberships(lrel.getTarget()));
+//                        if (createCompleteVersion) {
+//							listA = getInferredAncestors(lrel.getType(), true);
+//							r.setTypeInferredAncestors(listA);
+//							listA = getStatedAncestors(lrel.getType(),true);
+//							r.setTypeStatedAncestors(listA);
+//							listA = getInferredAncestors(lrel.getTarget(),false);
+//							r.setTargetInferredAncestors(listA);
+//							listA = getStatedAncestors(lrel.getTarget(),false);
+//							r.setTargetStatedAncestors(listA);
+//                        }
+//
+//						listR.add(r);
+//					}
+//				}
+//
+//				if (listR.isEmpty()) {
+//					cpt.setRelationships(null);
+//				} else {
+//					cpt.setRelationships(listR);
+//				}
+//			} else {
+//				cpt.setRelationships(null);
+//			}
+//
+//			listLR = relationships.get(cptId);
+//			listR = new ArrayList<Relationship>();
+//			if (listLR != null) {
+//				for (LightRelationship lrel : listLR) {
+//					if (lrel.getCharType().equals("900000000000227009")) {
+//						Relationship r = new Relationship();
+//						r.setEffectiveTime(lrel.getEffectiveTime());
+//						r.setActive(lrel.isActive());
+//						r.setModule(newLightConceptDescriptor(lrel.getStringModule()));
+//						r.setRelationshipGroup(lrel.getGroupId());
+//						r.setModifier(newLightConceptDescriptor(MODIFIER_ID));
+//						r.setSourceId(cptId);
+//						r.setDestination(concepts.get(lrel.getTarget()));
+//						r.setType(newLightConceptDescriptor(lrel.getType()));
+//						r.setCharacteristicType(newLightConceptDescriptor(lrel.getCharType()));
+//						r.setTargetMemberships(getMemberships(lrel.getTarget()));
+//
+//                        if (createCompleteVersion) {
+//							listA = getInferredAncestors(lrel.getType(), true);
+//							r.setTypeInferredAncestors(listA);
+//							listA = getStatedAncestors(lrel.getType(),true);
+//							r.setTypeStatedAncestors(listA);
+//							listA = getInferredAncestors(lrel.getTarget(),false);
+//							r.setTargetInferredAncestors(listA);
+//							listA = getStatedAncestors(lrel.getTarget(),false);
+//							r.setTargetStatedAncestors(listA);
+//                        }
+//
+//						listR.add(r);
+//					}
+//				}
+//
+//				if (listR.isEmpty()) {
+//					cpt.setAdditionalRelationships(null);
+//				} else {
+//					cpt.setAdditionalRelationships(listR);
+//				}
+//			} else {
+//				cpt.setAdditionalRelationships(null);
+//			}
 			listLRM = simpleMembers.get(cptId);
 			listRM = new ArrayList<RefsetMembership>();
 			if (listLRM != null) {
@@ -1171,11 +1219,11 @@ public class TransformerDiskBased {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
 					d.setActive(lrm.isActive());
-					d.setModule(lrm.getModule());
+					d.setModule(newLightConceptDescriptor(lrm.getStringModule()));
 					d.setUuid(lrm.getUuid());
 
 					d.setReferencedComponentId(cptId);
-					d.setRefset(concepts.get(lrm.getRefset()));
+					d.setRefset(newLightConceptDescriptor(lrm.getRefset()));
 					d.setType(lrm.getType());
 
 					listRM.add(d);
@@ -1188,11 +1236,11 @@ public class TransformerDiskBased {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
 					d.setActive(lrm.isActive());
-					d.setModule(lrm.getModule());
+					d.setModule(newLightConceptDescriptor(lrm.getStringModule()));
 					d.setUuid(lrm.getUuid());
 
 					d.setReferencedComponentId(cptId);
-					d.setRefset(concepts.get(lrm.getRefset()));
+					d.setRefset(newLightConceptDescriptor(lrm.getRefset()));
 					d.setType(lrm.getType());
 					d.setOtherValue(lrm.getOtherValue());
 
@@ -1205,13 +1253,13 @@ public class TransformerDiskBased {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
 					d.setActive(lrm.isActive());
-					d.setModule(lrm.getModule());
+					d.setModule(newLightConceptDescriptor(lrm.getStringModule()));
 					d.setUuid(lrm.getUuid());
 
 					d.setReferencedComponentId(cptId);
-					d.setRefset(concepts.get(lrm.getRefset()));
+					d.setRefset(newLightConceptDescriptor(lrm.getRefset()));
 					d.setType(lrm.getType());
-					d.setCidValue(concepts.get(lrm.getCidValue()));
+					d.setCidValue(newLightConceptDescriptor(lrm.getCidValue()));
 
 					listRM.add(d);
 				}
@@ -1222,13 +1270,13 @@ public class TransformerDiskBased {
 					RefsetMembership d = new RefsetMembership();
 					d.setEffectiveTime(lrm.getEffectiveTime());
 					d.setActive(lrm.isActive());
-					d.setModule(lrm.getModule());
+					d.setModule(newLightConceptDescriptor(lrm.getStringModule()));
 					d.setUuid(lrm.getUuid());
 
 					d.setReferencedComponentId(cptId);
-					d.setRefset(concepts.get(lrm.getRefset()));
+					d.setRefset(newLightConceptDescriptor(lrm.getRefset()));
 					d.setType(lrm.getType());
-					d.setCidValue(concepts.get(lrm.getCidValue()));
+					d.setCidValue(newLightConceptDescriptor(lrm.getCidValue()));
 
 					listRM.add(d);
 				}
@@ -1255,7 +1303,23 @@ public class TransformerDiskBased {
         System.out.println(".");
 		System.out.println(fileName + " Done");
 	}
-
+	
+	private LightConceptDescriptor newLightConceptDescriptor(String id) {
+		LightConceptDescriptor lcd=new LightConceptDescriptor();
+		if (id==null){
+			lcd.setConceptId("NULL");
+			lcd.setPreferredTerm("Deleted concept");
+		}else{
+			lcd.setConceptId(id);
+			if (concepts.get(id)==null){
+				lcd.setPreferredTerm("Deleted concept");
+			}else{
+				lcd.setPreferredTerm(concepts.get(id).getPreferredTerm());
+			}
+		}
+		return lcd;
+	}
+	
 	private List<String> getMemberships(String target) {
 		List<String>ret;
 		List<LightRefsetMembership> listLRM = simpleMembers.get(target);
@@ -1318,13 +1382,36 @@ public class TransformerDiskBased {
 			}
 		}
 
-		if (ret.size()==0){
-			ret=null;
-		}
+//		if (ret.size()==0){
+//			ret=null;
+//		}
 		if(isType ){
-			calculatedInferredAncestorsForRelType.put(cptId, ret);
+			if (ret.size()==0){
+				if (processInMemory){
+					calculatedInferredAncestorsForRelType.put(cptId, null);
+				}else{
+					calculatedInferredAncestorsForRelType.put(cptId, emptyList);
+				}
+			}else{
+				calculatedInferredAncestorsForRelType.put(cptId, ret);
+				
+			}
 		}else{
-			calculatedInferredAncestors.put(cptId, ret);
+
+			if (ret.size()==0){
+				if (processInMemory){
+					calculatedInferredAncestors.put(cptId, null);
+				}else{
+					calculatedInferredAncestors.put(cptId, emptyList);
+				}
+			}else{
+				calculatedInferredAncestors.put(cptId, ret);
+				
+			}
+		}
+
+		if (ret.size()==0){
+			return null;
 		}
 		return ret;
 	}
@@ -1366,13 +1453,37 @@ public class TransformerDiskBased {
 				}
 			}
 		}
-		if (ret.size()==0){
-			ret=null;
-		}
-		if (isType){
-			calculatedStatedAncestorsForRelType.put(cptId, ret);
+//		if (ret.size()==0){
+//			ret=null;
+//		}
+		
+		if(isType ){
+			if (ret.size()==0){
+				if (processInMemory){
+					calculatedStatedAncestorsForRelType.put(cptId, null);
+				}else{
+					calculatedStatedAncestorsForRelType.put(cptId, emptyList);
+				}
+			}else{
+				calculatedStatedAncestorsForRelType.put(cptId, ret);
+				
+			}
 		}else{
-			calculatedStatedAncestors.put(cptId, ret);
+
+			if (ret.size()==0){
+				if (processInMemory){
+					calculatedStatedAncestors.put(cptId, null);
+				}else{
+					calculatedStatedAncestors.put(cptId, emptyList);
+				}
+			}else{
+				calculatedStatedAncestors.put(cptId, ret);
+				
+			}
+		}
+
+		if (ret.size()==0){
+			return null;
 		}
 		return ret ;
 	}
@@ -1398,13 +1509,13 @@ public class TransformerDiskBased {
 				d.setTypeId(ldesc.getType());
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
-				d.setModule(ldesc.getModule());
+				d.setStringModule(ldesc.getStringModule());
 				//TODO: using String lang names to support compatibility with Mongo 2.4.x text indexes
-				d.setLang(langCodes.get(ldesc.getLang()));
+				d.setLanguageCode(langCodes.get(ldesc.getLang()));
 				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
-                                d.setConceptModule(concept.getModule());
+				d.setConceptModule(concept.getModule().getConceptId());
 				d.setConceptActive(concept.isActive());
-                d.setDefinitionStatus(concept.getDefinitionStatus());
+                d.setDefinitionStatus(concept.getDefinitionStatus().getConceptId());
                 d.setFsn(cptFSN.get(conceptId));
 				d.setSemanticTag("");
 				if (d.getFsn().endsWith(")")) {
@@ -1443,6 +1554,66 @@ public class TransformerDiskBased {
 				bw.append(sep);
 			}
 		}
+		for (String conceptId : tdefMembers.keySet()) {
+
+			count++;
+			if (count % 10000 == 0) {
+				System.out.print(".");
+			}
+			for (LightDescription ldesc : tdefMembers.get(conceptId)) {
+				TextIndexDescription d = new TextIndexDescription();
+				d.setActive(ldesc.getActive());
+				d.setTerm(ldesc.getTerm());
+				d.setLength(ldesc.getTerm().length());
+				d.setTypeId(ldesc.getType());
+				d.setConceptId(ldesc.getConceptId());
+				d.setDescriptionId(ldesc.getDescriptionId());
+				d.setStringModule(ldesc.getStringModule());
+
+				d.setEffectiveTime(ldesc.getEffectiveTime());
+				d.setLanguageCode(langCodes.get(ldesc.getLang()));
+				ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
+				d.setConceptModule(concept.getModule().getConceptId());
+				d.setConceptActive(concept.getActive());
+				d.setDefinitionStatus(concept.getDefinitionStatus().getConceptId());
+				d.setFsn(cptFSN.get(conceptId));
+				d.setSemanticTag("");
+				if (d.getFsn().endsWith(")")) {
+					d.setSemanticTag(d.getFsn().substring(d.getFsn().lastIndexOf("(") + 1, d.getFsn().length() - 1));
+				}
+				setIndexWords(d);
+				d.setRefsetIds(new ArrayList<String>());
+
+				// Refset index assumes that only active members are included in the db.
+				List<LightRefsetMembership> listLRM = simpleMembers.get(concept.getConceptId());
+				if (listLRM != null) {
+					for (LightRefsetMembership lrm : listLRM) {
+						d.getRefsetIds().add(lrm.getRefset());
+					}
+				}
+				listLRM = simpleMapMembers.get(concept.getConceptId());
+				if (listLRM != null) {
+					for (LightRefsetMembership lrm : listLRM) {
+						d.getRefsetIds().add(lrm.getRefset());
+					}
+				}
+				listLRM = assocMembers.get(concept.getConceptId());
+				if (listLRM != null) {
+					for (LightRefsetMembership lrm : listLRM) {
+						d.getRefsetIds().add(lrm.getRefset());
+					}
+				}
+				listLRM = attrMembers.get(concept.getConceptId());
+				if (listLRM != null) {
+					for (LightRefsetMembership lrm : listLRM) {
+						d.getRefsetIds().add(lrm.getRefset());
+					}
+				}
+
+				bw.append(gson.toJson(d).toString());
+				bw.append(sep);
+			}
+		}
 
 		bw.close();
         System.out.println(".");
@@ -1451,6 +1622,7 @@ public class TransformerDiskBased {
 
 	private void setIndexWords(TextIndexDescription d) {
 		String cleanTerm = d.getTerm().replace("(", "").replace(")", "").trim().toLowerCase();
+		cleanTerm = cleanTerm.replace("[", " ").replace("]", " ").trim();
 		String[] tokens;
 		if (manifest.isTextIndexNormalized()) {
 		    String convertedTerm = convertTerm(cleanTerm);

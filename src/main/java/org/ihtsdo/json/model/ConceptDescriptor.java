@@ -3,8 +3,9 @@ package org.ihtsdo.json.model;
 public class ConceptDescriptor extends Component{
 
     String conceptId;
-	String defaultTerm;
-    String definitionStatus;
+	String preferredTerm;
+    String fullySpecifiedName;
+    LightConceptDescriptor definitionStatus;
 	int statedDescendants;
 	int inferredDescendants;
 	public String getConceptId() {
@@ -12,18 +13,6 @@ public class ConceptDescriptor extends Component{
 	}
 	public void setConceptId(String conceptId) {
 		this.conceptId = conceptId;
-	}
-	public String getDefaultTerm() {
-		return defaultTerm;
-	}
-	public void setDefaultTerm(String defaultTerm) {
-		this.defaultTerm = defaultTerm;
-	}
-	public String getDefinitionStatus() {
-		return definitionStatus;
-	}
-	public void setDefinitionStatus(String definitionStatus) {
-		this.definitionStatus = definitionStatus;
 	}
 	public int getStatedDescendants() {
 		return statedDescendants;
@@ -36,6 +25,24 @@ public class ConceptDescriptor extends Component{
 	}
 	public void setInferredDescendants(int inferredDescendants) {
 		this.inferredDescendants = inferredDescendants;
+	}
+	public String getPreferredTerm() {
+		return preferredTerm;
+	}
+	public void setPreferredTerm(String preferredTerm) {
+		this.preferredTerm = preferredTerm;
+	}
+	public LightConceptDescriptor getDefinitionStatus() {
+		return definitionStatus;
+	}
+	public void setDefinitionStatus(LightConceptDescriptor definitionStatus) {
+		this.definitionStatus = definitionStatus;
+	}
+	public String getFullySpecifiedName() {
+		return fullySpecifiedName;
+	}
+	public void setFullySpecifiedName(String fullySpecifiedName) {
+		this.fullySpecifiedName = fullySpecifiedName;
 	}
 	
 }

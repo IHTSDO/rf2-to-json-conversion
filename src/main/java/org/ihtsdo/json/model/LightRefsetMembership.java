@@ -29,6 +29,7 @@ public class LightRefsetMembership extends Component {
 	private String refset;
 	private String cidValue;
 	private String otherValue;
+	private String stringModule;
 	public String getType() {
 		return type;
 	}
@@ -58,6 +59,12 @@ public class LightRefsetMembership extends Component {
 	}
 	public void setOtherValue(String otherValue) {
 		this.otherValue = otherValue;
+	}
+	public String getStringModule() {
+		return stringModule;
+	}
+	public void setStringModule(String stringModule) {
+		this.stringModule = stringModule;
 	}
 
 }

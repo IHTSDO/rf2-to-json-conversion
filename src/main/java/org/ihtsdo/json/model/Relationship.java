@@ -9,37 +9,22 @@ import java.util.List;
 
 public class Relationship extends Component {
 
-    private ConceptDescriptor type;
+	private String relationshipId;
+    private LightConceptDescriptor type;
     private List<String> typeInferredAncestors;
     private List<String> typeStatedAncestors;
-    private ConceptDescriptor target;
+    private ConceptDescriptor destination;
     private List<String> targetInferredAncestors;
     private List<String> targetStatedAncestors;
     private String sourceId;
-    private Integer groupId;
-    private ConceptDescriptor charType;
-    private String modifier;
+    private Integer relationshipGroup;
+    private LightConceptDescriptor characteristicType;
+    private LightConceptDescriptor modifier;
     private List<String> targetMemberships;
 
     public Relationship() {
         super();
     }
-
-	public ConceptDescriptor getType() {
-		return type;
-	}
-
-	public void setType(ConceptDescriptor type) {
-		this.type = type;
-	}
-
-	public ConceptDescriptor getTarget() {
-		return target;
-	}
-
-	public void setTarget(ConceptDescriptor target) {
-		this.target = target;
-	}
 
 	public String getSourceId() {
 		return sourceId;
@@ -47,30 +32,6 @@ public class Relationship extends Component {
 
 	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
-	}
-
-	public Integer getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(Integer groupId) {
-		this.groupId = groupId;
-	}
-
-	public ConceptDescriptor getCharType() {
-		return charType;
-	}
-
-	public void setCharType(ConceptDescriptor charType) {
-		this.charType = charType;
-	}
-
-	public String getModifier() {
-		return modifier;
-	}
-
-	public void setModifier(String modifier) {
-		this.modifier = modifier;
 	}
 
     public List<String> getTypeInferredAncestors() {
@@ -111,5 +72,53 @@ public class Relationship extends Component {
 
 	public void setTargetMemberships(List<String> targetMemberships) {
 		this.targetMemberships = targetMemberships;
+	}
+
+	public String getRelationshipId() {
+		return relationshipId;
+	}
+
+	public void setRelationshipId(String relationshipId) {
+		this.relationshipId = relationshipId;
+	}
+
+	public LightConceptDescriptor getType() {
+		return type;
+	}
+
+	public void setType(LightConceptDescriptor type) {
+		this.type = type;
+	}
+
+	public ConceptDescriptor getDestination() {
+		return destination;
+	}
+
+	public void setDestination(ConceptDescriptor destination) {
+		this.destination = destination;
+	}
+
+	public Integer getRelationshipGroup() {
+		return relationshipGroup;
+	}
+
+	public void setRelationshipGroup(Integer relationshipGroup) {
+		this.relationshipGroup = relationshipGroup;
+	}
+
+	public LightConceptDescriptor getCharacteristicType() {
+		return characteristicType;
+	}
+
+	public void setCharacteristicType(LightConceptDescriptor characteristicType) {
+		this.characteristicType = characteristicType;
+	}
+
+	public LightConceptDescriptor getModifier() {
+		return modifier;
+	}
+
+	public void setModifier(LightConceptDescriptor modifier) {
+		this.modifier = modifier;
 	}
 }

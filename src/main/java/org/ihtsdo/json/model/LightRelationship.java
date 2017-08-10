@@ -7,9 +7,11 @@ package org.ihtsdo.json.model;
 
 public class LightRelationship extends Component {
 
+	private String relationshipId;
     private String type;
     private String target;
     private String sourceId;
+    private String stringModule;
     private Integer groupId;
     private String charType;
     private String modifier;
@@ -48,6 +50,18 @@ public class LightRelationship extends Component {
 	}
 	public void setModifier(String modifier) {
 		this.modifier = modifier;
+	}
+	public String getRelationshipId() {
+		return relationshipId;
+	}
+	public void setRelationshipId(String relationshipId) {
+		this.relationshipId = relationshipId;
+	}
+	public String getStringModule() {
+		return stringModule;
+	}
+	public void setStringModule(String stringModule) {
+		this.stringModule = stringModule;
 	}
 
 

@@ -36,22 +36,17 @@ if [ -s inferredTransitiveClosure.json ]; then
     ERROR=$(mongoimport --file inferredTransitiveClosure.json -d $2 -c v$3itc)
     exitIfError ${ERROR}
 fi
-
 mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'conceptId' : 1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.target.conceptId' : 1,'relationships.type.conceptId' : 1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'statedRelationships.target.conceptId' : 1,'statedRelationships.type.conceptId' : 1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'additionalRelationships.target.conceptId' : 1,'additionalRelationships.type.conceptId' : 1});"
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.destination.conceptId' : 1,'relationships.type.conceptId' : 1});"
 mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'memberships.refset.conceptId' :1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({inferredAncestors:1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({statedAncestors:1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'statedRelationships.typeInferredAncestors':1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'statedRelationships.typeStatedAncestors':1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.typeInferredAncestors':1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.typeStatedAncestors':1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'statedRelationships.targetInferredAncestors':1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'statedRelationships.targetStatedAncestors':1});"
-mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.targetInferredAncestors':1});"
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({inferredAncestors:1});" 
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({statedAncestors:1});" 
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.typeInferredAncestors':1});" 
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.typeStatedAncestors':1});" 
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.targetInferredAncestors':1});" 
 mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'relationships.targetStatedAncestors':1});"
+mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3.ensureIndex({'module.conceptId':1});"
+
 mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3tx.ensureIndex({'descriptionId' : 1});"
 mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3tx.ensureIndex({term: 'text'});"
 mongo --host $1 --port 27017 --eval "db = db.getSiblingDB('$2');db.v$3tx.ensureIndex({term: 1});"

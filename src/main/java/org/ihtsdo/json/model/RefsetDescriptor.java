@@ -14,7 +14,7 @@ public class RefsetDescriptor extends ConceptDescriptor {
         this.setEffectiveTime(concept.getEffectiveTime());
         this.setCount(count);
         this.setConceptId(concept.getConceptId());
-        this.setDefaultTerm(concept.getDefaultTerm());
+        this.setPreferredTerm(concept.getPreferredTerm());
         this.setModule(concept.getModule());
         this.setUuid(concept.getUuid());
         this.setActive(concept.isActive());

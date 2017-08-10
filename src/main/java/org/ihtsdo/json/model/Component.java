@@ -17,7 +17,7 @@ public class Component implements Serializable {
     private UUID uuid;
     private Boolean active;
     private String effectiveTime;
-    private String module;
+    private LightConceptDescriptor module;
     
     public Component() {
     }
@@ -46,11 +46,16 @@ public class Component implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getModule() {
-        return module;
-    }
+	public LightConceptDescriptor getModule() {
+		return module;
+	}
 
-    public void setModule(String module) {
-        this.module = module;
-    }
+	public void setModule(LightConceptDescriptor module) {
+		this.module = module;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
 }

@@ -16,6 +16,7 @@ public class TextIndexDescription extends Description {
     private String fsn;
     private String semanticTag;
     private boolean conceptActive;
+    private String stringModule;
     private String typeId;
     private List<String> refsetIds;
     String definitionStatus;
@@ -79,4 +80,12 @@ public class TextIndexDescription extends Description {
     public void setDefinitionStatus(String definitionStatus) {
         this.definitionStatus = definitionStatus;
     }
+
+	public String getStringModule() {
+		return stringModule;
+	}
+
+	public void setStringModule(String stringModule) {
+		this.stringModule = stringModule;
+	}
 }

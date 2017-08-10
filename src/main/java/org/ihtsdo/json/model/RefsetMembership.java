@@ -26,25 +26,9 @@ public class RefsetMembership extends Component {
 	}
 	private String type;
 	private String referencedComponentId;
-	private ConceptDescriptor refset;
-	private ConceptDescriptor cidValue;
+	private LightConceptDescriptor refset;
+	private LightConceptDescriptor cidValue;
 	private String otherValue;
-
-	public ConceptDescriptor getRefset() {
-		return refset;
-	}
-
-	public void setRefset(ConceptDescriptor refset) {
-		this.refset = refset;
-	}
-
-	public ConceptDescriptor getCidValue() {
-		return cidValue;
-	}
-
-	public void setCidValue(ConceptDescriptor cidValue) {
-		this.cidValue = cidValue;
-	}
 
 
 	public RefsetMembership() {
@@ -72,6 +56,22 @@ public class RefsetMembership extends Component {
 
 	public void setReferencedComponentId(String referencedComponentId) {
 		this.referencedComponentId = referencedComponentId;
+	}
+
+	public LightConceptDescriptor getRefset() {
+		return refset;
+	}
+
+	public void setRefset(LightConceptDescriptor refset) {
+		this.refset = refset;
+	}
+
+	public LightConceptDescriptor getCidValue() {
+		return cidValue;
+	}
+
+	public void setCidValue(LightConceptDescriptor cidValue) {
+		this.cidValue = cidValue;
 	}
 
 }

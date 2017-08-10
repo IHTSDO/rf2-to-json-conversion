@@ -17,6 +17,7 @@ public class LightDescription extends Component {
     String term;
     String ics;
     String lang;
+    String stringModule;
 
     public LightDescription() {
     }
@@ -68,5 +69,13 @@ public class LightDescription extends Component {
     public void setLang(String lang) {
         this.lang = lang;
     }
+
+	public String getStringModule() {
+		return stringModule;
+	}
+
+	public void setStringModule(String stringModule) {
+		this.stringModule = stringModule;
+	}
 
 }
