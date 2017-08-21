@@ -80,9 +80,9 @@ The snapshot API requires a MongoDB database to store the denormalized represent
 
 This project includes a script file for importing the resulting .json files into MongoDB, and creating the necessary indexes. This sentence needs to be executed from the folder that contains the .json files. The script will use the `mongoimport` command provided by mongoDB, it is expected to be in the path, as well as `mongo` runtime.
 
-`./import.sh en-edition 20140731`
+`./import.sh localhost en-edition 20140731`
 
-The first parameter is the edition short name, and the second is the effective time. The edition and effective time will be used to configure the Rest API that runs with this data.
+The first parameter is the host followed by the edition short name, and the effective time. The edition and effective time will be used to configure the Rest API that runs with this data.
 
 ## Easy Use instructions for IHTSDO Maven repository users:
 
