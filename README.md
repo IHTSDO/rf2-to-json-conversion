@@ -57,10 +57,10 @@ If the base edition and the extension are available in a single RF2 snapshot pac
 You can find sample config files in the `config` folder.
 
 ## Executing conversion
-Run the executable jar file:
+Run the executable jar file after building the repository, alternatively it can be found in the [releases]( https://github.com/IHTSDO/rf2-to-json-conversion/releases):
 
 ```
-java -Xmx8g -jar rf2-to-json-conversion-1.0-SNAPSHOT-jar-with-dependencies.jar config.xml
+java -Xmx8g -jar rf2-to-json-conversion-<version>-SNAPSHOT-jar-with-dependencies.jar config.xml
 ```
 
 The results will be a set of .json files in the output folder.
@@ -74,46 +74,3 @@ This project includes a script file for importing the resulting .json files into
 
 The first parameter is the edition short name, and the second is the effective time. The edition and effective time will be used to configure the Rest API that runs with this data.
 
-## Easy Use instructions for IHTSDO Maven repository users:
-Assumes the use of Ubuntu or a debian linux This build will build to jars and to a .deb file which will contain the jar and a variety of script files
-
-## Steps:
-1) Get the .deb onto the linux machine by either adding the the ihtsdo repository or  by building the .deb yourself using maven.
-
-sudo echo "deb [https://maven.ihtsdotools.org/content/repositories/releases/](https://maven.ihtsdotools.org/content/repositories/releases/) ./" >   /etc/apt/sources.list.d/ihtsdo.releases.list sudo wget -O - [https://maven.ihtsdotools.org/service/local/repositories/releases/content/apt-key.gpg.key](https://maven.ihtsdotools.org/service/local/repositories/releases/content/apt-key.gpg.key) | apt-key add - sudo apt-get update sudo apt-get install rf2-to-json-conversion
-
-2) cd /opt/rf2-to-json-conversion
-
-3) Get the relevant SNOMED international release using wget/curl or similar
-
-4) If importing an extension, get that too.
-
-5) cd to the conf folder and edit the relevant xml file ( e.g. if adding the swedish extension you will want to edit the seConfig.xml file)
-
-6) Set the following values $EFF_TIME, $EXP_TIME, $PATH_TO_SNOMED_RELEASE  and (if an extension) $PATH_TO_EXTENSION_RELEASE
-
-Time/date values are in the yyyymmdd format e.g. 20150331 The path should be a full path to the RF2 releases/Snapshot directory e.g. /home/test/releases/SnomedCT_RF2Release_INT_20150131/Snapshot
-
-7) Save the changes and then cd to the parent dir (cd ..).
-
-8) Edit run.sh setting $CONFIG to the name of the config xml file you have edited e.g seConfig.
-
-9) run "./run.sh". This should create the json files. Note where the json is saved to.
-
-10) When run has finished/while it is running edit zipAndUpload.sh set:
-
-"json_dir" to the path where the json is being/has been written to. "desturl" to the machine you wish to copy the json to (where the mongodb is).
-
-If need be set destuser and destdir if left if will use the current user & copy to the home folder of that user on the remote machine. Check you can ssh onto the destination machine prior to running zipAndUpload.sh as it use scp to copy the files.
-
-11) Once the run.sh has finished then run zipAndUpload.sh e.g. "./zipAndUpload.sh"
-
-12) ssh to desturl machine & get to the directory where you have scp'ed the files You should find 2 files: json.tgz and unzip-import.sh
-
-13) Edit unzip-import.sh and set:
-
-edition:  e.g. edition="en-edition"
-
-importDate:  the import date same formate as expdate etc in (6) e.g. 20150531
-
-14) Run unzip-import.sh e.g. "./unzip-import.sh"
