@@ -6,13 +6,13 @@
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
-    <editionName>US Edition</editionName>
-    <databaseName>us-edition</databaseName>
-    <effectiveTime>20180301</effectiveTime>
-    <expirationTime>20191002</expirationTime>
-    <outputFolder>/Users/rory/releases/us-edition</outputFolder>
+    <editionName>International Edition</editionName>
+    <databaseName>beta-edition</databaseName>
+    <effectiveTime>20170731</effectiveTime>
+    <expirationTime>20180901</expirationTime>
+    <outputFolder>/Users/rory/releases/intl/20170731</outputFolder>
     <foldersBaselineLoad>
-		<folder>/Users/rory/releases/SnomedCT_USEditionRF2_PRODUCTION_20180301T120000Z/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_PRODUCTION_20170731T120000Z/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>

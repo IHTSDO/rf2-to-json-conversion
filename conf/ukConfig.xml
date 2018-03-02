@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>999001251000000103</defaultTermLanguageRefset>
@@ -8,12 +8,12 @@
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>UK Edition</editionName>
     <databaseName>uk-edition</databaseName>
-    <effectiveTime>20150401</effectiveTime>
-    <expirationTime>20160501</expirationTime>
-    <outputFolder>uk-edition</outputFolder>
+    <effectiveTime>20170401</effectiveTime>
+    <expirationTime>20181101</expirationTime>
+    <outputFolder>/Users/rory/releases/ukjson/20170401</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_Production_20170131T120000/Snapshot</folder>
+        <folder>/Users/rory/releases/uk_sct2cl_23.0.0_20170401000001/SnomedCT_UKClinicalRF2_Production_20170401T000001/Snapshot</folder>    
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>

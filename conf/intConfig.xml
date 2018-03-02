@@ -7,12 +7,12 @@
     <normalizeTextIndex>true</normalizeTextIndex>
     <createCompleteConceptsFile>true</createCompleteConceptsFile>
     <editionName>International Edition</editionName>
-    <databaseName>en-edition</databaseName>
-    <effectiveTime>20150131</effectiveTime>
-    <expirationTime>20160201</expirationTime>
-    <outputFolder>intl-edition</outputFolder>
+    <databaseName>query-edition</databaseName>
+    <effectiveTime>20180131</effectiveTime>
+    <expirationTime>20190901</expirationTime>
+    <outputFolder>/Users/rory/releases/intl/20180131-query</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_MEMBER_20180131T120000Z-new/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>

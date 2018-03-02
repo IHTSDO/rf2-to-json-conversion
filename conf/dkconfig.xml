@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <processInMemory>true</processInMemory>
+    <defaultTermLangCode>da</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>554461000005103</defaultTermLanguageRefset>
+    <normalizeTextIndex>false</normalizeTextIndex>
+    <createCompleteConceptsFile>false</createCompleteConceptsFile>
+    <editionName>Danish Edition</editionName>
+    <databaseName>dk-edition</databaseName>
+    <effectiveTime>20170930</effectiveTime>
+    <expirationTime>20181201</expirationTime>
+    <outputFolder>dk</outputFolder>
+    <foldersBaselineLoad>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_PRODUCTION_20170731T150000Z/Snapshot</folder>
+    	<folder>/Users/rory/releases/SnomedCT_ManagedServiceDK_PRODUCTION_DK1000005_20170930T120000Z/Snapshot</folder>
+    </foldersBaselineLoad>
+    <modulesToIgnoreBaselineLoad>
+    </modulesToIgnoreBaselineLoad>
+    <foldersExtensionLoad>
+    </foldersExtensionLoad>
+    <modulesToIgnoreExtensionLoad>
+    </modulesToIgnoreExtensionLoad>
+</config>

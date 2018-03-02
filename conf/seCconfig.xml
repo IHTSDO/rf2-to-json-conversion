@@ -5,15 +5,15 @@
     <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
     <defaultTermLanguageRefset>46011000052107</defaultTermLanguageRefset>
     <normalizeTextIndex>false</normalizeTextIndex>
-    <createCompleteConceptsFile>false</createCompleteConceptsFile>
+    <createCompleteConceptsFile>true</createCompleteConceptsFile>
     <editionName>Swedish Edition</editionName>
     <databaseName>se-edition</databaseName>
-    <effectiveTime>20150531</effectiveTime>
-    <expirationTime>20160601</expirationTime>
-    <outputFolder>se-edition</outputFolder>
+    <effectiveTime>20171130</effectiveTime>
+    <expirationTime>20181201</expirationTime>
+    <outputFolder>/Users/rory/releases/se</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_PRODUCTION_20170731T150000Z-snap/Snapshot</folder>
+    	<folder>/Users/rory/releases/SnomedCT_ManagedServiceSE_PRODUCTION_SE1000052_20171130T120000Z/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>

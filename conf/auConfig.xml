@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>au</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>32570271000036106</defaultTermLanguageRefset>
@@ -8,11 +8,12 @@
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>AU Edition</editionName>
     <databaseName>au-edition</databaseName>
-    <effectiveTime>20150531</effectiveTime>
-    <expirationTime>20160601</expirationTime>
+    <effectiveTime>20170930</effectiveTime>
+    <expirationTime>20181030</expirationTime>
+    <outputFolder>/Users/rory/releases/au/json/20170930</outputFolder>
     <outputFolder>au-edition</outputFolder>
     <foldersBaselineLoad>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_Release_AU1000036_20170930/RF2Release/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
