@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <processInMemory>true</processInMemory>
+    <defaultTermLangCode>fr</defaultTermLangCode>
+    <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
+    <defaultTermLanguageRefset>21000172104</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
+    <createCompleteConceptsFile>false</createCompleteConceptsFile>
+    <editionName>Belgian Edition</editionName>
+    <databaseName>be-edition</databaseName>
+    <effectiveTime>20180315</effectiveTime>
+    <expirationTime>20191201</expirationTime>
+    <outputFolder>be-edition</outputFolder>
+    <foldersBaselineLoad>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_MEMBER_20180131T120000Z-new/Snapshot</folder>
+    	<folder>/Users/rory/releases/SnomedCT_BelgiumExtensionRF2_PRODUCTION_20180315T120000Z/Snapshot</folder>
+    </foldersBaselineLoad>
+    <modulesToIgnoreBaselineLoad>
+    </modulesToIgnoreBaselineLoad>
+    <foldersExtensionLoad>
+    </foldersExtensionLoad>
+    <modulesToIgnoreExtensionLoad>
+    </modulesToIgnoreExtensionLoad>
+</config>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>es</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>450828004</defaultTermLanguageRefset>
@@ -8,12 +8,12 @@
     <editionName>Spanish Edition</editionName>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <databaseName>es-edition</databaseName>
-    <effectiveTime>20150430</effectiveTime>
-    <expirationTime>20160501</expirationTime>
-    <outputFolder>es-edition</outputFolder>
+    <effectiveTime>20171031</effectiveTime>
+    <expirationTime>20181201</expirationTime>
+    <outputFolder>/Users/rory/releases/es/json</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_InternationalRF2_PRODUCTION_20170731T150000Z-snapshot/Snapshot</folder>
+		<folder>/Users/rory/releases/SnomedCT_SpanishRelease-es_Production_20171031T120000Z/RF2Release/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
