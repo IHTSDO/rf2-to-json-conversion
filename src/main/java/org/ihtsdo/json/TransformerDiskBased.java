@@ -1504,8 +1504,12 @@ public class TransformerDiskBased {
 			for (LightDescription ldesc : descriptions.get(conceptId)) {
 				TextIndexDescription d = new TextIndexDescription();
 				d.setActive(ldesc.isActive());
-				d.setTerm(ldesc.getTerm());
-				d.setLength(ldesc.getTerm().length());
+				if (ldesc.getTerm().length()>1000) {
+					d.setTerm(ldesc.getTerm().substring(0, 1000));
+				}else {
+					d.setTerm(ldesc.getTerm());
+				}
+				d.setLength(d.getTerm().length());
 				d.setTypeId(ldesc.getType());
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
@@ -1563,8 +1567,12 @@ public class TransformerDiskBased {
 			for (LightDescription ldesc : tdefMembers.get(conceptId)) {
 				TextIndexDescription d = new TextIndexDescription();
 				d.setActive(ldesc.getActive());
-				d.setTerm(ldesc.getTerm());
-				d.setLength(ldesc.getTerm().length());
+				if (ldesc.getTerm().length()>1000) {
+					d.setTerm(ldesc.getTerm().substring(0, 1000));
+				}else {
+					d.setTerm(ldesc.getTerm());
+				}
+				d.setLength(d.getTerm().length());
 				d.setTypeId(ldesc.getType());
 				d.setConceptId(ldesc.getConceptId());
 				d.setDescriptionId(ldesc.getDescriptionId());
