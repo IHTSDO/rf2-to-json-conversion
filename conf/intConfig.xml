@@ -5,14 +5,14 @@
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>900000000000509007</defaultTermLanguageRefset>
     <normalizeTextIndex>true</normalizeTextIndex>
-    <createCompleteConceptsFile>true</createCompleteConceptsFile>
+    <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>International Edition</editionName>
     <databaseName>en-edition</databaseName>
-    <effectiveTime>20150131</effectiveTime>
-    <expirationTime>20160201</expirationTime>
-    <outputFolder>intl-edition</outputFolder>
+    <effectiveTime>20180131</effectiveTime>
+    <expirationTime>20190901</expirationTime>
+    <outputFolder>intl</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+  		<folder><PATH_TO_UNZIPPED_INTERNATIONAL_RELEASE_FILES>/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>

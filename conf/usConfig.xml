@@ -8,16 +8,15 @@
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <editionName>US Edition</editionName>
     <databaseName>us-edition</databaseName>
-    <effectiveTime>20150301</effectiveTime>
-    <expirationTime>20160302</expirationTime>
+    <effectiveTime>20180301</effectiveTime>
+    <expirationTime>20191002</expirationTime>
     <outputFolder>us-edition</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
+  		<folder><PATH_TO_UNZIPPED_EDITION_RELEASE_FILES>/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
     <foldersExtensionLoad>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>

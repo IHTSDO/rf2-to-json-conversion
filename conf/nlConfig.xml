@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>nl</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
     <defaultTermLanguageRefset>31000146106</defaultTermLanguageRefset>
@@ -8,16 +8,16 @@
     <editionName>NL Edition</editionName>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <databaseName>nl-edition</databaseName>
-    <effectiveTime>20150331</effectiveTime>
-    <expirationTime>20160402</expirationTime>
-    <outputFolder>nl-edition</outputFolder>
+    <effectiveTime>20180331</effectiveTime>
+    <expirationTime>20191002</expirationTime>
+    <outputFolder>nl</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+    	<folder><PATH_TO_UNZIPPED_EDITION_RELEASE_FILES>/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>
     <foldersExtensionLoad>
+    	<folder><PATH_TO_UNZIPPED_EXTRA_EXTENSION_RELEASE_FILES>/Snapshot</folder>
     </foldersExtensionLoad>
     <modulesToIgnoreExtensionLoad>
     </modulesToIgnoreExtensionLoad>

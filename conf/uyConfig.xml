@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<processInMemory>true</processInMemory>
+	<defaultTermLangCode>es</defaultTermLangCode>
+	<defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
+	<defaultTermLanguageRefset>5641000179103</defaultTermLanguageRefset>
+	<normalizeTextIndex>true</normalizeTextIndex>
+	<createCompleteConceptsFile>false</createCompleteConceptsFile>
+	<editionName>UY edition</editionName>
+	<databaseName>uy-edition</databaseName>
+	<effectiveTime>20171215</effectiveTime>
+    <expirationTime>20191002</expirationTime>
+    <outputFolder>uy-edition</outputFolder>
+    <foldersBaselineLoad>
+		<folder><PATH_TO_UNZIPPED_EDITION_RELEASE_FILES>/Snapshot</folder>
+	</foldersBaselineLoad>
+	<modulesToIgnoreBaselineLoad></modulesToIgnoreBaselineLoad>
+	<foldersExtensionLoad></foldersExtensionLoad>
+	<modulesToIgnoreExtensionLoad></modulesToIgnoreExtensionLoad>
+</config>

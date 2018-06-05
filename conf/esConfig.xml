@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <processInMemory>false</processInMemory>
+    <processInMemory>true</processInMemory>
     <defaultTermLangCode>es</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000003001</defaultTermDescriptionType>
     <defaultTermLanguageRefset>450828004</defaultTermLanguageRefset>
@@ -8,12 +8,12 @@
     <editionName>Spanish Edition</editionName>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
     <databaseName>es-edition</databaseName>
-    <effectiveTime>20150430</effectiveTime>
-    <expirationTime>20160501</expirationTime>
-    <outputFolder>es-edition</outputFolder>
+    <effectiveTime>20171031</effectiveTime>
+    <expirationTime>20181201</expirationTime>
+    <outputFolder>es</outputFolder>
     <foldersBaselineLoad>
-		<folder>$PATH_TO_SNOMED_RELEASE/Snapshot</folder>
-    	<folder>$PATH_TO_EXTENSION_RELEASE/Snapshot</folder>
+		  <folder><PATH_TO_UNZIPPED_INTERNATIONAL_RELEASE_FILES>/Snapshot</folder>
+    	<folder><PATH_TO_UNZIPPED_EXTENSION_RELEASE_FILES>/Snapshot</folder>
     </foldersBaselineLoad>
     <modulesToIgnoreBaselineLoad>
     </modulesToIgnoreBaselineLoad>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <processInMemory>true</processInMemory>
-    <defaultTermLangCode>sv</defaultTermLangCode>
+    <defaultTermLangCode>en</defaultTermLangCode>
     <defaultTermDescriptionType>900000000000013009</defaultTermDescriptionType>
-    <defaultTermLanguageRefset>46011000052107</defaultTermLanguageRefset>
-    <normalizeTextIndex>false</normalizeTextIndex>
+    <defaultTermLanguageRefset>21000172104</defaultTermLanguageRefset>
+    <normalizeTextIndex>true</normalizeTextIndex>
     <createCompleteConceptsFile>false</createCompleteConceptsFile>
-    <editionName>Swedish Edition</editionName>
-    <databaseName>se-edition</databaseName>
-    <effectiveTime>20150531</effectiveTime>
-    <expirationTime>20160601</expirationTime>
-    <outputFolder>se-edition</outputFolder>
+    <editionName>Belgian Edition</editionName>
+    <databaseName>be-edition</databaseName>
+    <effectiveTime>20180315</effectiveTime>
+    <expirationTime>20191201</expirationTime>
+    <outputFolder>be</outputFolder>
     <foldersBaselineLoad>
 		<folder><PATH_TO_UNZIPPED_INTERNATIONAL_RELEASE_FILES>/Snapshot</folder>
     	<folder><PATH_TO_UNZIPPED_EXTENSION_RELEASE_FILES>/Snapshot</folder>
