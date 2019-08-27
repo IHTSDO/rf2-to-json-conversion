@@ -1,4 +1,7 @@
 # RF2 to json conversion utility [![Build Status](https://travis-ci.org/IHTSDO/rf2-to-json-conversion.svg?branch=master)](https://travis-ci.org/IHTSDO/rf2-to-json-conversion) [![Code Climate](https://codeclimate.com/github/IHTSDO/rf2-to-json-conversion/badges/gpa.svg)](https://codeclimate.com/github/IHTSDO/rf2-to-json-conversion)
+
+This utility **will not work with SNOMED CT releases from the July 2019 International Edition release of SNOMED CT onwards** due to changes to how stated relationships are represented. **This utility is no longer supported ffrom the July 2019 release onwards.**
+
 Conversion of SNOMED CT RF2 files to a JSON format, including pre-computed indexes for common search strategies
 
 Please see the bottom of this readme file for instructions for users who are developing within the IHTSDO.
