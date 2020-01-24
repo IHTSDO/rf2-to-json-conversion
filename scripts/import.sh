@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Import Snomed-CT json data
 #
-# Requires two arguments:
+# Requires three arguments:
 # $ ./import.sh <host> <database> <collection>
 # e.g. ./import.sh localhost en-edition 20160131
 #
